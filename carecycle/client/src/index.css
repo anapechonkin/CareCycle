@@ -10,3 +10,10 @@
 }
 
 /* Path: carecycle/client/src/App.css */
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+

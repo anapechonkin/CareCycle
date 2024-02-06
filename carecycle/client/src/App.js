@@ -1,13 +1,17 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-
+import LoginPage from './pages/LoginPage';
+import StartQuestionnairePage from './pages/StartQuestionnairePage';
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        {/* route paths */}
-      </Routes>
-    </Router>
+    <>
+      <Router>
+        <Routes>
+          <Route path="/" element={<LoginPage />} />
+          <Route path="/startQuestionnaire" element={<StartQuestionnairePage />} />
+        </Routes>
+      </Router>
+    </>
   );
 }
 
