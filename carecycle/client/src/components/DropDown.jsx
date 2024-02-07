@@ -16,7 +16,7 @@ const DropDown = ({ options, placeholder }) => {
   return (
     <div className="relative w-full">
       <div
-        className="w-full cursor-pointer border border-gray-300 rounded-lg text-base focus:outline-none flex justify-between items-center p-3 shadow-sm bg-white text-black"
+        className="w-full cursor-pointer border border-black rounded-lg text-base focus:outline-none flex justify-between items-center p-3 shadow-sm bg-white text-black"
         onClick={toggleDropdown}
       >
         <span>{selectedOption || placeholder}</span>

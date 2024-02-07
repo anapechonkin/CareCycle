@@ -35,7 +35,7 @@ const PageOneQuestionnaire = () => {
           <input
             type="text"
             placeholder="Please Enter Your Postal Code"
-            className="mt-4 p-2 border border-gray-300 rounded-lg w-full"
+            className="mt-4 p-2 border border-black rounded-lg w-full"
             disabled={preferNotToAnswerPostal}
           />
           <label className="flex items-center mt-1">
@@ -49,7 +49,7 @@ const PageOneQuestionnaire = () => {
           <input
             type="text"
             placeholder="Please Enter Your Year of Birth"
-            className="mt-4 p-2 border border-gray-300 rounded-lg w-full"
+            className="mt-4 p-2 border border-black rounded-lg w-full"
             disabled={preferNotToAnswerYear}
           />
           <label className="flex items-center mt-1">

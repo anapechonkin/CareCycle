@@ -30,7 +30,7 @@ const StartQuestionnairePage = () => {
             placeholder="Choose Type of Activity"
           />
           <img
-            className="w-full h-auto rounded shadow-lg"
+            className="w-full h-auto rounded shadow-lg border-2 border-black"
             src="/photos/DIYWorkshop.jpg"
             alt="Lots of people working on bikes in a workshop, outside."
           />

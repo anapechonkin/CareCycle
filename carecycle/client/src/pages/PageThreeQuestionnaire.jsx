@@ -6,10 +6,10 @@ import Footer from "../components/Footer";
 import Button from "../components/Button";
 import { useNavigate } from "react-router-dom";
 
-const PageTwoExtraQuestionnaire = () => {
+const PageThreeQuestionnaire = () => {
   const navigate = useNavigate();
+  const [preferNotToAnswerMap, setPreferNotToAnswerMap] = useState(false);
 
-  // Functions to navigate between pages
   const handleNextClick = () => navigate('/pageFourQuestionnaire');
   const handlePreviousClick = () => navigate('/pageTwoQuestionnaire');
 
@@ -21,7 +21,28 @@ const PageTwoExtraQuestionnaire = () => {
       <div className="flex-grow pt-20 pb-20 mt-24 flex flex-col items-center justify-center w-full">
         <div className="max-w-[800px] w-full px-4 lg:px-8 space-y-12">
         <h1 className="text-5xl font-bold mb-16 text-center text-[#704218] [text-shadow:0px_4px_4px_#00000040]">Place of Origin</h1>
-            {/*Page content */}
+          <div className={`relative ${preferNotToAnswerMap ? 'opacity-50' : ''}`}>
+            <img
+              className="w-full h-auto rounded shadow-lg border-2 border-black"
+              src="/photos/map.jpeg"
+              alt="Map of the world."
+              style={{ pointerEvents: preferNotToAnswerMap ? 'none' : 'auto' }} // Disables map interaction when 'Prefer Not to Answer' is checked
+            />
+            {preferNotToAnswerMap && (
+              <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center">
+                <span className="text-4xl text-white font-bold">Disabled</span>
+              </div>
+            )}
+          </div>
+          <label className="flex items-center mt-4 text-lg cursor-pointer">
+            <input
+              type="checkbox"
+              className="form-checkbox h-6 w-6"
+              checked={preferNotToAnswerMap}
+              onChange={() => setPreferNotToAnswerMap(!preferNotToAnswerMap)}
+            />
+            <span className="ml-2 text-2xl">Prefer Not To Answer</span>
+          </label>
           <div className="flex justify-between w-full mt-8">
             <Button 
               text="PREVIOUS QUESTION"
@@ -50,4 +71,4 @@ const PageTwoExtraQuestionnaire = () => {
   );
 };
 
-export default PageTwoExtraQuestionnaire;
+export default PageThreeQuestionnaire;

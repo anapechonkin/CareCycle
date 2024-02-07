@@ -5,6 +5,7 @@ import PageOneQuestionnaire from './pages/PageOneQuestionnaire';
 import PageTwoQuestionnaire from './pages/PageTwoQuestionnaire';
 import PageThreeQuestionnaire from './pages/PageThreeQuestionnaire';
 import PageTwoExtraQuestionnaire from './pages/PageTwoExtraQuestionnaire';
+import PageFourQuestionnaire from './pages/PageFourQuestionnaire';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/pageTwoQuestionnaire" element={<PageTwoQuestionnaire />} />
           <Route path="/pageTwoExtraQuestionnaire" element={<PageTwoExtraQuestionnaire />} />
           <Route path="/pageThreeQuestionnaire" element={<PageThreeQuestionnaire />} />
+          <Route path="/pageFourQuestionnaire" element={<PageFourQuestionnaire />} />
         </Routes>
       </Router>
     </>

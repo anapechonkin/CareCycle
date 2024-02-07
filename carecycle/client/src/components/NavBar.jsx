@@ -4,7 +4,7 @@ const Navbar = ({ userType }) => {
     const userRole = userType === 'admin' ? 'Admin' : userType === 'editor' ? 'Volunteer' : 'CAA/Employee';
 
     return (
-        <div className="fixed w-full h-[46px] top-0 left-0 bg-black flex justify-between items-center px-4">
+        <div className="fixed w-full h-[46px] top-0 left-0 bg-black flex justify-between items-center px-4 z-50">
             <div className="[font-family:'Holtwood_One_SC-Regular',Helvetica] font-normal text-[#15839b] text-lg">
                 {userRole}
             </div>
