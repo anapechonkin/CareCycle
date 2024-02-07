@@ -1,7 +1,11 @@
 import React, { useState } from "react";
+import Button from "./Button";
+import DropDown from "./DropDown";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 export const LoginForm = () => {
   const [userType, setUserType] = useState('');
+  const navigate = useNavigate(); // Hook for navigation
 
   const handleUserTypeChange = (event) => {
     setUserType(event.target.value);
@@ -10,11 +14,22 @@ export const LoginForm = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
     console.log('User Type:', userType);
-    // ... other form submission related code
+    //validation and authentication occur here
+
+    // On successful login, navigate to /startQuestionnaire
+    navigate('/startQuestionnaire');
+  };
+
+  // Placeholder function for Forgot Password click
+  const handleForgotPasswordClick = (event) => {
+    event.preventDefault();
+    // Placeholder for future forgot password functionality
+    console.log("Forgot Password clicked");
+    //Open a modal or navigate to a forgot password page when implemented
   };
 
   // Determine if the screen is mobile size
-  const isMobile = window.innerWidth < 768; 
+  const isMobile = window.innerWidth < 768;
 
   return (
     <form
@@ -26,24 +41,17 @@ export const LoginForm = () => {
     >
       <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full" style={{ marginTop: isMobile ? '-3rem' : '0' }}>
         <h2 className="text-2xl font-medium text-gray-700 mb-4 text-center">LOG IN TO CARECYCLE</h2>
-        <select
-          name="userType"
-          id="userType"
-          value={userType}
-          onChange={handleUserTypeChange}
-          className="w-full p-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring focus:border-blue-300 mb-4"
-        >
-          <option value="" disabled hidden>Select User Type</option>
-          <option value="admin">Admin</option>
-          <option value="editor">Volunteer</option>
-          <option value="subscriber">CAA/Employee</option>
-          {/* ... add other user types as needed ... */}
-        </select>
+        <DropDown
+          options={["Admin", "Volunteer", "CAA/Employee"]} // Update these options as needed
+          placeholder="Select User Type"
+          selectedOption={userType} // Ensure DropDown can accept a selectedOption or similar prop if you need to set an initial value
+          onSelect={handleUserTypeChange} // Adjust the DropDown component to accept an onSelect or similar prop for callback
+        />
         <input
           type="text"
           placeholder="Username"
           name="username"
-          className="w-full p-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring focus:border-blue-300 mb-4"
+          className="w-full p-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring focus:border-blue-300 mb-4 mt-4"
         />
         <input
           type="password"
@@ -51,15 +59,16 @@ export const LoginForm = () => {
           name="password"
           className="w-full p-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring focus:border-blue-300 mb-4"
         />
-        <button
+        <Button
           type="submit"
-          className="w-full text-white font-bold py-3 rounded-lg text-base focus:outline-none focus:shadow-outline mt-4"
-          style={{ backgroundColor: '#16839B', borderColor: '#D78030' }} // Custom color for button
-        >
-          LOGIN
-        </button>
-        <a href="/startQuestionnaire" className="mt-4 text-center text-sm font-semibold"
-          style={{ color: '#16839B' }} // Custom color for link
+          text="LOGIN"
+        />
+        {/* Keep as a link but prevent default navigation */}
+        <a
+          href="#"
+          onClick={handleForgotPasswordClick}
+          className="mt-4 text-center text-sm font-semibold"
+          style={{ color: '#16839B' }}
         >
           Forgot Password?
         </a>

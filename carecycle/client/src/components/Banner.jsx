@@ -2,7 +2,7 @@ import React from "react";
 
 const Banner = () => {
     return (
-        <div className="relative w-full h-[85px]">
+        <div className="fixed w-full h-[85px]">
             <img
                 className="absolute w-full h-[85px] top-[46px] left-0 object-cover"
                 alt="Atelier Culture Velo"

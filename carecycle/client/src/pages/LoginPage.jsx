@@ -60,7 +60,7 @@ const LoginPage = () => {
         className="text-white font-bold mb-10"
         style={titleStyle}
       >
-        Atelier Culture Velo
+        Atelier Culture Vélo
       </h1>
       
       {/* LoginForm */}
