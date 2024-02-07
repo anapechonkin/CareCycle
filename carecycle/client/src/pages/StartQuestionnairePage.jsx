@@ -5,8 +5,17 @@ import Shadow from "../components/Shadow";
 import Footer from "../components/Footer";
 import Dropdown from "../components/DropDown";
 import Button from "../components/Button";
+import { useNavigate } from "react-router-dom";
 
 const StartQuestionnairePage = () => {
+
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    // Any logic you need to execute before navigation
+    navigate('/pageOneQuestionnaire');
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-[#f6cdd0]">
       <NavBar />
@@ -26,6 +35,7 @@ const StartQuestionnairePage = () => {
             alt="Lots of people working on bikes in a workshop, outside."
           />
           <Button 
+            onClick={handleClick}
             text="START QUESTIONNAIRE"
             className="text-white bg-[#16839B] hover:bg-[#0f6a8b] font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-150 ease-in-out"
           />

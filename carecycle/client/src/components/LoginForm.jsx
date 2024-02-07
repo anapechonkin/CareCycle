@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Button from "./Button";
 import DropDown from "./DropDown";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
 
 export const LoginForm = () => {
   const [userType, setUserType] = useState('');
