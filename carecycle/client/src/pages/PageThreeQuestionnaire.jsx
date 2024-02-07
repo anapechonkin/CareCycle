@@ -20,13 +20,13 @@ const PageThreeQuestionnaire = () => {
       <Shadow />
       <div className="flex-grow pt-20 pb-20 mt-24 flex flex-col items-center justify-center w-full">
         <div className="max-w-[800px] w-full px-4 lg:px-8 space-y-12">
-        <h1 className="text-5xl font-bold mb-16 text-center text-[#704218] [text-shadow:0px_4px_4px_#00000040]">Place of Origin</h1>
+          <h1 className="text-5xl font-bold mb-16 text-center text-[#704218]" style={{ textShadow: "0px 4px 4px #00000040" }}>Place of Origin</h1>
           <div className={`relative ${preferNotToAnswerMap ? 'opacity-50' : ''}`}>
             <img
               className="w-full h-auto rounded shadow-lg border-2 border-black"
               src="/photos/map.jpeg"
               alt="Map of the world."
-              style={{ pointerEvents: preferNotToAnswerMap ? 'none' : 'auto' }} // Disables map interaction when 'Prefer Not to Answer' is checked
+              style={{ pointerEvents: preferNotToAnswerMap ? 'none' : 'auto' }}
             />
             {preferNotToAnswerMap && (
               <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center">
@@ -34,15 +34,17 @@ const PageThreeQuestionnaire = () => {
               </div>
             )}
           </div>
-          <label className="flex items-center mt-4 text-lg cursor-pointer">
-            <input
-              type="checkbox"
-              className="form-checkbox h-6 w-6"
-              checked={preferNotToAnswerMap}
-              onChange={() => setPreferNotToAnswerMap(!preferNotToAnswerMap)}
-            />
-            <span className="ml-2 text-2xl">Prefer Not To Answer</span>
-          </label>
+          <div className="flex justify-center mt-4"> {/* This div wraps the label to center it under the map */}
+            <label className="flex items-center text-lg cursor-pointer">
+              <input
+                type="checkbox"
+                className="form-checkbox h-6 w-6"
+                checked={preferNotToAnswerMap}
+                onChange={() => setPreferNotToAnswerMap(!preferNotToAnswerMap)}
+              />
+              <span className="ml-2 text-2xl">Prefer Not To Answer</span>
+            </label>
+          </div>
           <div className="flex justify-between w-full mt-8">
             <Button 
               text="PREVIOUS QUESTION"
