@@ -48,7 +48,7 @@ const PageOneQuestionnaire = () => {
           </label>
           <input
             type="text"
-            placeholder="Please Enter Your Year of Birth"
+            placeholder="Please Enter Your Year of Birth (YYYY)"
             className="mt-4 p-2 border border-black rounded-lg w-full"
             disabled={preferNotToAnswerYear}
           />

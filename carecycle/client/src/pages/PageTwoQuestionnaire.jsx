@@ -12,7 +12,7 @@ const PageTwoQuestionnaire = () => {
 
   // Function to navigate based on gender selection
   const handleNextClick = () => {
-    if (selectedGender === 'Other') {
+    if (selectedGender === 'For More Options') {
       navigate('/pageTwoExtraQuestionnaire'); // Navigate to extra questions for "Other" selection
     } else {
       navigate('/pageThreeQuestionnaire'); // Navigate to the next page for all other selections
@@ -26,9 +26,9 @@ const PageTwoQuestionnaire = () => {
   const handleGenderChange = (event) => setSelectedGender(event.target.value);
 
   const genderOptions = [
+    { label: "For More Options", imgSrc: "/icons/other.png" },
     { label: "Male", imgSrc: "/icons/male.png" },
     { label: "Female", imgSrc: "/icons/female.png" },
-    { label: "Other", imgSrc: "/icons/other.png" },
     { label: "Prefer Not to Answer", imgSrc: "/icons/noAnswer.png"  } 
   ];
 

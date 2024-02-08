@@ -42,7 +42,7 @@ export const LoginForm = () => {
       <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full" style={{ marginTop: isMobile ? '-3rem' : '0' }}>
         <h2 className="text-2xl font-medium text-gray-700 mb-4 text-center">LOG IN TO CARECYCLE</h2>
         <DropDown
-          options={["Admin", "Volunteer", "CAA/Employee"]} // Update these options as needed
+          options={["Admin", "Volunteer", "CA/Employee"]} // Update these options as needed
           placeholder="Select User Type"
           selectedOption={userType} // Ensure DropDown can accept a selectedOption or similar prop if you need to set an initial value
           onSelect={handleUserTypeChange} // Adjust the DropDown component to accept an onSelect or similar prop for callback
@@ -63,7 +63,6 @@ export const LoginForm = () => {
           type="submit"
           text="LOGIN"
         />
-        {/* Keep as a link but prevent default navigation */}
         <a
           href="#"
           onClick={handleForgotPasswordClick}
