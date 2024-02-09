@@ -109,7 +109,7 @@ const PageTwoExtraQuestionnaire = () => {
         </div>
       </div>
       {/* Modal component */}
-      <Modal isOpen={showModal} onClose={() => setShowModal(false)} content={modalContent} />
+        <Modal isOpen={showModal} onClose={() => setShowModal(false)} htmlContent={modalContent} />
       <Footer />
     </div>
   );
