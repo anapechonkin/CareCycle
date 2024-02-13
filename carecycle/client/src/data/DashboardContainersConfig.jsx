@@ -1,7 +1,7 @@
 // Example configuration for dashboard containers based on user types
 const dashboardContainersConfig = {
     admin: [
-      { name: "Manage User Account", icon: "/icons/userAccount.png", route: "/manage-users" },
+      { name: "Manage User Account", icon: "/icons/userAccount.png", route: "/userAccount" },
       { name: "Client Stats Questionnaire", icon: "/icons/clientStats.png", route: "/startQuestionnaire" },
       { name: "Client Stats Report", icon: "/icons/clientStatsReport.png", route: "/reports" },
       // Add more admin containers as needed

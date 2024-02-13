@@ -8,6 +8,7 @@ import PageThreeQuestionnaire from './pages/PageThreeQuestionnaire';
 import PageTwoExtraQuestionnaire from './pages/PageTwoExtraQuestionnaire';
 import PageFourQuestionnaire from './pages/PageFourQuestionnaire';
 import Dashboard from './pages/Dashboard';
+import UserAccountPage from './pages/UserAccountPage'; 
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route path="/pageThreeQuestionnaire" element={<PageThreeQuestionnaire />} />
           <Route path="/pageFourQuestionnaire" element={<PageFourQuestionnaire />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/userAccount" element={<UserAccountPage />} /> 
         </Routes>
       </Router>
     </UserProvider>
