@@ -36,7 +36,7 @@ const LoginPage = () => {
 
   const titleStyle = {
     textShadow: '2px 2px 8px rgba(0, 0, 0, 0.75)',
-    fontFamily: "'CursiveFontName', sans-serif", // Replace 'CursiveFontName' with your font
+    fontFamily: "'CursiveFontName', sans-serif", 
     position: 'absolute',
     top: isMobile ? '20%' : '15%', // Slightly lower position for mobile
     left: '50%',

@@ -31,9 +31,6 @@ const PageTwoExtraQuestionnaire = () => {
     setShowModal(true);
   };
   
-  
-  
-
   const handlePreferNotToAnswer = () => {
     setPreferNotToAnswer(!preferNotToAnswer);
     if (!preferNotToAnswer) {
@@ -49,7 +46,7 @@ const PageTwoExtraQuestionnaire = () => {
       <Shadow />
       <div className="flex-grow pt-20 pb-20 mt-24 flex flex-col items-center justify-center w-full">
         <div className="max-w-[800px] w-full px-4 lg:px-8 space-y-12">
-        <h1 className="text-5xl font-bold mb-16 text-center text-[#704218] [text-shadow:0px_4px_4px_#00000040]">Gender Identities</h1>
+        <h1 className="text-5xl font-bold mb-16 text-center text-[#704218] [text-shadow:0px_4px_4px_#00000040]">All Applicable Gender Identities</h1>
           <div className="grid grid-cols-2 gap-6">
             {genderIdentities.map(({ id, name, info }) => (
               <div key={id} className="flex items-center space-x-3">

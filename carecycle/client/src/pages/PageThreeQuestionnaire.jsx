@@ -20,8 +20,8 @@ const PageThreeQuestionnaire = () => {
       <Shadow />
       <div className="flex-grow pt-20 pb-20 mt-24 flex flex-col items-center justify-center w-full">
         <div className="max-w-[800px] w-full px-4 lg:px-8 space-y-12">
-          <h1 className="text-5xl font-bold mb-16 text-center text-[#704218]" style={{ textShadow: "0px 4px 4px #00000040" }}>Place of Origin</h1>
-          <div className={`relative ${preferNotToAnswerMap ? 'opacity-50' : ''}`}>
+        <h1 className="text-5xl font-bold mb-16 text-center text-[#704218] [text-shadow:0px_4px_4px_#00000040]">Place of Origin</h1>
+          <div className={`relative ${preferNotToAnswerMap ? 'opacity-45' : ''}`}>
             <img
               className="w-full h-auto rounded shadow-lg border-2 border-black"
               src="/photos/map.jpeg"
