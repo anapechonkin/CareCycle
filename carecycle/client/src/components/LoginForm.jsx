@@ -10,10 +10,10 @@ const LoginForm = () => {
   const [localUserType, setLocalUserType] = useState('');
   const navigate = useNavigate();
 
-  const handleUserTypeChange = (event) => {
-    setLocalUserType(event.target.value);
+  const handleUserTypeChange = (selectedOption) => {
+    setLocalUserType(selectedOption); 
   };
-
+  
   const handleSubmit = (event) => {
     event.preventDefault();
     setUserType(localUserType || 'admin'); // Hardcode to 'Admin' or use the selected value

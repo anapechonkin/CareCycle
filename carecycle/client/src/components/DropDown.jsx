@@ -1,4 +1,3 @@
-// DropDown.jsx
 import React, { useState } from "react";
 
 const DropDown = ({ options, placeholder, onSelect }) => {
