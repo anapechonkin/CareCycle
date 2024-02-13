@@ -1,16 +1,16 @@
+// DropDown.jsx
 import React, { useState } from "react";
 
-const DropDown = ({ options, placeholder }) => {
+const DropDown = ({ options, placeholder, onSelect }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState("");
 
-  const toggleDropdown = () => {
-    setIsOpen(!isOpen);
-  };
+  const toggleDropdown = () => setIsOpen(!isOpen);
 
   const handleOptionClick = (option) => {
     setSelectedOption(option);
     setIsOpen(false);
+    onSelect(option); // Call the passed onSelect function with the selected option
   };
 
   return (
@@ -25,12 +25,10 @@ const DropDown = ({ options, placeholder }) => {
         </span>
       </div>
       {isOpen && (
-        <ul
-          className="absolute z-10 w-full bg-white border border-gray-300 rounded-lg shadow-md mt-1"
-        >
-          {options.map((option) => (
+        <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-lg shadow-md mt-1 max-h-40 overflow-y-auto">
+          {options.map((option, index) => (
             <li
-              key={option}
+              key={index}
               onClick={() => handleOptionClick(option)}
               className="p-2 text-lg text-black hover:bg-gray-100 cursor-pointer"
             >
