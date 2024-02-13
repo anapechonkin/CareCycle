@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useUser } from '../context/UserContext'; 
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation  } from 'react-router-dom';
 import Modal from './Modal'; // Adjust this path to match your file structure
 
 const Navbar = () => {
@@ -9,6 +9,7 @@ const Navbar = () => {
   const [logoutReason, setLogoutReason] = useState('');
   const [customReason, setCustomReason] = useState(''); // State for custom reason input
   const navigate = useNavigate();
+  const location = useLocation(); 
 
   const { userType } = useUser();
   console.log("Current userType in Navbar:", userType); 
@@ -53,7 +54,7 @@ const Navbar = () => {
       <div className="fixed w-full h-[46px] top-0 left-0 bg-black flex justify-between items-center px-4 z-50">
         <div className="text-[#15839b] text-lg">{userRole}</div>
         <div className="space-x-4">
-          <Link to="/dashboard" className={linkStyle}>DASHBOARD</Link>
+        {location.pathname !== '/dashboard' && <Link to="/dashboard" className={linkStyle}>DASHBOARD</Link>}
           <button className={linkStyle} onClick={() => console.log('Language toggle clicked')}>FR/EN</button>
           <button className={linkStyle} onClick={handleLogoutClick}>LOGOUT</button>
         </div>

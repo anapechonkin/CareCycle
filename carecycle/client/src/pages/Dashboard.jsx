@@ -22,7 +22,7 @@ const Dashboard = () => {
   // Retrieve the containers for the current user type
   const containers = DashboardContainersConfig[userType] || [];
   
-  // Correct place for the log statement
+  // Debugging: Log the containers to verify they are being set correctly
   console.log("Containers to render:", containers);
   
   const navigate = useNavigate();
@@ -30,11 +30,14 @@ const Dashboard = () => {
   return (
     <div className="relative min-h-screen flex flex-col">
       <NavBar />
-      <div className="flex-grow relative">
+      <div className="flex-grow relative pt-16"> 
         <div className="absolute inset-0 z-[-1]" style={{ backgroundImage: "url('/photos/photoIndoor.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
           <div className="absolute inset-0 bg-custom-blue opacity-75"></div>
         </div>
-        <div className="flex justify-center pt-24 mt-8 mb-32">
+        <div className="text-center mb-20" style={{ paddingTop: '4rem' }}>
+          <h1 className="text-6xl font-bold text-white [text-shadow:0px_4px_4px_#00000040]">Dashboard</h1>
+        </div>
+        <div className="flex justify-center mt-8 mb-32"> 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {containers.map(({ name, icon, route }) => (
                     <DashboardContainer
