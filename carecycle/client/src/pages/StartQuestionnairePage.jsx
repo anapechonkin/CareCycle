@@ -16,6 +16,11 @@ const StartQuestionnairePage = () => {
     navigate('/pageOneQuestionnaire');
   };
 
+  const handleSelect = (selectedOption) => {
+    console.log("Selected option:", selectedOption);
+    // Additional logic to handle the selected option
+  };  
+
   return (
     <div className="flex flex-col min-h-screen bg-[#f6cdd0]">
       <NavBar />
@@ -28,6 +33,7 @@ const StartQuestionnairePage = () => {
           <Dropdown
             options={["Wednesday DIY", "Regular DIY", "Moonday", "Special Event", "Other"]}
             placeholder="Choose Type of Activity"
+            onSelect={handleSelect}
           />
           <img
             className="w-full h-auto rounded shadow-lg border-2 border-black"

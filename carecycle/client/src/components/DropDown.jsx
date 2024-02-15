@@ -9,7 +9,12 @@ const DropDown = ({ options, placeholder, onSelect }) => {
   const handleOptionClick = (option) => {
     setSelectedOption(option);
     setIsOpen(false);
-    onSelect(option); // Call the passed onSelect function with the selected option
+    // Check if onSelect is a function before calling it
+    if (typeof onSelect === 'function') {
+      onSelect(option);
+    } else {
+      console.warn('onSelect prop is not provided or not a function');
+    }
   };
 
   return (

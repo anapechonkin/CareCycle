@@ -1,17 +1,19 @@
 const Checkbox = ({ title, options, onChange }) => {
     return (
       <div className="mb-4">
-        <h3 className="font-semibold text-lg mb-2">{title}</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {title && <h3 className="font-semibold text-lg mb-2">{title}</h3>}
+        <div className="flex flex-wrap gap-2 justify-start items-center">
           {options.map((option) => (
-            <label key={option.id} className="flex items-center space-x-2 cursor-pointer">
+            <label key={option.id} className="flex items-center cursor-pointer mr-2 mb-2 flex-nowrap" style={{ minWidth: '0', maxWidth: '100%' }}>
               <input
                 type="checkbox"
-                value={option.value || option.name} // Adapt based on your data structure
-                onChange={(e) => onChange(e, option)}
-                className="form-checkbox h-5 w-5 text-[#16839B] rounded border-gray-300 focus:ring-[#0f6a8b]"
+                id={option.id}
+                checked={option.checked}
+                onChange={() => onChange(option)}
+                disabled={option.disabled}
+                className="form-checkbox h-4 w-4 text-[#16839B] rounded border-gray-300 focus:ring-[#0f6a8b] mr-2"
               />
-              <span className="text-md text-gray-700">{option.label || option.name}</span>
+              <span className="text-md text-gray-700 flex-1 whitespace-nowrap overflow-hidden text-ellipsis" style={{ maxWidth: 'calc(100% - 1.5rem)' }}>{option.label}</span>
             </label>
           ))}
         </div>
@@ -19,5 +21,5 @@ const Checkbox = ({ title, options, onChange }) => {
     );
   };
   
-  export default Checkbox;
   
+  export default Checkbox;
