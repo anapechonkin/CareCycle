@@ -45,7 +45,7 @@ const PageFourQuestionnaire = () => {
             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
           </div>
           <div className="flex justify-center mt-6 text-2xl">
-            <label className="flex items-center m">
+            <label className="flex items-center cursor-pointer">
               <input
                 type="radio"
                 name="rulesAccepted"
@@ -55,7 +55,7 @@ const PageFourQuestionnaire = () => {
               />
               <span className="ml-2">Accept</span>
             </label>
-            <label className="flex items-center mx-8">
+            <label className="flex items-center mx-8 cursor-pointer">
               <input
                 type="radio"
                 name="rulesAccepted"
