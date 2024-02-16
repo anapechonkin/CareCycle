@@ -1,4 +1,10 @@
 const Checkbox = ({ title, options, onChange }) => {
+  // Adjusted handler to pass both event and option
+  const handleChange = (event, option) => {
+    // Call the passed onChange prop with both the event and the option data
+    onChange(event, option);
+  };
+
   return (
     <div className="mb-4">
       {title && <h3 className="font-semibold text-lg mb-2">{title}</h3>}
@@ -9,11 +15,11 @@ const Checkbox = ({ title, options, onChange }) => {
               type="checkbox"
               id={option.id}
               checked={option.checked}
-              onChange={() => onChange(option)}
+              // Update to call handleChange with both event and option
+              onChange={(event) => handleChange(event, option)}
               disabled={option.disabled}
               className="form-checkbox h-4 w-4 text-[#16839B] rounded border-gray-300 focus:ring-[#0f6a8b] mr-2"
             />
-            {/* Adjusted to use 'label' or 'name' */}
             <span className="text-md text-gray-700 flex-1 whitespace-nowrap overflow-hidden text-ellipsis" style={{ maxWidth: 'calc(100% - 1.5rem)' }}>{option.label || option.name}</span>
           </label>
         ))}

@@ -2,7 +2,7 @@ import React from "react";
 
 const TabComponent = ({ tabs, currentTab, setCurrentTab }) => {
     return (
-      <div className="flex justify-center gap-4 mb-8">
+      <div className="flex justify-center gap-4 m-12">
         {tabs.map((tab, index) => (
           <button
             key={index}
