@@ -1,69 +1,69 @@
-// DeleteUserForm.js
 import React, { useState } from "react";
+import Select from 'react-select'; // Import React Select
 import Button from "./Button";
+import users from "../data/mockUserData"; // Import your users data
 
 const DeleteUserForm = () => {
-  const [searchUsername, setSearchUsername] = useState("");
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    username: "",
-  });
+  const [selectedUser, setSelectedUser] = useState(null);
 
-  const handleSearch = () => {
-    console.log("Searching for user:", searchUsername);
-    // Implement search logic here, typically setting formData with the user's existing data
-  };
+  // Transform users data for React Select
+  const userOptions = users.map(user => ({
+    value: user.username,
+    label: `${user.firstName} ${user.lastName} (${user.username})`,
+    user: user,
+  }));
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prevData => ({
-      ...prevData,
-      [name]: value
-    }));
+  const handleSelectChange = (selectedOption) => {
+    // Set selected user data to state
+    if (selectedOption) {
+      setSelectedUser(selectedOption.user);
+    } else {
+      setSelectedUser(null);
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Deleting user:", formData);
-    // Here you would implement the logic to handle the deletion,
-    // such as calling an API with the formData to delete the user.
+    if (selectedUser) {
+      console.log("Deleting user:", selectedUser);
+      // Implement the deletion logic here, e.g., calling an API to delete the user
+    }
   };
+
+  // Custom style for react-select, mimicking Tailwind
+  const customSelectStyles = {
+    control: (provided) => ({
+      ...provided,
+      borderRadius: '0.5rem',
+      border: '1px solid #d1d5db', // Tailwind gray-300
+      padding: '0.5rem',
+    }),
+    menu: (provided) => ({
+      ...provided,
+      borderRadius: '0.5rem',
+    }),
+  };
+
 
   return (
     <div className="bg-white shadow-lg rounded-lg p-8 mt-10 mb-10">
       <h2 className="text-3xl font-semibold text-center text-gray-800 mb-6">Delete User</h2>
-      <div className="mb-8">
-        <input type="text" placeholder="Search by Username" value={searchUsername} onChange={(e) => setSearchUsername(e.target.value)} className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200" />
-        <Button onClick={handleSearch} text="Search" />
-      </div>
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <input
-          type="text"
-          name="firstName"
-          placeholder="First Name"
-          value={formData.firstName}
-          onChange={handleChange}
-          className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200"
-        />
-        <input
-          type="text"
-          name="lastName"
-          placeholder="Last Name"
-          value={formData.lastName}
-          onChange={handleChange}
-          className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200"
-        />
-        <input
-          type="text"
-          name="username"
-          placeholder="Username"
-          value={formData.username}
-          onChange={handleChange}
-          className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200"
-        />
-        <Button type="submit" text="DELETE" className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" />
-      </form>
+      <Select
+        options={userOptions}
+        onChange={handleSelectChange}
+        placeholder="Search by username"
+        isClearable
+        className="mb-4"
+        styles={customSelectStyles}
+      />
+      {selectedUser && (
+        <div className="space-y-4 mb-4">
+          <div><strong>First Name:</strong> {selectedUser.firstName}</div>
+          <div><strong>Last Name:</strong> {selectedUser.lastName}</div>
+          <div><strong>Username:</strong> {selectedUser.username}</div>
+        </div>
+      )}
+      <Button type="submit" onClick={handleSubmit} text="DELETE" className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" />
     </div>
   );
 };
