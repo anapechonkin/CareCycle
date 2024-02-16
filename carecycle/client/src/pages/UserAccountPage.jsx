@@ -28,6 +28,7 @@ const UserAccountPage = () => {
       <Shadow />
       <div className="pt-20 pb-20 flex-grow flex flex-col items-center justify-center" style={{ marginTop: '100px' }}>
         <div className="max-w-[800px] w-full px-4 lg:px-8 space-y-12">
+        <h1 className="text-5xl font-bold mb-12 text-center text-black opacity-85 [text-shadow:0px_4px_4px_#00000040]">Manage User Account</h1>
           <TabComponent
             tabs={tabs.map(tab => ({ id: tab.id, name: tab.name }))}
             currentTab={activeTab}

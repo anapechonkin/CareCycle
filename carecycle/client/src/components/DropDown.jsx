@@ -6,12 +6,17 @@ const DropDown = ({ options, placeholder, onSelect }) => {
 
   const toggleDropdown = () => setIsOpen(!isOpen);
 
+  const isOptionObject = (option) => typeof option === 'object' && option !== null && 'label' in option && 'value' in option;
+
   const handleOptionClick = (option) => {
-    setSelectedOption(option);
+    // Determine if the option is an object and handle accordingly
+    const optionLabel = isOptionObject(option) ? option.label : option;
+    const optionValue = isOptionObject(option) ? option.value : option;
+
+    setSelectedOption(optionLabel); // Set display label
     setIsOpen(false);
-    // Check if onSelect is a function before calling it
     if (typeof onSelect === 'function') {
-      onSelect(option);
+      onSelect(optionValue); // Pass the value (or the string itself if it's not an object)
     } else {
       console.warn('onSelect prop is not provided or not a function');
     }
@@ -36,7 +41,8 @@ const DropDown = ({ options, placeholder, onSelect }) => {
               onClick={() => handleOptionClick(option)}
               className="p-2 text-lg text-black hover:bg-gray-100 cursor-pointer"
             >
-              {option}
+              {/* Display based on whether the option is an object */}
+              {isOptionObject(option) ? option.label : option}
             </li>
           ))}
         </ul>
