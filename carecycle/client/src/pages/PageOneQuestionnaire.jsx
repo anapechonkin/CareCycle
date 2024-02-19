@@ -5,13 +5,13 @@ import Shadow from '../components/Shadow';
 import Footer from '../components/Footer';
 import Dropdown from '../components/DropDown';
 import Button from '../components/Button';
-import Checkbox from '../components/Checkbox'; // Ensure this component supports 'disabled' prop
+import Checkbox from '../components/Checkbox'; // Assuming Checkbox supports 'disabled'
 import { useNavigate } from 'react-router-dom';
 
 const PageOneQuestionnaire = () => {
   const [preferNotToAnswerPostal, setPreferNotToAnswerPostal] = useState(false);
   const [preferNotToAnswerYear, setPreferNotToAnswerYear] = useState(false);
-  const [declined, setDeclined] = useState(null);
+  const [declined, setDeclined] = useState(null); // null for undecided, true for declined, false for accepted
 
   const navigate = useNavigate();
 
@@ -28,16 +28,9 @@ const PageOneQuestionnaire = () => {
     console.log("Selected option:", selectedOption);
   };
 
-  const handleConsentChange = (option) => {
-    // Allow toggling off by clicking the same option again
-    setDeclined(prev => prev === (option.id === 'decline') ? null : option.id === 'decline');
+  const handleConsentChange = (value) => {
+    setDeclined(value === 'decline');
   };
-
-  // Prepare consent options for rendering
-  const consentOptions = [
-    { id: 'accept', label: 'I accept', checked: declined === false },
-    { id: 'decline', label: 'I decline', checked: declined === true }
-  ];
 
   return (
     <div className="flex flex-col min-h-screen bg-[#f6cdd0]">
@@ -55,25 +48,33 @@ const PageOneQuestionnaire = () => {
           />
           <p className="m-8 text-xl">I consent to the data obtained from this questionnaire being used for grant applications</p>
           <div className="flex justify-center items-center space-x-8 mb-4">
-            {consentOptions.map(option => (
-              <Checkbox
-                key={option.id}
-                title=""
-                options={[{
-                  id: option.id,
-                  label: option.label,
-                  checked: option.checked,
-                  disabled: declined !== null && !option.checked // Disable non-selected option when one is selected
-                }]}
-                onChange={() => handleConsentChange(option)}
+            {/* Consent radio buttons */}
+            <label className="flex items-center cursor-pointer">
+              <input
+                type="radio"
+                name="consent"
+                value="accept"
+                checked={declined === false}
+                onChange={() => handleConsentChange('accept')}
               />
-            ))}
+              <span className="ml-2">I accept</span>
+            </label>
+            <label className="flex items-center cursor-pointer">
+              <input
+                type="radio"
+                name="consent"
+                value="decline"
+                checked={declined === true}
+                onChange={() => handleConsentChange('decline')}
+              />
+              <span className="ml-2">I decline</span>
+            </label>
           </div>
           <input
             type="text"
             placeholder="Please Enter Your Postal Code"
             className="mt-4 p-2 border border-black rounded-lg w-full"
-            disabled={preferNotToAnswerPostal || declined === true}
+            disabled={preferNotToAnswerPostal || declined}
           />
           <Checkbox
             title=""
@@ -81,7 +82,7 @@ const PageOneQuestionnaire = () => {
               id: 'postal',
               label: 'Prefer Not To Answer',
               checked: preferNotToAnswerPostal,
-              disabled: declined === true // Disable when declined is true
+              disabled: declined // Disable when declined is true
             }]}
             onChange={() => setPreferNotToAnswerPostal(!preferNotToAnswerPostal)}
           />
@@ -89,7 +90,7 @@ const PageOneQuestionnaire = () => {
             type="text"
             placeholder="Please Enter Your Year of Birth (YYYY)"
             className="mt-4 p-2 border border-black rounded-lg w-full"
-            disabled={preferNotToAnswerYear || declined === true}
+            disabled={preferNotToAnswerYear || declined}
           />
           <Checkbox
             title=""
@@ -97,23 +98,16 @@ const PageOneQuestionnaire = () => {
               id: 'year',
               label: 'Prefer Not To Answer',
               checked: preferNotToAnswerYear,
-              disabled: declined === true // Disable when declined is true
+              disabled: declined // Disable when declined is true
             }]}
             onChange={() => setPreferNotToAnswerYear(!preferNotToAnswerYear)}
           />
           <div className="flex flex-col items-center mt-8 space-y-4">
             <Button
               text="NEXT QUESTION"
-              className="text-white bg-[#16839B] hover:bg-[#0f6a8b] font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-150 ease-in-out"
+              className="text-white bg-[#16839B] hover:bg-[#0f6674]"
               onClick={handleClick}
             />
-            <div className="flex space-x-2">
-              <span>Page</span>
-              <span className="font-bold">1</span>
-              <span>2</span>
-              <span>3</span>
-              <span>4</span>
-            </div>
           </div>
         </div>
       </div>
