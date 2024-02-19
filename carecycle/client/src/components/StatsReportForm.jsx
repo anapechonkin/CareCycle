@@ -23,7 +23,7 @@ const StatsReportForm = ({ headerTitle }) => {
   const [selectedSeason, setSelectedSeason] = useState("");
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(null);
-  const [dateSelectionType, setDateSelectionType] = useState('single');
+  const navigate = useNavigate();
   
   const onChange = (dates) => {
     const [start, end] = dates;
@@ -31,30 +31,21 @@ const StatsReportForm = ({ headerTitle }) => {
     setEndDate(end);
   };
 
-  const navigate = useNavigate();
+  const handleCheckboxChange = (event, option, category) => {
+    const { checked } = event.target;
+    setSelectedOptions(prev => ({
+      ...prev,
+      [category]: checked
+        ? [...prev[category], option]
+        : prev[category].filter(opt => opt !== option),
+    }));
+  };
 
   const categoryData = {
     genderIdentities,
     postalCodeAreas,
     mapRegions,
     workshopActivityTypes,
-  };
-
-  const handleCheckboxChange = (event, option, category) => {
-    const { checked } = event.target;
-    if (option === 'ALL') {
-      setSelectedOptions(prev => ({
-        ...prev,
-        [category]: checked ? ['ALL', ...categoryData[category]] : [], // Corrected access to categoryData
-      }));
-    } else {
-      setSelectedOptions(prev => ({
-        ...prev,
-        [category]: checked
-          ? [...prev[category], option]
-          : prev[category].filter(opt => opt !== option),
-      }));
-    }
   };
 
   const handleDropdownSelection = (selectedYear) => {
@@ -81,8 +72,6 @@ const StatsReportForm = ({ headerTitle }) => {
     })
   ];
 
-  const addAllOption = (options) => [{ id: 'ALL', name: 'ALL' }, ...options];
-
   // Function to select all options for a given category
   const handleSelectAll = (category) => {
     setSelectedOptions(prev => ({
@@ -107,59 +96,17 @@ const StatsReportForm = ({ headerTitle }) => {
 
       {/* Form Section */}
       <form onSubmit={handleSubmit} className="p-5 bg-white space-y-8">
-       {/* Toggle between Single Date and Date Range */}
-       <div className="mb-4">
-          <div className="font-semibold text-lg mb-2">Select Date Type:</div>
-          <div className="flex justify-start space-x-4 mb-2">
-            <label className="flex items-center cursor-pointer">
-              <input
-                type="radio"
-                name="dateSelectionType"
-                value="single"
-                checked={dateSelectionType === 'single'}
-                onChange={() => setDateSelectionType('single')}
-                className="mr-2"
-              />
-              Single Date
-            </label>
-            <label className="flex items-center cursor-pointer">
-              <input
-                type="radio"
-                name="dateSelectionType"
-                value="range"
-                checked={dateSelectionType === 'range'}
-                onChange={() => setDateSelectionType('range')}
-                className="mr-2"
-              />
-              Date Range
-            </label>
-          </div>
-        </div>
-
-      {/* Conditionally render DatePicker */}
       <div className="mb-4">
-        <div className="font-semibold text-lg mb-2">Select Dates:</div>
-        <div className="text-sm mb-2">Click on the date field to select a date or date range.</div>
-      {
-        dateSelectionType === 'single' ? (
-          <DatePicker
-            selected={startDate}
-            onChange={(date) => setStartDate(date)}
-          />
-        ) : (
+          <div className="font-semibold text-lg mb-2">Select Dates:</div>
+          <div className="text-sm mb-2">Tip: Select the same start and end date for a single day or choose date range.</div>
           <DatePicker
             selectsRange={true}
             startDate={startDate}
             endDate={endDate}
-            onChange={(dates) => {
-              const [start, end] = dates;
-              setStartDate(start);
-              setEndDate(end);
-            }}
+            onChange={onChange}
+            className="form-input rounded-md shadow-sm mt-1 block w-[200px]"
           />
-        )
-      }
-      </div>
+        </div>
       <div className="flex flex-col space-y-2">
           <h3 className="font-semibold text-lg">Season</h3>
           <div className="flex items-center space-x-4">
