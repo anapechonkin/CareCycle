@@ -83,6 +83,22 @@ const StatsReportForm = ({ headerTitle }) => {
 
   const addAllOption = (options) => [{ id: 'ALL', name: 'ALL' }, ...options];
 
+  // Function to select all options for a given category
+  const handleSelectAll = (category) => {
+    setSelectedOptions(prev => ({
+      ...prev,
+      [category]: categoryData[category].map(option => option.id), // Assuming IDs are used to track selections
+    }));
+  };
+
+  // Function to deselect all options for a given category
+  const handleUnselectAll = (category) => {
+    setSelectedOptions(prev => ({
+      ...prev,
+      [category]: [],
+    }));
+  };
+  
   return (
     <div className="max-w-4xl mx-auto shadow-lg rounded-lg overflow-hidden">
       <div className="bg-[#0f6a8b] p-4">
@@ -189,23 +205,42 @@ const StatsReportForm = ({ headerTitle }) => {
         />
         <Checkbox
           title="Gender Identities"
-          options={addAllOption(genderIdentities)}
-          onChange={(e) => handleCheckboxChange(e, 'ALL', 'genderIdentities')}
+          options={genderIdentities.map(identity => ({ ...identity, checked: selectedOptions.genderIdentities.includes(identity.id) }))}
+          onChange={(e, option) => handleCheckboxChange(e, option.id, 'genderIdentities')}
+          onSelectAll={() => handleSelectAll('genderIdentities')}
+          onUnselectAll={() => handleUnselectAll('genderIdentities')}
         />
         <Checkbox
           title="Postal Code Areas"
-          options={addAllOption(postalCodeAreas)}
-          onChange={(e) => handleCheckboxChange(e, 'ALL', 'postalCodeAreas')}
+          options={postalCodeAreas.map(area => ({
+            ...area,
+            checked: selectedOptions.postalCodeAreas.includes(area.id),
+          }))}
+          onChange={(e, option) => handleCheckboxChange(e, option, 'postalCodeAreas')}
+          onSelectAll={() => handleSelectAll('postalCodeAreas')}
+          onUnselectAll={() => handleUnselectAll('postalCodeAreas')}
         />
+
         <Checkbox
-          title="World Map Regions"
-          options={addAllOption(mapRegions)}
-          onChange={(e) => handleCheckboxChange(e, 'ALL', 'mapRegions')}
+          title="Place of Origin"
+          options={mapRegions.map(region => ({
+            ...region,
+            checked: selectedOptions.mapRegions.includes(region.id),
+          }))}
+          onChange={(e, option) => handleCheckboxChange(e, option, 'mapRegions')}
+          onSelectAll={() => handleSelectAll('mapRegions')}
+          onUnselectAll={() => handleUnselectAll('mapRegions')}
         />
+
         <Checkbox
           title="Workshop Activity Types"
-          options={addAllOption(workshopActivityTypes)}
-          onChange={(e) => handleCheckboxChange(e, 'ALL', 'workshopActivityTypes')}
+          options={workshopActivityTypes.map(activityType => ({
+            ...activityType,
+            checked: selectedOptions.workshopActivityTypes.includes(activityType.id),
+          }))}
+          onChange={(e, option) => handleCheckboxChange(e, option, 'workshopActivityTypes')}
+          onSelectAll={() => handleSelectAll('workshopActivityTypes')}
+          onUnselectAll={() => handleUnselectAll('workshopActivityTypes')}
         />
         <Button
           type="submit"

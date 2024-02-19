@@ -18,6 +18,7 @@ const UpdateUserForm = () => {
     genderIdentity: "",
     placeOfOrigin: "",
     postalCode: "",
+    vegetable: "",
     status: false,
   });
 
@@ -76,6 +77,7 @@ const UpdateUserForm = () => {
         genderIdentity: user.genderIdentity,
         placeOfOrigin: user.placeOfOrigin,
         postalCode: user.postalCode,
+        vegetable: user.vegetable,
         status: user.status === "Active",
       });
     } else {
@@ -90,6 +92,7 @@ const UpdateUserForm = () => {
         genderIdentity: "",
         placeOfOrigin: "",
         postalCode: "",
+        vegetable: "",
         status: false,
       });
     }
@@ -270,6 +273,19 @@ const UpdateUserForm = () => {
       type="text"
       name="postalCode"
       value={formData.postalCode}
+      onChange={handleChange}
+      className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200"
+    />
+  </div>
+
+  {/* Vegetable */}
+  <div>
+    <label htmlFor="vegetable" className="block text-sm font-medium text-gray-700">Vegetable</label>
+    <input
+      id="vegetable"
+      type="text"
+      name="vegetable"
+      value={formData.vegetable}
       onChange={handleChange}
       className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200"
     />

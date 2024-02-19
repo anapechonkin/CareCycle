@@ -17,6 +17,7 @@ const AddUserForm = () => {
     genderIdentity: '',
     placeOfOrigin: '',
     postalCode: '',
+    vegetable: '',
     status: 'Active', // Initial status for new users
   });
 
@@ -53,6 +54,7 @@ const AddUserForm = () => {
         {renderTextInput("lastName", "Last Name", formData.lastName, handleChange)}
         {renderTextInput("yearOfBirth", "Year of Birth", formData.yearOfBirth, handleChange)}
         {renderTextInput("postalCode", "Postal Code", formData.postalCode, handleChange)}
+        {renderTextInput("vegetable", "Vegetable", formData.vegetable, handleChange)}
 
         {/* Gender Identity and Place of Origin Dropdowns */}
         <Dropdown
