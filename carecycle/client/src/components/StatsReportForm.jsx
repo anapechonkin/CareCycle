@@ -216,7 +216,7 @@ const StatsReportForm = ({ headerTitle }) => {
             ...area,
             checked: selectedOptions.postalCodeAreas.includes(area.id),
           }))}
-          onChange={(e, option) => handleCheckboxChange(e, option, 'postalCodeAreas')}
+          onChange={(e, option) => handleCheckboxChange(e, option.id, 'postalCodeAreas')}
           onSelectAll={() => handleSelectAll('postalCodeAreas')}
           onUnselectAll={() => handleUnselectAll('postalCodeAreas')}
         />
@@ -227,7 +227,7 @@ const StatsReportForm = ({ headerTitle }) => {
             ...region,
             checked: selectedOptions.mapRegions.includes(region.id),
           }))}
-          onChange={(e, option) => handleCheckboxChange(e, option, 'mapRegions')}
+          onChange={(e, option) => handleCheckboxChange(e, option.id, 'mapRegions')}
           onSelectAll={() => handleSelectAll('mapRegions')}
           onUnselectAll={() => handleUnselectAll('mapRegions')}
         />
@@ -238,7 +238,7 @@ const StatsReportForm = ({ headerTitle }) => {
             ...activityType,
             checked: selectedOptions.workshopActivityTypes.includes(activityType.id),
           }))}
-          onChange={(e, option) => handleCheckboxChange(e, option, 'workshopActivityTypes')}
+          onChange={(e, option) => handleCheckboxChange(e, option.id, 'workshopActivityTypes')}
           onSelectAll={() => handleSelectAll('workshopActivityTypes')}
           onUnselectAll={() => handleUnselectAll('workshopActivityTypes')}
         />
