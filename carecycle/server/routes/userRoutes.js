@@ -5,17 +5,65 @@ const saltRounds = 10; // Defines the complexity of the hash function
 
 // Retrieves all users from the database
 const getUsers = (request, response) => {
+    console.log("Received request to fetch all users");
+
+    // Query the database to fetch all users
     pool.query('SELECT * FROM carecycle.users', (error, results) => {
-        if (error) throw error;
-        response.status(200).json(results.rows);
-    });
+        if (error) {
+            console.error('Error executing query:', error);
+            // Handle the error and return an appropriate response
+            return response.status(500).json({ error: 'Internal server error' });
+        }
+        
+        // Check if users are found
+        if (results.rows.length > 0) {
+            console.log('Returning users:', results.rows);
+            // Send the users data in the response
+            return response.status(200).json(results.rows); // Use return here
+        } else {
+            console.log('No users found');
+            // Send a 404 response if no users are found
+            return response.status(404).json({ error: 'No users found' }); // Use return here
+        }
+    });    
 };
 
 // Fetches a single user by their unique ID
 const getUserById = (request, response) => {
     const id = parseInt(request.params.id);
+    console.log('Received user ID:', id); 
+
+    if (isNaN(id)) {
+        return response.status(400).json({ error: 'Invalid user ID' });
+    }
+
     pool.query('SELECT * FROM carecycle.users WHERE user_id = $1', [id], (error, results) => {
-        if (error) throw error;
+        if (error) {
+            console.error('Error fetching user by ID:', error);
+            return response.status(500).json({ error: 'Internal server error' });
+        }
+        
+        if (!results || results.rows.length === 0) {
+            console.log('User not found');
+            return response.status(404).json({ error: 'User not found' });
+        }
+        
+        return response.status(200).json(results.rows[0]);
+    });
+};
+
+// Add error handling in getUserByUsername function
+const getUserByUsername = (request, response) => {
+    const username = request.params.username;
+    pool.query('SELECT * FROM carecycle.users WHERE username = $1', [username], (error, results) => {
+        if (error) {
+            console.error('Error fetching user by username:', error);
+            return response.status(500).json({ error: 'Internal server error' });
+        }
+        if (!results || results.rows.length === 0) {
+            console.log('User not found');
+            return response.status(404).json({ error: 'User not found' });
+        }
         response.status(200).json(results.rows);
     });
 };
@@ -70,17 +118,20 @@ const updateUser = (request, response) => {
     const values = [username, password, firstName, lastName, primaryGender, vegetable, yearOfBirth, postalCodeId, isActive, userTypeID, mapID, id];
 
     pool.query(query, values, (error, results) => {
-        if (error) throw error;
+        if (error) {
+            console.error('Error updating user:', error);
+            return response.status(500).json({ error: 'Internal server error' });
+        }
         if (results.rowCount > 0) {
             response.status(200).json(results.rows[0]);
         } else {
-            response.status(404).send(`User not found with ID: ${id}`);
+            response.status(404).json({ error: `User not found with ID: ${id}` });
         }
     });
 };
 
 // Soft deletes a user by deactivating their account
-const deleteUser = (request, response) => {
+const softDeleteUserById = (request, response) => {
     const id = parseInt(request.params.id);
 
     const query = `
@@ -90,11 +141,36 @@ const deleteUser = (request, response) => {
         RETURNING *;`;
 
     pool.query(query, [id], (error, results) => {
-        if (error) throw error;
+        if (error) {
+            console.error('Error soft deleting user:', error);
+            return response.status(500).json({ error: 'Internal server error' });
+        }
         if (results.rowCount > 0) {
             response.status(200).json({ message: `User archived with ID: ${id}`, user: results.rows[0] });
         } else {
-            response.status(404).send(`User not found with ID: ${id}`);
+            response.status(404).json({ error: `User not found with ID: ${id}` });
+        }
+    });
+};
+
+// Soft deletes a user by deactivating their account using username
+const softDeleteUserByUsername = (request, response) => {
+    const username = request.params.username; // Assuming username is passed as a URL parameter
+
+    const query = `
+        UPDATE carecycle.users 
+        SET is_active = FALSE 
+        WHERE username = $1
+        RETURNING *;`;
+
+    pool.query(query, [username], (error, results) => {
+        if (error) {
+            throw error;
+        }
+        if (results.rowCount > 0) {
+            response.status(200).json({ message: `User archived with username: ${username}`, user: results.rows[0] });
+        } else {
+            response.status(404).send(`User not found with username: ${username}`);
         }
     });
 };
@@ -102,7 +178,9 @@ const deleteUser = (request, response) => {
 module.exports = {
     getUsers,
     getUserById,
+    getUserByUsername,
     addUser,
     updateUser,
-    deleteUser
+    softDeleteUserById,
+    softDeleteUserByUsername
 };

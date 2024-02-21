@@ -74,6 +74,7 @@ const updateClientStat = (request, response) => {
     });
 };
 
+
 module.exports = {
    getClientStats,
    getClientStatById,

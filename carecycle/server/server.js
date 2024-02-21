@@ -20,17 +20,21 @@ app.get('/', (request, response) => {
   })
 
 // User routes
-app.get('/users', userDB.getUsers)
-app.get('/users/:id', userDB.getUserById)
-app.post('/users', userDB.addUser)
-app.put('/users/:id', userDB.updateUser)
-app.delete('/users/:id', userDB.deleteUser)
+app.get('/users', userDB.getUsers);
+app.get('/users/:id', userDB.getUserById);
+app.get('/users/username/:username', userDB.getUserByUsername); // Modified route pattern
+app.post('/users', userDB.addUser);
+app.put('/users/:id', userDB.updateUser);
+app.delete('/users/:id', userDB.softDeleteUserById); // Renamed to softDeleteUserById
+app.delete('/users/username/:username', userDB.softDeleteUserByUsername); // Modified route pattern
+
 
 // ClientStat routes
 app.get('/clientstats', clientStatDB.getClientStats)
 app.get('/clientstats/:id', clientStatDB.getClientStatById)
 app.post('/clientstats', clientStatDB.addClientStat)
 app.put('/clientstats/:id', clientStatDB.updateClientStat)
+
 
 app.listen(port, () => {
     console.log(`App running on port ${port}.`)
