@@ -4,175 +4,189 @@ const bcrypt = require('bcrypt'); // For hashing passwords
 const saltRounds = 10; // Defines the complexity of the hash function
 
 // Retrieves all users from the database
-const getUsers = (request, response) => {
-    console.log("Received request to fetch all users");
-
-    // Query the database to fetch all users
-    pool.query('SELECT * FROM carecycle.users', (error, results) => {
-        if (error) {
-            console.error('Error executing query:', error);
-            // Handle the error and return an appropriate response
-            return response.status(500).json({ error: 'Internal server error' });
-        }
-        
-        // Check if users are found
+const getUsers = async (request, response) => {
+    try {
+        const results = await pool.query('SELECT * FROM carecycle.users');
         if (results.rows.length > 0) {
-            console.log('Returning users:', results.rows);
-            // Send the users data in the response
-            return response.status(200).json(results.rows); // Use return here
+            response.status(200).json(results.rows);
         } else {
-            console.log('No users found');
-            // Send a 404 response if no users are found
-            return response.status(404).json({ error: 'No users found' }); // Use return here
+            // Respond with 200 OK and a message indicating no users found
+            // This is not considered an error state, thus using 200
+            response.status(200).json({ message: 'No users found' });
         }
-    });    
+    } catch (error) {
+        console.error('Error fetching all users:', error);
+        response.status(500).json({ error: 'Internal server error' });
+    }
 };
 
 // Fetches a single user by their unique ID
-const getUserById = (request, response) => {
+const getUserById = async (request, response) => {
     const id = parseInt(request.params.id);
-    console.log('Received user ID:', id); 
-
     if (isNaN(id)) {
         return response.status(400).json({ error: 'Invalid user ID' });
     }
 
-    pool.query('SELECT * FROM carecycle.users WHERE user_id = $1', [id], (error, results) => {
-        if (error) {
-            console.error('Error fetching user by ID:', error);
-            return response.status(500).json({ error: 'Internal server error' });
+    try {
+        const results = await pool.query('SELECT * FROM carecycle.users WHERE user_id = $1', [id]);
+        if (results.rows.length > 0) {
+            response.status(200).json(results.rows[0]);
+        } else {
+            response.status(404).json({ error: 'User not found' });
         }
-        
-        if (!results || results.rows.length === 0) {
-            console.log('User not found');
-            return response.status(404).json({ error: 'User not found' });
-        }
-        
-        return response.status(200).json(results.rows[0]);
-    });
+    } catch (error) {
+        console.error(`Error fetching user by ID ${id}:`, error);
+        response.status(500).json({ error: 'Internal server error' });
+    }
 };
 
-// Add error handling in getUserByUsername function
-const getUserByUsername = (request, response) => {
+// Fetches a single user by their username
+const getUserByUsername = async (request, response) => {
     const username = request.params.username;
-    pool.query('SELECT * FROM carecycle.users WHERE username = $1', [username], (error, results) => {
-        if (error) {
-            console.error('Error fetching user by username:', error);
-            return response.status(500).json({ error: 'Internal server error' });
+    try {
+        const results = await pool.query('SELECT * FROM carecycle.users WHERE username = $1', [username]);
+        if (results.rows.length > 0) {
+            response.status(200).json(results.rows[0]);
+        } else {
+            response.status(404).json({ error: 'User not found' });
         }
-        if (!results || results.rows.length === 0) {
-            console.log('User not found');
-            return response.status(404).json({ error: 'User not found' });
-        }
-        response.status(200).json(results.rows);
-    });
+    } catch (error) {
+        console.error(`Error fetching user by username '${username}':`, error);
+        response.status(500).json({ error: 'Internal server error' });
+    }
 };
 
 // Adds a new user with provided details, hashing the password for security
-const addUser = (request, response) => {
-    const { username, password, firstName, lastName, primaryGender, vegetable, yearOfBirth, postalCodeId, isActive, userTypeID, mapID } = request.body;
+const addUser = async (request, response) => {
+    const { username, password, firstName, lastName, vegetable, yearOfBirth, primaryGenderId, postalCodeId, isActive, userTypeID, mapID } = request.body;
 
-    bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
-        if (err) {
-            response.status(500).send('Error hashing password');
-            return;
-        }
-        const query = `
+    try {
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+        const result = await pool.query(`
             INSERT INTO carecycle.users 
-            (username, password, first_name, last_name, primary_gender, vegetable, year_of_birth, postal_code_id, is_active, usertype_id, map_id) 
+            (username, password, firstname, lastname, vegetable, year_of_birth, primary_gender_id, postal_code_id, is_active, usertype_id, map_id) 
             VALUES 
             ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-            RETURNING *;`;
+            RETURNING *;`,
+            [username, hashedPassword, firstName, lastName, vegetable, yearOfBirth, primaryGenderId, postalCodeId, isActive, userTypeID, mapID]);
 
-        const values = [username, hashedPassword, firstName, lastName, primaryGender, vegetable, yearOfBirth, postalCodeId, isActive, userTypeID, mapID];
-
-        pool.query(query, values, (error, results) => {
-            if (error) throw error;
-            response.status(201).json(results.rows[0]);
-        });
-    });
+        response.status(201).json(result.rows[0]);
+    } catch (error) {
+        console.error('Error adding new user:', error);
+        response.status(500).json({ error: 'Internal server error' });
+    }
 };
 
-// Updates an existing user's information
-const updateUser = (request, response) => {
+// Updates an existing user's information, excluding the password
+const updateUser = async (request, response) => {
     const id = parseInt(request.params.id);
-    const { username, password, firstName, lastName, primaryGender, vegetable, yearOfBirth, postalCodeId, isActive, userTypeID, mapID } = request.body;
+    const { username, firstName, lastName, primaryGenderId, vegetable, yearOfBirth, postalCodeId, isActive, userTypeID, mapID } = request.body;
 
-    const query = `
-        UPDATE carecycle.users
-        SET 
-            username = $1, 
-            password = $2, 
-            first_name = $3, 
-            last_name = $4, 
-            primary_gender = $5, 
-            vegetable = $6, 
-            year_of_birth = $7, 
-            postal_code_id = $8, 
-            is_active = $9, 
-            usertype_id = $10, 
-            map_id = $11
-        WHERE user_id = $12
-        RETURNING *;`;
+    try {
+        const result = await pool.query(`
+            UPDATE carecycle.users
+            SET 
+                username = $1, 
+                firstname = $2, 
+                lastname = $3, 
+                primary_gender_id = $4, 
+                vegetable = $5, 
+                year_of_birth = $6, 
+                postal_code_id = $7, 
+                is_active = $8, 
+                usertype_id = $9, 
+                map_id = $10
+            WHERE user_id = $11
+            RETURNING *;`,
+            [username, firstName, lastName, primaryGenderId, vegetable, yearOfBirth, postalCodeId, isActive, userTypeID, mapID, id]);
 
-    const values = [username, password, firstName, lastName, primaryGender, vegetable, yearOfBirth, postalCodeId, isActive, userTypeID, mapID, id];
-
-    pool.query(query, values, (error, results) => {
-        if (error) {
-            console.error('Error updating user:', error);
-            return response.status(500).json({ error: 'Internal server error' });
-        }
-        if (results.rowCount > 0) {
-            response.status(200).json(results.rows[0]);
+        if (result.rowCount > 0) {
+            response.status(200).json(result.rows[0]);
         } else {
             response.status(404).json({ error: `User not found with ID: ${id}` });
         }
-    });
+    } catch (error) {
+        console.error(`Error updating user with ID ${id}:`, error);
+        response.status(500).json({ error: 'Internal server error' });
+    }
 };
 
-// Soft deletes a user by deactivating their account
-const softDeleteUserById = (request, response) => {
+// Soft deletes a user by deactivating their account using ID
+const softDeleteUserById = async (request, response) => {
     const id = parseInt(request.params.id);
+    try {
+        const result = await pool.query(`
+            UPDATE carecycle.users 
+            SET is_active = FALSE 
+            WHERE user_id = $1
+            RETURNING *;`, [id]);
 
-    const query = `
-        UPDATE carecycle.users 
-        SET is_active = FALSE 
-        WHERE user_id = $1
-        RETURNING *;`;
-
-    pool.query(query, [id], (error, results) => {
-        if (error) {
-            console.error('Error soft deleting user:', error);
-            return response.status(500).json({ error: 'Internal server error' });
-        }
-        if (results.rowCount > 0) {
-            response.status(200).json({ message: `User archived with ID: ${id}`, user: results.rows[0] });
+        if (result.rowCount > 0) {
+            response.status(200).json({ message: `User archived with ID: ${id}`, user: result.rows[0] });
         } else {
             response.status(404).json({ error: `User not found with ID: ${id}` });
         }
-    });
+    } catch (error) {
+        console.error(`Error soft deleting user with ID ${id}:`, error);
+        response.status(500).json({ error: 'Internal server error' });
+    }
 };
 
 // Soft deletes a user by deactivating their account using username
-const softDeleteUserByUsername = (request, response) => {
-    const username = request.params.username; // Assuming username is passed as a URL parameter
+const softDeleteUserByUsername = async (request, response) => {
+    const username = request.params.username;
+    try {
+        const result = await pool.query(`
+            UPDATE carecycle.users 
+            SET is_active = FALSE 
+            WHERE username = $1
+            RETURNING *;`, [username]);
 
-    const query = `
-        UPDATE carecycle.users 
-        SET is_active = FALSE 
-        WHERE username = $1
-        RETURNING *;`;
-
-    pool.query(query, [username], (error, results) => {
-        if (error) {
-            throw error;
-        }
-        if (results.rowCount > 0) {
-            response.status(200).json({ message: `User archived with username: ${username}`, user: results.rows[0] });
+        if (result.rowCount > 0) {
+            response.status(200).json({ message: `User archived with username: ${username}`, user: result.rows[0] });
         } else {
-            response.status(404).send(`User not found with username: ${username}`);
+            response.status(404).json({ error: `User not found with username: ${username}` });
         }
-    });
+    } catch (error) {
+        console.error(`Error soft deleting user with username '${username}':`, error);
+        response.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+// Permanently deletes a user by their unique ID
+const deleteUserById = async (request, response) => {
+    const id = parseInt(request.params.id);
+    if (isNaN(id)) {
+        return response.status(400).json({ error: 'Invalid user ID' });
+    }
+
+    try {
+        const result = await pool.query('DELETE FROM carecycle.users WHERE user_id = $1 RETURNING *;', [id]);
+        if (result.rowCount > 0) {
+            response.status(200).json({ message: `User deleted with ID: ${id}` });
+        } else {
+            response.status(404).json({ error: 'User not found' });
+        }
+    } catch (error) {
+        console.error(`Error deleting user with ID ${id}:`, error);
+        response.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+// Permanently deletes a user by their username
+const deleteUserByUsername = async (request, response) => {
+    const username = request.params.username;
+    try {
+        const result = await pool.query('DELETE FROM carecycle.users WHERE username = $1 RETURNING *;', [username]);
+        if (result.rowCount > 0) {
+            response.status(200).json({ message: `User deleted with username: ${username}` });
+        } else {
+            response.status(404).json({ error: 'User not found' });
+        }
+    } catch (error) {
+        console.error(`Error deleting user with username '${username}':`, error);
+        response.status(500).json({ error: 'Internal server error' });
+    }
 };
 
 module.exports = {
@@ -182,5 +196,7 @@ module.exports = {
     addUser,
     updateUser,
     softDeleteUserById,
-    softDeleteUserByUsername
+    softDeleteUserByUsername,
+    deleteUserById,
+    deleteUserByUsername
 };

@@ -22,12 +22,14 @@ app.get('/', (request, response) => {
 // User routes
 app.get('/users', userDB.getUsers);
 app.get('/users/:id', userDB.getUserById);
-app.get('/users/username/:username', userDB.getUserByUsername); // Modified route pattern
+app.get('/users/username/:username', userDB.getUserByUsername); 
 app.post('/users', userDB.addUser);
 app.put('/users/:id', userDB.updateUser);
-app.delete('/users/:id', userDB.softDeleteUserById); // Renamed to softDeleteUserById
-app.delete('/users/username/:username', userDB.softDeleteUserByUsername); // Modified route pattern
-
+app.delete('/users/:id', userDB.softDeleteUserById); // softDeleteUserById
+app.delete('/users/username/:username', userDB.softDeleteUserByUsername); //softdelete by username
+app.delete('/users/hard/:id', userDB.deleteUserById); // Hard delete by ID
+app.delete('/users/hard/username/:username', userDB.deleteUserByUsername); // Hard delete by username
+app.delete('/users/hard', userDB.deleteAllUsers); // Hard delete all users
 
 // ClientStat routes
 app.get('/clientstats', clientStatDB.getClientStats)
