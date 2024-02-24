@@ -34,9 +34,10 @@ app.delete('/users/hard/username/:username', userDB.deleteUserByUsername); // Ha
 // ClientStat routes
 app.get('/clientstats', clientStatDB.getClientStats)
 app.get('/clientstats/:id', clientStatDB.getClientStatById)
+app.get('/clientstats/postalcode/:postalCode', clientStatDB.getClientByPostalCode);
 app.post('/clientstats', clientStatDB.addClientStat)
 app.put('/clientstats/:id', clientStatDB.updateClientStat)
-
+app.delete('/clientstats/:cs_id', clientStatDB.deleteClientStat);
 
 app.listen(port, () => {
     console.log(`App running on port ${port}.`)

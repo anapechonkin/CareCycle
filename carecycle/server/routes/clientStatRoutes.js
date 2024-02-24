@@ -1,8 +1,6 @@
 // Import required modules
 const { response } = require('express');
 const pool = require('../config/db'); // Database connection pool
-const bcrypt = require('bcrypt'); // For hashing passwords
-const saltRounds = 10; // Defines the complexity of the hash function
 
 // Retrieves all clientStats from the database
 const getClientStats = (request, response) => {
@@ -20,6 +18,15 @@ const getClientStatById = (request, response) => {
         response.status(200).json(results.rows);
     });
 }
+
+// Fetches clientStats by postal code
+const getClientByPostalCode = (request, response) => {
+    const postalCode = request.params.postalCode;
+    pool.query('SELECT * FROM carecycle.clientstats WHERE postal_code_id = $1', [postalCode], (error, results) => {
+        if (error) throw error;
+        response.status(200).json(results.rows);
+    });
+};
 
 // Adds a new clientStat with provided details to the database
 const addClientStat = (request, response) => {
@@ -74,10 +81,28 @@ const updateClientStat = (request, response) => {
     });
 };
 
+// Deletes a clientStat by its cs_id
+const deleteClientStat = (request, response) => {
+    const cs_id = parseInt(request.params.cs_id);
+    pool.query('DELETE FROM ClientStats WHERE cs_id = $1 RETURNING *;', [cs_id], (error, results) => {
+        if (error) {
+            response.status(500).send('Error deleting clientStat');
+            return;
+        }
+        if (results.rowCount > 0) {
+            response.status(200).json({ message: `ClientStat deleted with ID: ${cs_id}` });
+        } else {
+            response.status(404).send(`ClientStat not found with ID: ${cs_id}`);
+        }
+    });
+};
+
 
 module.exports = {
    getClientStats,
    getClientStatById,
+   getClientByPostalCode,
    addClientStat,
    updateClientStat,
+   deleteClientStat
 };
