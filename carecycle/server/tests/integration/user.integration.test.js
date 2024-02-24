@@ -1,4 +1,4 @@
-// Assuming userRoutes.js exports getUsers and addUser functions
+// import required modules
 const { 
   getUsers, 
   addUser, 
@@ -81,12 +81,12 @@ async function main() {
     body: userData
   });
 
-  // mock request for Username
+  // Mock request object generator for a specific username
   const mockRequestUsername = (username) => ({
     params: { username }
   });
 
-  // Mock request for update
+  // Mock request object generator for updating user information
   const mockUpdateRequest = (userId, updateData) => ({
     params: { id: userId },
     body: updateData
@@ -96,6 +96,7 @@ async function main() {
   console.log("\nFetching all users initially...");
   await getUsers(mockRequest(), mockResponse());
 
+  // Add mock users
   for (const user of detailedUsers) {
     console.log(`\nAdding user: ${user.username}`);
     await addUser(mockRequest(user), mockResponse());
@@ -104,8 +105,7 @@ async function main() {
   console.log("\nFetching all users after additions...");
   await getUsers(mockRequest(), mockResponse());
 
-  // Now, test getUserByUsername
-  // Directly fetch a specific user by username
+ // Fetch a specific user by username
   const specificUsername = "user1"; 
   console.log(`\nFetching user by specific username: ${specificUsername}`);
   await getUserByUsername(mockRequestUsername(specificUsername), mockResponse());
@@ -127,12 +127,12 @@ if (lastJsonResponse && lastJsonResponse.user_id) {
 }
 
 // Test soft delete by user ID
-const userIdToDeleteSoft = 1; // Assuming user ID 1 needs to be soft deleted
+const userIdToDeleteSoft = 1; 
 console.log(`\nSoft deleting user with ID: ${userIdToDeleteSoft}`);
 await softDeleteUserById({ params: { id: userIdToDeleteSoft.toString() } }, mockResponse());
 
 // Test soft delete by username
-const usernameToDeleteSoft = "user2"; // Assuming username "user2" needs to be soft deleted
+const usernameToDeleteSoft = "user2"; 
 console.log(`\nSoft deleting user with username: ${usernameToDeleteSoft}`);
 await softDeleteUserByUsername(mockRequestUsername(usernameToDeleteSoft), mockResponse());
 
@@ -140,19 +140,20 @@ console.log("\nFetching all users after soft deletes...");
   await getUsers(mockRequest(), mockResponse());
 
 // Test hard delete by user ID
-const userIdToDeleteHard = 3; // Assuming user ID 3 needs to be hard deleted
+const userIdToDeleteHard = 3; 
 console.log(`\nHard deleting user with ID: ${userIdToDeleteHard}`);
 await deleteUserById({ params: { id: userIdToDeleteHard.toString() } }, mockResponse());
 
 // Test hard delete by username
-const usernameToDeleteHard = "user1"; // Assuming username "user4" needs to be hard deleted
+const usernameToDeleteHard = "user1"; 
 console.log(`\nHard deleting user with username: ${usernameToDeleteHard}`);
 await deleteUserByUsername(mockRequestUsername(usernameToDeleteHard), mockResponse());
 
 console.log("\nFetching all users after deleting user1 and user3...");
   await getUsers(mockRequest(), mockResponse());
 
-const userIdToDeleteHardAgain = 2; // Assuming user ID 2 needs to be hard deleted
+//Hard delete user2
+const userIdToDeleteHardAgain = 2; 
 console.log(`\nHard deleting user with ID: ${userIdToDeleteHardAgain}`);
 await deleteUserById({ params: { id: userIdToDeleteHardAgain.toString() } }, mockResponse());
 
