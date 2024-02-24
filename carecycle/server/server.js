@@ -29,7 +29,7 @@ app.delete('/users/:id', userDB.softDeleteUserById); // softDeleteUserById
 app.delete('/users/username/:username', userDB.softDeleteUserByUsername); //softdelete by username
 app.delete('/users/hard/:id', userDB.deleteUserById); // Hard delete by ID
 app.delete('/users/hard/username/:username', userDB.deleteUserByUsername); // Hard delete by username
-app.delete('/users/hard', userDB.deleteAllUsers); // Hard delete all users
+//app.delete('/users/hard', userDB.deleteAllUsers); // Hard delete all users
 
 // ClientStat routes
 app.get('/clientstats', clientStatDB.getClientStats)

@@ -82,23 +82,72 @@ const updateUser = async (request, response) => {
     const id = parseInt(request.params.id);
     const { username, firstName, lastName, primaryGenderId, vegetable, yearOfBirth, postalCodeId, isActive, userTypeID, mapID } = request.body;
 
+    // Initialize an array to hold parts of the SQL SET clause
+    const updates = [];
+    // Initialize an array to hold the values for the parameterized query
+    const values = [];
+    // Keep track of the parameter position for the SQL query
+    let valuePosition = 1;
+
+    // Dynamically add fields to the updates array if they're present in the request
+    if (username !== undefined) {
+        updates.push(`username = $${valuePosition++}`);
+        values.push(username);
+    }
+    if (firstName !== undefined) {
+        updates.push(`firstname = $${valuePosition++}`);
+        values.push(firstName);
+    }
+    if (lastName !== undefined) {
+        updates.push(`lastname = $${valuePosition++}`);
+        values.push(lastName);
+    }
+    if (primaryGenderId !== undefined) {
+        updates.push(`primary_gender_id = $${valuePosition++}`);
+        values.push(primaryGenderId);
+    }
+    if (vegetable !== undefined) {
+        updates.push(`vegetable = $${valuePosition++}`);
+        values.push(vegetable);
+    }
+    if (yearOfBirth !== undefined) {
+        updates.push(`year_of_birth = $${valuePosition++}`);
+        values.push(yearOfBirth);
+    }
+    if (postalCodeId !== undefined) {
+        updates.push(`postal_code_id = $${valuePosition++}`);
+        values.push(postalCodeId);
+    }
+    if (isActive !== undefined) {
+        updates.push(`is_active = $${valuePosition++}`);
+        values.push(isActive);
+    }
+    if (userTypeID !== undefined) {
+        updates.push(`usertype_id = $${valuePosition++}`);
+        values.push(userTypeID);
+    }
+    if (mapID !== undefined) {
+        updates.push(`map_id = $${valuePosition++}`);
+        values.push(mapID);
+    }
+
+    // Add the user ID to the values array for the WHERE clause
+    values.push(id);
+
+    // If no fields were provided for update, return an error
+    if (updates.length === 0) {
+        return response.status(400).json({ error: 'No valid fields provided for update' });
+    }
+
+    // Construct the SQL query
+    const sqlQuery = `
+        UPDATE carecycle.users
+        SET ${updates.join(', ')}
+        WHERE user_id = $${valuePosition}
+        RETURNING *;`;
+
     try {
-        const result = await pool.query(`
-            UPDATE carecycle.users
-            SET 
-                username = $1, 
-                firstname = $2, 
-                lastname = $3, 
-                primary_gender_id = $4, 
-                vegetable = $5, 
-                year_of_birth = $6, 
-                postal_code_id = $7, 
-                is_active = $8, 
-                usertype_id = $9, 
-                map_id = $10
-            WHERE user_id = $11
-            RETURNING *;`,
-            [username, firstName, lastName, primaryGenderId, vegetable, yearOfBirth, postalCodeId, isActive, userTypeID, mapID, id]);
+        const result = await pool.query(sqlQuery, values);
 
         if (result.rowCount > 0) {
             response.status(200).json(result.rows[0]);
