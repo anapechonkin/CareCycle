@@ -1,5 +1,5 @@
 // Import required modules
-const pool = require('../config/db'); // Database connection pool
+const { pool } = require('../config/db'); // Database connection pool
 const bcrypt = require('bcrypt'); // For hashing passwords
 const saltRounds = 10; // Defines the complexity of the hash function
 
