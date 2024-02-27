@@ -5,6 +5,8 @@ const bodyParser = require('body-parser')
 const port = process.env.PORT || 5001;
 const userDB = require('./routes/userRoutes.js');
 const clientStatDB = require('./routes/clientStatRoutes.js');
+const dropDownDB = require('./routes/dropDownRoutes.js');
+const lookupPostalCode = require('./routes/postalCodeRoutes.js');
 
 dotenv.config();
 
@@ -18,6 +20,15 @@ app.use(
 app.get('/', (request, response) => {
     response.json({ info: 'Node.js, Express, and Postgres API' })
   })
+
+// Postal code routes
+app.get('/postal-codes/lookup/:code', lookupPostalCode);
+
+  
+// Dropdown routes
+app.get('/dropdowns/primaryGender', dropDownDB.getPrimaryGenderIdentities);
+app.get('/dropdowns/mapRegions', dropDownDB.getMapRegions);
+app.get('/dropdowns/userTypes', dropDownDB.getUserTypes);
 
 // User routes
 app.get('/users', userDB.getUsers);
