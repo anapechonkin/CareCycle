@@ -18,7 +18,9 @@ const AddUserForm = () => {
     postalCode: '',
     vegetable: '',
     isActive: true,
+    postalCodeId: '', // Initialize postalCodeId here
   });
+  
 
   const [feedback, setFeedback] = useState({ message: '', type: '' });
   const [genderIdentities, setGenderIdentities] = useState([]);
@@ -67,7 +69,7 @@ const AddUserForm = () => {
       // Add postal code ID to the form data
       const dataToSend = {
         ...formData,
-        postalCodeId: postalCodeId, // Change to postalCodeId
+        postalCodeId, // Ensure this is always defined
       };
   
       // Add user with updated data
@@ -88,12 +90,14 @@ const AddUserForm = () => {
         postalCode: '',
         vegetable: '',
         isActive: true,
+        postalCodeId: '', // Reset this as well to maintain consistency
       });
     } catch (error) {
       console.error('Failed to add user:', error);
       setFeedback({ message: `Failed to add user: ${error.message}`, type: 'error' });
     }
   };
+  
   
   
   // Function to render text input fields
@@ -124,7 +128,7 @@ const AddUserForm = () => {
         {renderTextInput("password", "Password", formData.password, true)}
         {renderTextInput("firstName", "First Name", formData.firstName)}
         {renderTextInput("lastName", "Last Name", formData.lastName)}
-        {renderTextInput("yearOfBirth", "Year of Birth", formData.yearOfBirth)}
+        {renderTextInput("yearOfBirth", "Year of Birth (YYYY)", formData.yearOfBirth)}
         {renderTextInput("postalCode", "Postal Code", formData.postalCode)}
         {renderTextInput("vegetable", "Vegetable", formData.vegetable)}
         <Dropdown
