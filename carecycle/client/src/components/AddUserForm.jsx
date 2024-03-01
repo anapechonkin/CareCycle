@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import Dropdown from './DropDown';
 import Button from './Button';
+import Checkbox from './Checkbox';
 import { addUser } from '../api/userApi';
 import { fetchPrimaryGenderIdentities, fetchMapRegions, fetchUserTypes } from '../api/dropdownApi';
 import { lookupPostalCode, addPostalCode } from '../api/postalCodeApi';
+import { fetchGenderIdentities, addUserGenderIdentities } from '../api/genderIdentityApi';
 
 const AddUserForm = () => {
   const initialFormState = {
@@ -23,24 +25,55 @@ const AddUserForm = () => {
 
   const [formData, setFormData] = useState(initialFormState);
   const [feedback, setFeedback] = useState({ message: '', type: '' });
-  const [genderIdentities, setGenderIdentities] = useState([]);
+  const [primaryGenderIdentities, setPrimaryGenderIdentities] = useState([]);
   const [mapRegions, setMapRegions] = useState([]);
   const [userTypes, setUserTypes] = useState([]);
+  const [genderIdentities, setGenderIdentities] = useState([]);
+  const [selectedGenderIdentities, setSelectedGenderIdentities] = useState([]);
+
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setGenderIdentities(await fetchPrimaryGenderIdentities());
+        setPrimaryGenderIdentities(await fetchPrimaryGenderIdentities());
         setMapRegions(await fetchMapRegions());
         setUserTypes(await fetchUserTypes());
+
+        // Fetch gender identities and transform for Checkbox component
+        const fetchedGenderIdentities = await fetchGenderIdentities();
+        const checkboxOptions = fetchedGenderIdentities.map(identity => ({
+          ...identity,
+          id: identity.gender_identity_id,
+          name: identity.type,
+          checked: false, // Initialize all as unchecked
+        }));
+        setGenderIdentities(checkboxOptions);
+        console.log(genderIdentities); // Add this inside your useEffect after setting genderIdentities
+
       } catch (error) {
         console.error('Failed to fetch dropdown data:', error);
       }
     };
 
     fetchData();
-  }, []);
+}, []);
 
+
+  const handleGenderIdentityCheckboxChange = (event, option) => {
+    // Update the checked state of the option
+    const updatedGenderIdentities = genderIdentities.map(identity =>
+      identity.id === option.id ? { ...identity, checked: event.target.checked } : identity
+    );
+    setGenderIdentities(updatedGenderIdentities);
+  
+    // Update selectedGenderIdentities state
+    if (event.target.checked) {
+      setSelectedGenderIdentities(prev => [...prev, option.id]);
+    } else {
+      setSelectedGenderIdentities(prev => prev.filter(id => id !== option.id));
+    }
+  };
+  
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData(prev => ({
@@ -60,54 +93,73 @@ const AddUserForm = () => {
     e.preventDefault();
   
     try {
-      const formattedPostalCode = formData.postalCode.toUpperCase().replace(/\s+/g, '');
-      
-      // Attempt to lookup the postal code
-      const postalCodeResponse = await lookupPostalCode(formattedPostalCode);
-      
-      let postalCodeId = null;
-  
-      // If the postal code is found
-      if (postalCodeResponse && postalCodeResponse.postal_code_id) {
-        postalCodeId = postalCodeResponse.postal_code_id;
-      } else {
-        // If not found, add the postal code and get its ID
-        const addedPostalCodeResponse = await addPostalCode(formattedPostalCode);
-        if (addedPostalCodeResponse && addedPostalCodeResponse.postal_code_id) {
-          postalCodeId = addedPostalCodeResponse.postal_code_id;
+        const formattedPostalCode = formData.postalCode.toUpperCase().replace(/\s+/g, '');
+        
+        // Attempt to lookup the postal code
+        const postalCodeResponse = await lookupPostalCode(formattedPostalCode);
+        
+        let postalCodeId = null;
+    
+        // If the postal code is found
+        if (postalCodeResponse && postalCodeResponse.postal_code_id) {
+            postalCodeId = postalCodeResponse.postal_code_id;
         } else {
-          throw new Error('Failed to add postal code');
+            // If not found, add the postal code and get its ID
+            const addedPostalCodeResponse = await addPostalCode(formattedPostalCode);
+            if (addedPostalCodeResponse && addedPostalCodeResponse.postal_code_id) {
+                postalCodeId = addedPostalCodeResponse.postal_code_id;
+            } else {
+                throw new Error('Failed to add postal code');
+            }
         }
-      }
+    
+        // Prepare the data for user addition, including the postal code ID
+        const dataToSend = {
+            ...formData,
+            postalCode: formattedPostalCode, // Use the formatted postal code
+            postalCodeId, // Add the received postalCodeId to the user data
+        };
+    
+        // Attempt to add the user with the updated data
+        const addedUser = await addUser(dataToSend);
+        console.log('User added successfully:', addedUser);
+
+        // After successfully adding the user and retrieving their ID
+        const userId = addedUser.user_id; // Adjust based on the actual property name in your response
+        if (selectedGenderIdentities.length > 0) {
+            const genderIdentityResponse = await addUserGenderIdentities(userId, selectedGenderIdentities);
+            console.log('Gender identities added successfully:', genderIdentityResponse);
+        }
   
-      // Prepare the data for user addition, including the postal code ID
-      const dataToSend = {
-        ...formData,
-        postalCode: formattedPostalCode, // Use the formatted postal code
-        postalCodeId, // Add the received postalCodeId to the user data
-      };
-  
-      // Attempt to add the user with the updated data
-      const addedUser = await addUser(dataToSend);
-      console.log('User added successfully:', addedUser);
-  
-      setFeedback({ message: 'User added successfully!', type: 'success' });
-  
-      setTimeout(() => {
-        setFeedback({ message: '', type: '' });
-      }, 5000);
-  
-      // Reset form data to initial state after successful user addition
-      setFormData(initialFormState);
+        // Reset the selectedGenderIdentities
+        setSelectedGenderIdentities([]);
+
+        // Reset genderIdentities to uncheck all checkboxes
+        const resetGenderIdentities = genderIdentities.map(genderIdentity => ({
+            ...genderIdentity,
+            checked: false
+        }));
+        setGenderIdentities(resetGenderIdentities);
+
+        // Show success feedback message
+        setFeedback({ message: 'User added successfully!', type: 'success' });
+    
+        setTimeout(() => {
+            // Clear feedback message after timeout
+            setFeedback({ message: '', type: '' });
+        }, 5000);
+    
+        // Reset form data to initial state after successful user addition
+        setFormData(initialFormState);
     } catch (error) {
-      console.error('Failed to add user:', error);
-      setFeedback({ message: `Failed to add user: ${error.message}`, type: 'error' });
-  
-      setTimeout(() => {
-        setFeedback({ message: '', type: '' });
-      }, 5000);
+        console.error('Failed to add user:', error);
+        setFeedback({ message: `Failed to add user: ${error.message}`, type: 'error' });
+    
+        setTimeout(() => {
+            setFeedback({ message: '', type: '' });
+        }, 5000);
     }
-  };
+};
   
   // Restoring the renderTextInput function
   const renderTextInput = (name, placeholder, value, isPassword = false) => (
@@ -139,17 +191,25 @@ const AddUserForm = () => {
         {renderTextInput("postalCode", "Postal Code", formData.postalCode)}
         {renderTextInput("vegetable", "Vegetable", formData.vegetable)}
         <Dropdown
-          options={genderIdentities.map(({ primary_gender_id, gender_name }) => ({ label: gender_name, value: primary_gender_id }))}
-          placeholder="Select Gender Identity"
-          selectedValue={formData.primaryGenderId}
-          onSelect={(value) => handleDropdownChange('primaryGenderId', value)}
-        />
-        <Dropdown
           options={mapRegions.map(({ map_id, map_area_name }) => ({ label: map_area_name, value: map_id }))}
           placeholder="Select Map Region"
           selectedValue={formData.mapID}
           onSelect={(value) => handleDropdownChange('mapID', value)}
         />
+        <Dropdown
+          options={primaryGenderIdentities.map(({ primary_gender_id, gender_name }) => ({ label: gender_name, value: primary_gender_id }))}
+          placeholder="Select Primary Gender Identity"
+          selectedValue={formData.primaryGenderId}
+          onSelect={(value) => handleDropdownChange('primaryGenderId', value)}
+        />
+        {
+          formData.primaryGenderId === 3 && // Use the actual value for "other"
+          <Checkbox
+            title="Select Gender Identities"
+            options={genderIdentities}
+            onChange={(event, option) => handleGenderIdentityCheckboxChange(event, option)}
+          />
+        }
         <Button type="submit" text="Add User" />
       </form>
       {feedback.message && <p className={`mt-4 text-${feedback.type === 'success' ? 'green' : 'red'}-500`}>{feedback.message}</p>}
