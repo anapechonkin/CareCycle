@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 
-const DropDown = ({ options, placeholder, onSelect }) => {
+const DropDown = ({ options, placeholder, onSelect, selectedValue }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState("");
 
   const toggleDropdown = () => setIsOpen(!isOpen);
 
@@ -10,10 +9,8 @@ const DropDown = ({ options, placeholder, onSelect }) => {
 
   const handleOptionClick = (option) => {
     // Determine if the option is an object and handle accordingly
-    const optionLabel = isOptionObject(option) ? option.label : option;
     const optionValue = isOptionObject(option) ? option.value : option;
 
-    setSelectedOption(optionLabel); // Set display label
     setIsOpen(false);
     if (typeof onSelect === 'function') {
       onSelect(optionValue); // Pass the value (or the string itself if it's not an object)
@@ -22,13 +19,19 @@ const DropDown = ({ options, placeholder, onSelect }) => {
     }
   };
 
+  // Use selectedValue prop to determine the display label
+  const selectedOptionLabel = options.find((option) => {
+    const value = isOptionObject(option) ? option.value : option;
+    return value === selectedValue;
+  })?.label || '';
+
   return (
     <div className="relative w-full">
       <div
         className="w-full cursor-pointer border border-black rounded-lg text-base focus:outline-none flex justify-between items-center p-3 shadow-sm bg-white text-black"
         onClick={toggleDropdown}
       >
-        <span>{selectedOption || placeholder}</span>
+        <span>{selectedOptionLabel || placeholder}</span>
         <span className={`transform transition-transform duration-200 ${isOpen ? "rotate-180" : "rotate-0"}`}>
           &#9660;
         </span>
@@ -41,7 +44,6 @@ const DropDown = ({ options, placeholder, onSelect }) => {
               onClick={() => handleOptionClick(option)}
               className="p-2 text-lg text-black hover:bg-gray-100 cursor-pointer"
             >
-              {/* Display based on whether the option is an object */}
               {isOptionObject(option) ? option.label : option}
             </li>
           ))}
@@ -50,5 +52,6 @@ const DropDown = ({ options, placeholder, onSelect }) => {
     </div>
   );
 };
+
 
 export default DropDown;

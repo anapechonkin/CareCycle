@@ -3,10 +3,10 @@ import Dropdown from './DropDown';
 import Button from './Button';
 import { addUser } from '../api/userApi';
 import { fetchPrimaryGenderIdentities, fetchMapRegions, fetchUserTypes } from '../api/dropdownApi';
-import { lookupPostalCode } from '../api/postalCodeApi';
+import { lookupPostalCode, addPostalCode } from '../api/postalCodeApi';
 
 const AddUserForm = () => {
-  const [formData, setFormData] = useState({
+  const initialFormState = {
     userTypeID: '',
     username: '',
     password: '',
@@ -18,10 +18,10 @@ const AddUserForm = () => {
     postalCode: '',
     vegetable: '',
     isActive: true,
-    postalCodeId: '', // Initialize postalCodeId here
-  });
-  
+    postalCodeId: '', // Keep postalCodeId in the initial state
+  };
 
+  const [formData, setFormData] = useState(initialFormState);
   const [feedback, setFeedback] = useState({ message: '', type: '' });
   const [genderIdentities, setGenderIdentities] = useState([]);
   const [mapRegions, setMapRegions] = useState([]);
@@ -60,59 +60,66 @@ const AddUserForm = () => {
     e.preventDefault();
   
     try {
-      // Retrieve postal code ID
-      const postalCodeId = await lookupPostalCode(formData.postalCode);
-      if (!postalCodeId) {
-        throw new Error('Invalid postal code');
+      const formattedPostalCode = formData.postalCode.toUpperCase().replace(/\s+/g, '');
+      
+      // Attempt to lookup the postal code
+      const postalCodeResponse = await lookupPostalCode(formattedPostalCode);
+      
+      let postalCodeId = null;
+  
+      // If the postal code is found
+      if (postalCodeResponse && postalCodeResponse.postal_code_id) {
+        postalCodeId = postalCodeResponse.postal_code_id;
+      } else {
+        // If not found, add the postal code and get its ID
+        const addedPostalCodeResponse = await addPostalCode(formattedPostalCode);
+        if (addedPostalCodeResponse && addedPostalCodeResponse.postal_code_id) {
+          postalCodeId = addedPostalCodeResponse.postal_code_id;
+        } else {
+          throw new Error('Failed to add postal code');
+        }
       }
   
-      // Add postal code ID to the form data
+      // Prepare the data for user addition, including the postal code ID
       const dataToSend = {
         ...formData,
-        postalCodeId, // Ensure this is always defined
+        postalCode: formattedPostalCode, // Use the formatted postal code
+        postalCodeId, // Add the received postalCodeId to the user data
       };
   
-      // Add user with updated data
+      // Attempt to add the user with the updated data
       const addedUser = await addUser(dataToSend);
       console.log('User added successfully:', addedUser);
+  
       setFeedback({ message: 'User added successfully!', type: 'success' });
   
-      // Reset form data
-      setFormData({
-        userTypeID: '',
-        username: '',
-        password: '',
-        firstName: '',
-        lastName: '',
-        yearOfBirth: '',
-        primaryGenderId: '',
-        mapID: '',
-        postalCode: '',
-        vegetable: '',
-        isActive: true,
-        postalCodeId: '', // Reset this as well to maintain consistency
-      });
+      setTimeout(() => {
+        setFeedback({ message: '', type: '' });
+      }, 5000);
+  
+      // Reset form data to initial state after successful user addition
+      setFormData(initialFormState);
     } catch (error) {
       console.error('Failed to add user:', error);
       setFeedback({ message: `Failed to add user: ${error.message}`, type: 'error' });
+  
+      setTimeout(() => {
+        setFeedback({ message: '', type: '' });
+      }, 5000);
     }
   };
   
-  
-  
-  // Function to render text input fields
-  function renderTextInput(name, placeholder, value, isPassword = false) {
-    return (
-      <input
-        type={isPassword ? "password" : "text"}
-        name={name}
-        placeholder={placeholder}
-        value={value}
-        onChange={handleChange}
-        className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200"
-      />
-    );
-  }
+  // Restoring the renderTextInput function
+  const renderTextInput = (name, placeholder, value, isPassword = false) => (
+    <input
+      type={isPassword ? "password" : "text"}
+      name={name}
+      placeholder={placeholder}
+      value={value}
+      onChange={handleChange}
+      className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200"
+    />
+  );
 
   return (
     <div className="bg-white shadow-lg rounded-lg p-8 mt-10 mb-10">
@@ -133,14 +140,14 @@ const AddUserForm = () => {
         {renderTextInput("vegetable", "Vegetable", formData.vegetable)}
         <Dropdown
           options={genderIdentities.map(({ primary_gender_id, gender_name }) => ({ label: gender_name, value: primary_gender_id }))}
-          placeholder="Gender Identity"
+          placeholder="Select Gender Identity"
           selectedValue={formData.primaryGenderId}
           onSelect={(value) => handleDropdownChange('primaryGenderId', value)}
         />
         <Dropdown
           options={mapRegions.map(({ map_id, map_area_name }) => ({ label: map_area_name, value: map_id }))}
-          placeholder="Map Region"
-          selectedValue={formData.map_id}
+          placeholder="Select Map Region"
+          selectedValue={formData.mapID}
           onSelect={(value) => handleDropdownChange('mapID', value)}
         />
         <Button type="submit" text="Add User" />

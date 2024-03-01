@@ -6,7 +6,7 @@ const port = process.env.PORT || 5001;
 const userDB = require('./routes/userRoutes.js');
 const clientStatDB = require('./routes/clientStatRoutes.js');
 const dropDownDB = require('./routes/dropDownRoutes.js');
-const lookupPostalCode = require('./routes/postalCodeRoutes.js');
+const findPostalCode = require('./routes/postalCodeRoutes.js');
 
 dotenv.config();
 
@@ -22,9 +22,9 @@ app.get('/', (request, response) => {
   })
 
 // Postal code routes
-app.get('/postal-codes/lookup/:code', lookupPostalCode);
+app.get('/postal-codes/lookup/:code', findPostalCode.lookupPostalCode);
+app.post('/postal-codes/add', findPostalCode.addPostalCode);
 
-  
 // Dropdown routes
 app.get('/dropdowns/primaryGender', dropDownDB.getPrimaryGenderIdentities);
 app.get('/dropdowns/mapRegions', dropDownDB.getMapRegions);
