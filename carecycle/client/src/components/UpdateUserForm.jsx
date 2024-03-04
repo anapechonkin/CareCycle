@@ -241,6 +241,13 @@ const handleSubmit = async (e) => {
     label: `${user.firstname} ${user.lastname} (${user.username})`,
   }));
 
+  //Filter users based on the 'filter' state
+  const filteredUsers = users.filter(user => {
+    if (filter === 'active') return user.is_active;
+    if (filter === 'archived') return !user.is_active;
+    return true; // 'all' case, no filtering needed
+  });
+
   const customSelectStyles = {
     control: (provided) => ({
       ...provided,
@@ -273,7 +280,11 @@ const handleSubmit = async (e) => {
       </div>
 
       <Select
-        options={userOptions}
+        options={filteredUsers.map(user => ({
+          value: user.user_id,
+          label: `${user.firstname} ${user.lastname} (${user.username})`,
+          user: user,
+        }))}
         onChange={(option) => handleSelectChange('username', option)}
         placeholder="Search by name or username"
         isClearable
