@@ -1,41 +1,68 @@
-import React, { useState } from "react";
-import Select from 'react-select'; // Import React Select
+import React, { useState, useEffect } from "react";
+import Select from 'react-select';
 import Button from "./Button";
-import users from "../data/mockUserData"; // Import your users data
+import { getUsers, softDeleteUser } from "../api/userApi"; // Adjust the import path as needed
 
-const DeleteUserForm = () => {
+const DeleteUserForm = ({ onUsersChanged }) => {
   const [selectedUser, setSelectedUser] = useState(null);
+  const [users, setUsers] = useState([]);
+  const [feedbackMessage, setFeedbackMessage] = useState("");
+  const [feedbackType, setFeedbackType] = useState(""); // New state for feedback type
+  const [clearSelect, setClearSelect] = useState(false);
 
-  // Transform users data for React Select
-  const userOptions = users.map(user => ({
-    value: user.username,
-    label: `${user.firstName} ${user.lastName} (${user.username})`,
-    user: user,
-  }));
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const fetchedUsers = await getUsers();
+      setUsers(fetchedUsers);
+    };
+
+    fetchUsers();
+  }, []);
+
+  useEffect(() => {
+    if (clearSelect) {
+      setSelectedUser(null);
+      setClearSelect(false);
+    }
+  }, [clearSelect]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (selectedUser && selectedUser.user_id) {
+      console.log("Attempting to archive user:", selectedUser); // Log before archiving
+      try {
+        await softDeleteUser(selectedUser.user_id);
+        console.log("User successfully archived:", { ...selectedUser, is_active: false }); // Log after assuming success
+        onUsersChanged();
+        setFeedbackMessage("User successfully archived.");
+        setFeedbackType("success");
+        setClearSelect(true);
+        
+        setTimeout(() => {
+          setFeedbackMessage("");
+        }, 3000); // Clear message after 3 seconds
+      } catch (error) {
+        console.error('Error deleting user:', error);
+        setFeedbackMessage("Failed to archive user.");
+        setFeedbackType("error");
+      }
+    } else {
+      console.error('No user selected or user ID is undefined');
+      setFeedbackMessage("No user selected.");
+      setFeedbackType("error");
+    }
+  };
 
   const handleSelectChange = (selectedOption) => {
-    // Set selected user data to state
-    if (selectedOption) {
-      setSelectedUser(selectedOption.user);
-    } else {
-      setSelectedUser(null);
-    }
+    setSelectedUser(selectedOption ? selectedOption.user : null);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (selectedUser) {
-      console.log("Deleting user:", selectedUser);
-      // Implement the deletion logic here, e.g., calling an API to delete the user
-    }
-  };
-
-  // Custom style for react-select, mimicking Tailwind
+  // Custom style for react-select
   const customSelectStyles = {
     control: (provided) => ({
       ...provided,
       borderRadius: '0.5rem',
-      border: '1px solid #d1d5db', // Tailwind gray-300
+      border: '1px solid #d1d5db',
       padding: '0.5rem',
     }),
     menu: (provided) => ({
@@ -44,26 +71,39 @@ const DeleteUserForm = () => {
     }),
   };
 
-
   return (
     <div className="bg-white shadow-lg rounded-lg p-8 mt-10 mb-10">
       <h2 className="text-3xl font-semibold text-center text-gray-800 mb-6">Delete User</h2>
       <Select
-        options={userOptions}
+        options={users.map(user => ({
+          value: user.user_id,
+          label: `${user.firstname} ${user.lastname} (${user.username})`,
+          user: user,
+        }))}
         onChange={handleSelectChange}
         placeholder="Search by username"
         isClearable
+        value={selectedUser ? {
+          value: selectedUser.user_id,
+          label: `${selectedUser.firstname} ${selectedUser.lastname} (${selectedUser.username})`,
+          user: selectedUser,
+        } : null}
         className="mb-4"
         styles={customSelectStyles}
       />
       {selectedUser && (
         <div className="space-y-4 mb-4">
-          <div><strong>First Name:</strong> {selectedUser.firstName}</div>
-          <div><strong>Last Name:</strong> {selectedUser.lastName}</div>
+          <div><strong>First Name:</strong> {selectedUser.firstname}</div>
+          <div><strong>Last Name:</strong> {selectedUser.lastname}</div>
           <div><strong>Username:</strong> {selectedUser.username}</div>
         </div>
       )}
-      <Button type="submit" onClick={handleSubmit} text="DELETE" className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" />
+      <Button type="button" onClick={handleSubmit} text="DELETE" className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" />
+      {feedbackMessage && (
+        <div className={`text-center my-4 ${feedbackType === "success" ? "text-green-500" : "text-red-500"}`}>
+          {feedbackMessage}
+        </div>
+      )}
     </div>
   );
 };

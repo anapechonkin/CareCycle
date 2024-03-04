@@ -82,7 +82,7 @@ export const addUser = async (userData) => {
     };
   
     try {
-      const response = await fetch(`/api/users/${userId}`, requestOptions);
+      const response = await fetch(`/users/${userId}`, requestOptions);
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }

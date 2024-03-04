@@ -27,7 +27,7 @@ const UserAccountPage = () => {
   const tabs = [
     { id: 'add', name: 'ADD' },
     { id: 'update', name: 'UPDATE' },
-    { id: 'delete', name: 'DELETE' }
+    { id: 'archive', name: 'ARCHIVE' }
   ];
 
   return (
@@ -50,8 +50,8 @@ const UserAccountPage = () => {
             {/* Pass the refreshUsersList and users to UpdateUserForm */}
             <UpdateUserForm onAddUser={refreshUsersList} users={users} />
           </div>
-          <div className={activeTab !== 'delete' ? 'hidden' : ''}>
-            <DeleteUserForm />
+          <div className={activeTab !== 'archive' ? 'hidden' : ''}>
+            <DeleteUserForm onUsersChanged={refreshUsersList}/>
           </div>
         </div>
       </div>
