@@ -7,7 +7,7 @@ import { fetchPrimaryGenderIdentities, fetchMapRegions, fetchUserTypes } from '.
 import { lookupPostalCode, addPostalCode } from '../api/postalCodeApi';
 import { fetchGenderIdentities, addUserGenderIdentities } from '../api/genderIdentityApi';
 
-const AddUserForm = () => {
+const AddUserForm = ({ onAddUser }) => {
   const initialFormState = {
     userTypeID: '',
     username: '',
@@ -30,7 +30,6 @@ const AddUserForm = () => {
   const [userTypes, setUserTypes] = useState([]);
   const [genderIdentities, setGenderIdentities] = useState([]);
   const [selectedGenderIdentities, setSelectedGenderIdentities] = useState([]);
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -138,8 +137,9 @@ const AddUserForm = () => {
             ...genderIdentity,
             checked: false
         }));
-        setGenderIdentities(resetGenderIdentities);
-
+        setGenderIdentities(resetGenderIdentities); 
+       
+        await onAddUser(); // Call the handler to update the list of users
         // Show success feedback message
         setFeedback({ message: 'User added successfully!', type: 'success' });
     

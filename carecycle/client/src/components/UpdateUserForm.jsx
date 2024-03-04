@@ -4,11 +4,12 @@ import Button from "./Button";
 import Checkbox from "./Checkbox";
 import Dropdown from "./DropDown";
 import { fetchUserTypes, fetchPrimaryGenderIdentities, fetchMapRegions } from "../api/dropdownApi";
-import { getUsers, updateUser, getUserById } from "../api/userApi";
+import { updateUser, getUserById } from "../api/userApi";
 import { fetchGenderIdentities, updateUserGenderIdentities } from "../api/genderIdentityApi";
 import { lookupPostalCode, addPostalCode } from '../api/postalCodeApi';
 
-const UpdateUserForm = () => {
+// Updated to accept `users` as a prop
+const UpdateUserForm = ({ onAddUser, users }) => {
   const [formData, setFormData] = useState({
     userTypeID: '',
     username: '',
@@ -23,7 +24,6 @@ const UpdateUserForm = () => {
     postalCodeId: '',
   });
 
-  const [users, setUsers] = useState([]);
   const [filter, setFilter] = useState('all');
   const [userTypes, setUserTypes] = useState([]);
   const [primaryGenderIdentities, setPrimaryGenderIdentities] = useState([]);
@@ -39,13 +39,11 @@ const UpdateUserForm = () => {
       const userTypesData = await fetchUserTypes();
       const primaryGenderIdentitiesData = await fetchPrimaryGenderIdentities();
       const mapRegionsData = await fetchMapRegions();
-      const usersData = await getUsers();
       const genderIdentitiesData = await fetchGenderIdentities();
 
       setUserTypes(userTypesData);
       setPrimaryGenderIdentities(primaryGenderIdentitiesData);
       setMapRegions(mapRegionsData);
-      setUsers(usersData);
       setGenderIdentities(genderIdentitiesData);
     }
     fetchData();
@@ -55,9 +53,8 @@ const UpdateUserForm = () => {
     async function fetchUserData() {
       if (selectedUserId) {
         const userData = await getUserById(selectedUserId);
-        console.log("User Data:", userData); // Ensure this log is here to see fetched data
+        // Setting form data based on fetched user data
         setFormData({
-          ...formData,
           userTypeID: userData.usertype_id || '',
           username: userData.username || '',
           firstName: userData.firstname || '',
@@ -65,21 +62,20 @@ const UpdateUserForm = () => {
           yearOfBirth: userData.year_of_birth ? userData.year_of_birth.toString() : '',
           primaryGenderId: userData.primary_gender_id,
           mapID: userData.map_id || '',
-          postalCode: userData.postal_code || '', // Make sure this matches your API response
+          postalCode: userData.postal_code || '',
           vegetable: userData.vegetable || '',
           isActive: userData.is_active || false,
-          postalCodeId: userData.postal_code_id || '', // Only if needed
+          postalCodeId: userData.postal_code_id || '',
         });
-        if (userData.gender_identities !== null) {
+        if (userData.gender_identities) {
           setSelectedGenderIdentities(userData.gender_identities.map(gi => gi.gender_identity_id));
         }
-        console.log("Primary Gender Id:", userData.primary_gender_id); // Log primary gender id
-        console.log("Primary Gender Identities:", userData.gender_identities); // Log gender identities
       }
     }
     fetchUserData();
   }, [selectedUserId]);
 
+  // Update the `checkboxOptions` state based on `genderIdentities` and `selectedGenderIdentities`
   useEffect(() => {
     const options = genderIdentities.map(identity => ({
       id: identity.gender_identity_id,
@@ -194,6 +190,8 @@ const handleSubmit = async (e) => {
     // Fetch updated user data and log it
     const updatedUserData = await getUserById(selectedUserId);
     console.log("Updated User Data:", updatedUserData);
+
+    await onAddUser();
 
     // Provide success feedback
     setFeedback({ message: 'User updated successfully!', type: 'success' });

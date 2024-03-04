@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Banner from "../components/Banner";
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
@@ -7,9 +7,21 @@ import TabComponent from "../components/Tab";
 import AddUserForm from "../components/AddUserForm";
 import UpdateUserForm from "../components/UpdateUserForm";
 import DeleteUserForm from "../components/DeleteUserForm";
+import { getUsers } from '../api/userApi';
 
 const UserAccountPage = () => {
   const [activeTab, setActiveTab] = useState('add');
+  const [users, setUsers] = useState([]);
+
+  // Fetch the list of users on component mount and whenever needed
+  const refreshUsersList = async () => {
+    const fetchedUsers = await getUsers();
+    setUsers(fetchedUsers);
+  };
+
+  useEffect(() => {
+    refreshUsersList();
+  }, []);
 
   // Define the tabs and their corresponding components
   const tabs = [
@@ -32,10 +44,11 @@ const UserAccountPage = () => {
             setCurrentTab={setActiveTab}
           />
           <div className={activeTab !== 'add' ? 'hidden' : ''}>
-            <AddUserForm />
+            <AddUserForm onAddUser={refreshUsersList} />
           </div>
           <div className={activeTab !== 'update' ? 'hidden' : ''}>
-            <UpdateUserForm />
+            {/* Pass the refreshUsersList and users to UpdateUserForm */}
+            <UpdateUserForm onAddUser={refreshUsersList} users={users} />
           </div>
           <div className={activeTab !== 'delete' ? 'hidden' : ''}>
             <DeleteUserForm />
@@ -46,6 +59,5 @@ const UserAccountPage = () => {
     </div>
   );
 };
-
 
 export default UserAccountPage;
