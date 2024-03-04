@@ -1,100 +1,126 @@
-import React, { useState, useMemo } from "react";
-import Select from 'react-select';
+import React, { useState, useEffect } from "react";
+import Select from 'react-select'; 
 import Button from "./Button";
 import Checkbox from "./Checkbox";
-import genderIdentities from "../data/genderIdentities";
-import mapRegions from "../data/mapRegions";
-import users from "../data/mockUserData";
+import Dropdown from "./DropDown";
+import { fetchUserTypes, fetchPrimaryGenderIdentities, fetchMapRegions } from "../api/dropdownApi";
+import { getUsers, updateUser, getUserById } from "../api/userApi";
+import { fetchGenderIdentities, updateUserGenderIdentities } from "../api/genderIdentityApi";
+import { lookupPostalCode, addPostalCode } from '../api/postalCodeApi';
 
 const UpdateUserForm = () => {
   const [formData, setFormData] = useState({
-    searchUser: null, // State for the selected user from the search bar
-    userType: "",
-    username: "",
-    password: "",
-    firstName: "",
-    lastName: "",
-    yearOfBirth: "",
-    genderIdentity: "",
-    placeOfOrigin: "",
-    postalCode: "",
-    vegetable: "",
-    status: false,
+    userTypeID: '',
+    username: '',
+    firstName: '',
+    lastName: '',
+    yearOfBirth: '',
+    primaryGenderId: '',
+    mapID: '',
+    postalCode: '',
+    vegetable: '',
+    isActive: false,
+    postalCodeId: '',
   });
 
-  const [filter, setFilter] = useState('all'); // 'all', 'active', 'archived'
+  const [users, setUsers] = useState([]);
+  const [filter, setFilter] = useState('all');
+  const [userTypes, setUserTypes] = useState([]);
+  const [primaryGenderIdentities, setPrimaryGenderIdentities] = useState([]);
+  const [mapRegions, setMapRegions] = useState([]);
+  const [selectedUserId, setSelectedUserId] = useState('');
+  const [genderIdentities, setGenderIdentities] = useState([]);
+  const [selectedGenderIdentities, setSelectedGenderIdentities] = useState([]);
+  const [feedback, setFeedback] = useState({ message: '', type: '' });
+  const [checkboxOptions, setCheckboxOptions] = useState([]); 
 
-  // State for the selected user from the search bar
-  const [selectedUser, setSelectedUser] = useState(null);
+  useEffect(() => {
+    async function fetchData() {
+      const userTypesData = await fetchUserTypes();
+      const primaryGenderIdentitiesData = await fetchPrimaryGenderIdentities();
+      const mapRegionsData = await fetchMapRegions();
+      const usersData = await getUsers();
+      const genderIdentitiesData = await fetchGenderIdentities();
 
-  const userOptions = useMemo(() => users.filter(user => {
-    switch (filter) {
-      case 'active':
-        return user.status === "Active";
-      case 'archived':
-        return user.status !== "Active";
-      default:
-        return true;
+      setUserTypes(userTypesData);
+      setPrimaryGenderIdentities(primaryGenderIdentitiesData);
+      setMapRegions(mapRegionsData);
+      setUsers(usersData);
+      setGenderIdentities(genderIdentitiesData);
     }
-  }).map(user => ({
-    value: user.username,
-    label: `${user.firstName} ${user.lastName} (${user.username})`,
-    user: user,
-  })), [filter]);
+    fetchData();
+  }, []);
 
-  const userTypeOptions = ["Admin", "Volunteer", "CA/Employee"].map(option => ({
-    value: option,
-    label: option,
-  }));
+  useEffect(() => {
+    async function fetchUserData() {
+      if (selectedUserId) {
+        const userData = await getUserById(selectedUserId);
+        console.log("User Data:", userData); // Ensure this log is here to see fetched data
+        setFormData({
+          ...formData,
+          userTypeID: userData.usertype_id || '',
+          username: userData.username || '',
+          firstName: userData.firstname || '',
+          lastName: userData.lastname || '',
+          yearOfBirth: userData.year_of_birth ? userData.year_of_birth.toString() : '',
+          primaryGenderId: userData.primary_gender_id,
+          mapID: userData.map_id || '',
+          postalCode: userData.postal_code || '', // Make sure this matches your API response
+          vegetable: userData.vegetable || '',
+          isActive: userData.is_active || false,
+          postalCodeId: userData.postal_code_id || '', // Only if needed
+        });
+        if (userData.gender_identities !== null) {
+          setSelectedGenderIdentities(userData.gender_identities.map(gi => gi.gender_identity_id));
+        }
+        console.log("Primary Gender Id:", userData.primary_gender_id); // Log primary gender id
+        console.log("Primary Gender Identities:", userData.gender_identities); // Log gender identities
+      }
+    }
+    fetchUserData();
+  }, [selectedUserId]);
 
-  const genderIdentityOptions = genderIdentities.map(gi => ({
-    value: gi.name,
-    label: gi.name,
-  }));
+  useEffect(() => {
+    const options = genderIdentities.map(identity => ({
+      id: identity.gender_identity_id,
+      name: identity.type,
+      checked: selectedGenderIdentities.includes(identity.gender_identity_id),
+    }));
+    setCheckboxOptions(options);
+  }, [genderIdentities, selectedGenderIdentities]);
 
-  const placeOfOriginOptions = mapRegions.map(region => ({
-    value: region.name,
-    label: region.name,
-  }));
-
-  const handleSelectChange = (field, selectedOption) => {
-    setFormData(prevState => ({
-      ...prevState,
-      [field]: selectedOption ? selectedOption.value : '',
+  const handleDropdownChange = (name, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [name]: value,
     }));
   };
 
-  const handleUserSelectChange = selectedOption => {
-    if (selectedOption) {
-      const { user } = selectedOption;
-      setFormData({
-        userType: user.userType,
-        username: user.username,
-        password: '', // Assuming you don't want to display the password
-        firstName: user.firstName,
-        lastName: user.lastName,
-        yearOfBirth: user.yearOfBirth,
-        genderIdentity: user.genderIdentity,
-        placeOfOrigin: user.placeOfOrigin,
-        postalCode: user.postalCode,
-        vegetable: user.vegetable,
-        status: user.status === "Active",
-      });
+  const handleSelectChange = (name, selectedOption) => {
+    if (name === 'username') {
+      if (selectedOption) {
+        setSelectedUserId(selectedOption.value);
+      } else {
+        setSelectedUserId(null);
+        setFormData({ // Reset formData to its initial state
+          userTypeID: '',
+          username: '',
+          firstName: '',
+          lastName: '',
+          yearOfBirth: '',
+          primaryGenderId: '',
+          mapID: '',
+          postalCode: '',
+          vegetable: '',
+          isActive: false,
+          postalCodeId: '',
+        });
+        setSelectedGenderIdentities([]);
+        // Reset any other state that depends on the selected user
+      }
     } else {
-      // Reset form if no user is selected
-      setFormData({
-        userType: "",
-        username: "",
-        password: "",
-        firstName: "",
-        lastName: "",
-        yearOfBirth: "",
-        genderIdentity: "",
-        placeOfOrigin: "",
-        postalCode: "",
-        vegetable: "",
-        status: false,
-      });
+      // For custom dropdown components
+      handleDropdownChange(name, selectedOption ? selectedOption.value : '');
     }
   };
 
@@ -105,18 +131,123 @@ const UpdateUserForm = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Updated User:", formData);
-    // Here you would typically send the update to your backend
-  };
+  const handleGenderIdentityCheckboxChange = (event, option) => {
+    const updatedSelections = event.target.checked
+        ? [...selectedGenderIdentities, option.id] // Add ID if checked
+        : selectedGenderIdentities.filter(id => id !== option.id); // Remove ID if unchecked
 
-  // Custom style for react-select, mimicking Tailwind
+    setSelectedGenderIdentities(updatedSelections);
+};
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    // Handle the Postal Code
+    const formattedPostalCode = formData.postalCode.toUpperCase().replace(/\s+/g, '');
+    let postalCodeId;
+
+    // Attempt to lookup the postal code
+    const postalCodeResponse = await lookupPostalCode(formattedPostalCode);
+    if (postalCodeResponse && postalCodeResponse.postal_code_id) {
+      postalCodeId = postalCodeResponse.postal_code_id;
+    } else {
+      // If not found, add the postal code and get its ID
+      const addedPostalCodeResponse = await addPostalCode(formattedPostalCode);
+      if (addedPostalCodeResponse && addedPostalCodeResponse.postal_code_id) {
+        postalCodeId = addedPostalCodeResponse.postal_code_id;
+      } else {
+        throw new Error('Failed to add postal code');
+      }
+    }
+
+    // Prepare the user information for update, now including the postalCodeId
+    const userInfoToUpdate = {
+      ...formData,
+      postalCodeId, // Include the postalCodeId obtained from the DB
+    };
+
+    // Remove the postalCode field as it's not expected by the updateUser API
+    delete userInfoToUpdate.postalCode;
+
+    // If the primary gender is updated from "Other" to "Male" or "Female",
+    // remove associated gender identities
+    if (formData.primaryGenderId !== 'Other') {
+      // Modify userInfoToUpdate to exclude gender identities
+      delete userInfoToUpdate.gender_identities;
+    } else if (selectedGenderIdentities.length > 0) {
+      // If the primary gender is "Other" and new gender identities are selected,
+      // include these identities in the userInfoToUpdate
+      userInfoToUpdate.gender_identities = selectedGenderIdentities;
+    }
+
+    // Update the user information with all fields
+    const updateResponse = await updateUser(selectedUserId, userInfoToUpdate);
+    console.log("Basic User Info Update Response:", updateResponse);
+
+    // If there's a change in gender identities, update them separately
+    if (formData.primaryGenderId !== 'Other' && selectedGenderIdentities.length > 0) {
+      const genderUpdateResponse = await updateUserGenderIdentities(selectedUserId, selectedGenderIdentities);
+      console.log("Gender Identities Update Response:", genderUpdateResponse);
+    }
+
+    // Fetch updated user data and log it
+    const updatedUserData = await getUserById(selectedUserId);
+    console.log("Updated User Data:", updatedUserData);
+
+    // Provide success feedback
+    setFeedback({ message: 'User updated successfully!', type: 'success' });
+
+    // Reset form data, selected user, and clear the feedback message after a few seconds
+    setTimeout(() => {
+      setFormData({
+        userTypeID: '',
+        username: '',
+        firstName: '',
+        lastName: '',
+        yearOfBirth: '',
+        primaryGenderId: '',
+        mapID: '',
+        postalCode: '',
+        vegetable: '',
+        isActive: false,
+        postalCodeId: '',
+      });
+
+      // Clear selected user and reset React Select
+      setSelectedUserId(null);
+
+      // Clear selected gender identities
+      setSelectedGenderIdentities([]);
+
+      // Optionally, reset checkboxes if necessary
+      const resetCheckboxOptions = checkboxOptions.map(option => ({
+        ...option,
+        checked: false,
+      }));
+      setCheckboxOptions(resetCheckboxOptions);
+
+      // Hide feedback message
+      setFeedback({ message: '', type: '' });
+    }, 5000); // Adjust the time as needed
+  } catch (error) {
+    console.error("Failed to update user:", error);
+    setFeedback({ message: `Failed to update user: ${error.message}`, type: 'error' });
+  }
+};
+
+
+  // Preparing user options for the dropdown
+  const userOptions = users.map(user => ({
+    value: user.user_id,
+    label: `${user.firstname} ${user.lastname} (${user.username})`,
+  }));
+
   const customSelectStyles = {
     control: (provided) => ({
       ...provided,
       borderRadius: '0.5rem',
-      border: '1px solid #d1d5db', // Tailwind gray-300
+      border: '1px solid #d1d5db',
       padding: '0.5rem',
     }),
     menu: (provided) => ({
@@ -145,161 +276,162 @@ const UpdateUserForm = () => {
 
       <Select
         options={userOptions}
-        onChange={handleUserSelectChange}
+        onChange={(option) => handleSelectChange('username', option)}
         placeholder="Search by name or username"
         isClearable
+        value={userOptions.find(option => option.value === selectedUserId) || null} // Ensure this line is correct
         className="mb-4"
         styles={customSelectStyles}
       />
-<form onSubmit={handleSubmit} className="space-y-4">
-  {/* Username */}
-  <div>
-    <label htmlFor="username" className="block text-sm font-medium text-gray-700">Username</label>
-    <input
-      id="username"
-      type="text"
-      name="username"
-      value={formData.username}
-      onChange={handleChange}
-      className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200"
-    />
-  </div>
 
-  {/* Password */}
-  <div>
-    <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
-    <input
-      id="password"
-      type="password"
-      name="password"
-      value={formData.password}
-      onChange={handleChange}
-      className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200"
-    />
-  </div>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label htmlFor="username" className="block text-sm font-medium text-gray-700">Username</label>
+          <input
+            id="username"
+            type="text"
+            name="username"
+            value={formData.username}
+            onChange={handleChange}
+            className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200"
+          />
+        </div>
 
-  {/* Status Checkbox */}
-  <div className="flex items-center">
-    <Checkbox
-      title="Status"
-      options={[{ id: "status", label: "Active", checked: formData.status }]}
-      onChange={handleChange}
-    />
-  </div>
+        <div>
+          <label htmlFor="userType" className="block text-sm font-medium text-gray-700">User Type</label>
+          <Dropdown
+            options={userTypes.map(({ usertype_id, role }) => ({ label: role, value: usertype_id }))}
+            selectedValue={formData.userTypeID}
+            onSelect={(value) => handleSelectChange('userTypeID', { value })}
+            placeholder="Select User Type"
+          />
+        </div>
 
-  {/* UserType */}
-  <div>
-    <label htmlFor="userType" className="block text-sm font-medium text-gray-700">User Type</label>
-    <Select
-      id="userType"
-      name="userType"
-      options={userTypeOptions}
-      value={userTypeOptions.find(option => option.value === formData.userType)}
-      onChange={(option) => handleSelectChange('userType', option)}
-      styles={customSelectStyles}
-    />
-  </div>
+        <Checkbox
+          title="Status"
+          options={[{ id: "status", name: "Active", checked: formData.isActive }]}
+          onChange={(event, option) => {
+            handleChange({
+              target: {
+                name: "isActive",
+                value: event.target.checked,
+                type: 'checkbox',
+              },
+            });
+          }}
+        />
 
-  {/* FirstName */}
-  <div>
-    <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">First Name</label>
-    <input
-      id="firstName"
-      type="text"
-      name="firstName"
-      value={formData.firstName}
-      onChange={handleChange}
-      className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200"
-    />
-  </div>
+        <div>
+          <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">First Name</label>
+          <input
+            id="firstName"
+            type="text"
+            name="firstName"
+            value={formData.firstName}
+            onChange={handleChange}
+            className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200"
+          />
+        </div>
 
-  {/* LastName */}
-  <div>
-    <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">Last Name</label>
-    <input
-      id="lastName"
-      type="text"
-      name="lastName"
-      value={formData.lastName}
-      onChange={handleChange}
-      className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200"
-    />
-  </div>
+        <div>
+          <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">Last Name</label>
+          <input
+            id="lastName"
+            type="text"
+            name="lastName"
+            value={formData.lastName}
+            onChange={handleChange}
+            className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200"
+          />
+        </div>
 
-  {/* Gender Identity */}
-  <div>
-    <label htmlFor="genderIdentity" className="block text-sm font-medium text-gray-700">Gender Identity</label>
-    <Select
-      id="genderIdentity"
-      name="genderIdentity"
-      options={genderIdentityOptions}
-      value={genderIdentityOptions.find(option => option.value === formData.genderIdentity)}
-      onChange={(option) => handleSelectChange('genderIdentity', option)}
-      styles={customSelectStyles}
-    />
-  </div>
+        <div>
+          <label htmlFor="primaryGenderIdentity" className="block text-sm font-medium text-gray-700">Primary Gender Identity</label>
+          <Dropdown
+            options={primaryGenderIdentities.map(({ primary_gender_id, gender_name }) => ({
+              label: gender_name,
+              value: primary_gender_id,
+            }))}
+            selectedValue={formData.primaryGenderId}
+            onSelect={value => handleDropdownChange('primaryGenderId', value)}
+            placeholder="Select Primary Gender Identity"
+          />
+        </div>
 
-  {/* YearOfBirth */}
-  <div>
-    <label htmlFor="yearOfBirth" className="block text-sm font-medium text-gray-700">Year of Birth</label>
-    <input
-      id="yearOfBirth"
-      type="text"
-      name="yearOfBirth"
-      value={formData.yearOfBirth}
-      onChange={handleChange}
-      className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200"
-    />
-  </div>
+        {/* Checkboxes for gender identities */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Select Gender Identities</label>
+          <Checkbox
+            title="Gender Identities"
+            options={checkboxOptions}
+            onChange={handleGenderIdentityCheckboxChange}
+          />
+        </div>
 
-  {/* PlaceOfOrigin */}
-  <div>
-    <label htmlFor="placeOfOrigin" className="block text-sm font-medium text-gray-700">Place of Origin</label>
-    <Select
-      id="placeOfOrigin"
-      name="placeOfOrigin"
-      options={placeOfOriginOptions}
-      value={placeOfOriginOptions.find(option => option.value === formData.placeOfOrigin)}
-      onChange={(option) => handleSelectChange('placeOfOrigin', option)}
-      styles={customSelectStyles}
-    />
-  </div>
+        <div>
+          <label htmlFor="yearOfBirth" className="block text-sm font-medium text-gray-700">Year of Birth</label>
+          <input
+            id="yearOfBirth"
+            type="text"
+            name="yearOfBirth"
+            value={formData.yearOfBirth}
+            onChange={handleChange}
+            className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200"
+          />
+        </div>
 
-  {/* PostalCode */}
-  <div>
-    <label htmlFor="postalCode" className="block text-sm font-medium text-gray-700">Postal Code</label>
-    <input
-      id="postalCode"
-      type="text"
-      name="postalCode"
-      value={formData.postalCode}
-      onChange={handleChange}
-      className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200"
-    />
-  </div>
+        <div>
+          <label htmlFor="mapId" className="block text-sm font-medium text-gray-700">Place of Origin</label>
+          <Dropdown
+            options={mapRegions.map(({ map_id, map_area_name }) => ({
+              label: map_area_name,
+              value: map_id
+            }))}
+            selectedValue={formData.mapID}
+            onSelect={(value) => handleDropdownChange('mapID', value)}
+            placeholder="Select Place of Origin"
+          />
+        </div>
 
-  {/* Vegetable */}
-  <div>
-    <label htmlFor="vegetable" className="block text-sm font-medium text-gray-700">Vegetable</label>
-    <input
-      id="vegetable"
-      type="text"
-      name="vegetable"
-      value={formData.vegetable}
-      onChange={handleChange}
-      className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200"
-    />
-  </div>
+        <div>
+          <label htmlFor="postalCodeId" className="block text-sm font-medium text-gray-700">Postal Code</label>
+          <input
+            id="postalCode"
+            type="text"
+            name="postalCode"
+            value={formData.postalCode} // Ensure this uses postalCode, not postalCodeId
+            onChange={handleChange}
+            className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200"
+          />
+        </div>
 
-  {/* Submit Button */}
-  <div className="flex justify-center">
-    <Button type="submit" text="Update User" />
-  </div>
-</form>
+        <div>
+          <label htmlFor="vegetable" className="block text-sm font-medium text-gray-700">Vegetable</label>
+          <input
+            id="vegetable"
+            type="text"
+            name="vegetable"
+            value={formData.vegetable}
+            onChange={handleChange}
+            className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200"
+          />
+        </div>
 
+        <div className="flex justify-center">
+          <Button type="submit" text="Update User" />
+        </div>
+            
+        {/* Display feedback message */}
+        {feedback.message && (
+          <p className={`mt-4 text-${feedback.type === 'success' ? 'green-500' : 'red-500'}`}>
+            {feedback.message}
+          </p>
+        )}
+      </form>
 
     </div>
   );
 };
 
 export default UpdateUserForm;
+

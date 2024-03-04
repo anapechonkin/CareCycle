@@ -43,7 +43,39 @@ async function addUserGenderIdentities(req, res) {
     }
 }
 
+async function updateUserGenderIdentities(req, res) {
+    const { userId } = req.params;
+    const { genderIdentityIds } = req.body; // Expect an array of gender_identity_id
+
+    try {
+        await pool.query('BEGIN');
+
+        // Step 1: Clear existing gender identities for the user
+        await pool.query('DELETE FROM carecycle.users_genderidentity WHERE user_id = $1', [userId]);
+
+        // Step 2: Add new gender identities for the user
+        let addedIdentitiesInfo = [];
+        for (let genderIdentityId of genderIdentityIds) {
+            await pool.query('INSERT INTO carecycle.users_genderidentity (user_id, gender_identity_id) VALUES ($1, $2)', [userId, genderIdentityId]);
+            
+            // Optionally, fetch and include the added identity information in the response
+            const result = await pool.query('SELECT type FROM carecycle.genderidentity WHERE gender_identity_id = $1', [genderIdentityId]);
+            if (result.rows.length > 0) {
+                addedIdentitiesInfo.push({id: genderIdentityId, type: result.rows[0].type});
+            }
+        }
+
+        await pool.query('COMMIT');
+        res.json({ message: 'User gender identities updated successfully.', addedIdentities: addedIdentitiesInfo });
+    } catch (error) {
+        await pool.query('ROLLBACK');
+        console.error('Error updating user gender identities:', error);
+        res.status(500).json({ message: 'Failed to update gender identities for user', error: error.message });
+    }
+}
+
 module.exports = {
     fetchGenderIdentities,
     addUserGenderIdentities,
+    updateUserGenderIdentities
 };

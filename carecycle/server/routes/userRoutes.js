@@ -27,10 +27,54 @@ const getUserById = async (request, response) => {
         return response.status(400).json({ error: 'Invalid user ID' });
     }
 
+    const userDetailsQuery = `
+        SELECT 
+            u.user_id, u.username, u.firstname, u.lastname, u.vegetable,
+            u.year_of_birth, u.is_active, u.usertype_id, u.map_id, u.created_at, u.updated_at,
+            pg.gender_name, pg.primary_gender_id,
+            pc.postal_code,
+            json_agg(distinct gi.*) FILTER (WHERE gi.gender_identity_id IS NOT NULL) AS gender_identities
+        FROM 
+            carecycle.users u
+        LEFT JOIN 
+            carecycle.postalcode pc ON u.postal_code_id = pc.postal_code_id
+        LEFT JOIN 
+            carecycle.primarygender pg ON u.primary_gender_id = pg.primary_gender_id
+        LEFT JOIN 
+            carecycle.users_genderidentity ugi ON u.user_id = ugi.user_id
+        LEFT JOIN 
+            carecycle.genderidentity gi ON ugi.gender_identity_id = gi.gender_identity_id
+        WHERE 
+            u.user_id = $1
+        GROUP BY 
+            u.user_id, u.username, u.firstname, u.lastname, u.vegetable,
+            u.year_of_birth, u.is_active, u.usertype_id, u.map_id, u.created_at, u.updated_at,
+            pg.gender_name, pc.postal_code, pg.primary_gender_id
+    `;
+
     try {
-        const results = await pool.query('SELECT * FROM carecycle.users WHERE user_id = $1', [id]);
+        const results = await pool.query(userDetailsQuery, [id]);
+        console.log(`Raw query results for user ID ${id}:`, results.rows); // Log the raw query results
+
         if (results.rows.length > 0) {
-            response.status(200).json(results.rows[0]);
+            const userDetails = results.rows[0];
+
+            // Log before processing gender_identities
+            console.log(`Before processing gender_identities for user ID ${id}:`, userDetails.gender_identities);
+
+            // Check if gender_identities is not null before filtering
+            if (userDetails.gender_identities !== null) {
+                // Ensure we don't include any null gender identities
+                userDetails.gender_identities = userDetails.gender_identities.filter(gi => gi.gender_identity_id !== null);
+            }
+
+            // Log after processing gender_identities
+            console.log(`After processing gender_identities for user ID ${id}:`, userDetails.gender_identities);
+
+            // Log the final userDetails object before sending it in the response
+            console.log(`Final userDetails to be sent for user ID ${id}:`, userDetails);
+
+            response.status(200).json(userDetails);
         } else {
             response.status(404).json({ error: 'User not found' });
         }
@@ -39,6 +83,7 @@ const getUserById = async (request, response) => {
         response.status(500).json({ error: 'Internal server error' });
     }
 };
+
 
 // Fetches a single user by their username
 const getUserByUsername = async (request, response) => {
@@ -77,84 +122,57 @@ const addUser = async (request, response) => {
     }
 };
 
-// Updates an existing user's information, excluding the password
 const updateUser = async (request, response) => {
     const id = parseInt(request.params.id);
     const { username, firstName, lastName, primaryGenderId, vegetable, yearOfBirth, postalCodeId, isActive, userTypeID, mapID } = request.body;
 
-    // Initialize an array to hold parts of the SQL SET clause
     const updates = [];
-    // Initialize an array to hold the values for the parameterized query
     const values = [];
-    // Keep track of the parameter position for the SQL query
     let valuePosition = 1;
 
     // Dynamically add fields to the updates array if they're present in the request
-    if (username !== undefined) {
-        updates.push(`username = $${valuePosition++}`);
-        values.push(username);
-    }
-    if (firstName !== undefined) {
-        updates.push(`firstname = $${valuePosition++}`);
-        values.push(firstName);
-    }
-    if (lastName !== undefined) {
-        updates.push(`lastname = $${valuePosition++}`);
-        values.push(lastName);
-    }
-    if (primaryGenderId !== undefined) {
-        updates.push(`primary_gender_id = $${valuePosition++}`);
-        values.push(primaryGenderId);
-    }
-    if (vegetable !== undefined) {
-        updates.push(`vegetable = $${valuePosition++}`);
-        values.push(vegetable);
-    }
-    if (yearOfBirth !== undefined) {
-        updates.push(`year_of_birth = $${valuePosition++}`);
-        values.push(yearOfBirth);
-    }
-    if (postalCodeId !== undefined) {
-        updates.push(`postal_code_id = $${valuePosition++}`);
-        values.push(postalCodeId);
-    }
-    if (isActive !== undefined) {
-        updates.push(`is_active = $${valuePosition++}`);
-        values.push(isActive);
-    }
-    if (userTypeID !== undefined) {
-        updates.push(`usertype_id = $${valuePosition++}`);
-        values.push(userTypeID);
-    }
-    if (mapID !== undefined) {
-        updates.push(`map_id = $${valuePosition++}`);
-        values.push(mapID);
-    }
+    if (username !== undefined) { updates.push(`username = $${valuePosition++}`); values.push(username); }
+    if (firstName !== undefined) { updates.push(`firstname = $${valuePosition++}`); values.push(firstName); }
+    if (lastName !== undefined) { updates.push(`lastname = $${valuePosition++}`); values.push(lastName); }
+    if (primaryGenderId !== undefined) { updates.push(`primary_gender_id = $${valuePosition++}`); values.push(primaryGenderId); }
+    if (vegetable !== undefined) { updates.push(`vegetable = $${valuePosition++}`); values.push(vegetable); }
+    if (yearOfBirth !== undefined) { updates.push(`year_of_birth = $${valuePosition++}`); values.push(yearOfBirth); }
+    if (postalCodeId !== undefined) { updates.push(`postal_code_id = $${valuePosition++}`); values.push(postalCodeId); }
+    if (isActive !== undefined) { updates.push(`is_active = $${valuePosition++}`); values.push(isActive); }
+    if (userTypeID !== undefined) { updates.push(`usertype_id = $${valuePosition++}`); values.push(userTypeID); }
+    if (mapID !== undefined) { updates.push(`map_id = $${valuePosition++}`); values.push(mapID); }
 
-    // Add the user ID to the values array for the WHERE clause
-    values.push(id);
+    values.push(id); // Add the user ID for the WHERE clause
 
-    // If no fields were provided for update, return an error
     if (updates.length === 0) {
         return response.status(400).json({ error: 'No valid fields provided for update' });
     }
 
-    // Construct the SQL query
-    const sqlQuery = `
-        UPDATE carecycle.users
-        SET ${updates.join(', ')}
-        WHERE user_id = $${valuePosition}
-        RETURNING *;`;
-
     try {
+        await pool.query('BEGIN');
+
+        // Correct table name used here
+        if (primaryGenderId && (primaryGenderId == 1 || primaryGenderId == 2)) {
+            await pool.query('DELETE FROM carecycle.users_genderidentity WHERE user_id = $1', [id]);
+        }
+
+        const sqlQuery = `
+            UPDATE carecycle.users
+            SET ${updates.join(', ')}
+            WHERE user_id = $${valuePosition}
+            RETURNING *;`;
+
         const result = await pool.query(sqlQuery, values);
 
         if (result.rowCount > 0) {
+            await pool.query('COMMIT');
             response.status(200).json(result.rows[0]);
         } else {
+            await pool.query('ROLLBACK');
             response.status(404).json({ error: `User not found with ID: ${id}` });
         }
     } catch (error) {
+        await pool.query('ROLLBACK');
         console.error(`Error updating user with ID ${id}:`, error);
         response.status(500).json({ error: 'Internal server error' });
     }
