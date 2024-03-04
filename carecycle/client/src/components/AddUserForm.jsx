@@ -39,38 +39,37 @@ const AddUserForm = () => {
         setMapRegions(await fetchMapRegions());
         setUserTypes(await fetchUserTypes());
 
-        // Fetch gender identities and transform for Checkbox component
         const fetchedGenderIdentities = await fetchGenderIdentities();
         const checkboxOptions = fetchedGenderIdentities.map(identity => ({
           ...identity,
-          id: identity.gender_identity_id,
+          id: `gender_${identity.gender_identity_id}`, // Ensure each ID is unique
           name: identity.type,
-          checked: false, // Initialize all as unchecked
+          checked: false,
         }));
         setGenderIdentities(checkboxOptions);
-        console.log(genderIdentities); // Add this inside your useEffect after setting genderIdentities
-
       } catch (error) {
         console.error('Failed to fetch dropdown data:', error);
       }
     };
 
     fetchData();
-}, []);
-
+  }, []);
 
   const handleGenderIdentityCheckboxChange = (event, option) => {
+    // Extract the numeric ID from the option's ID
+    const id = parseInt(option.id.replace('gender_', ''), 10);
+    
     // Update the checked state of the option
     const updatedGenderIdentities = genderIdentities.map(identity =>
       identity.id === option.id ? { ...identity, checked: event.target.checked } : identity
     );
     setGenderIdentities(updatedGenderIdentities);
-  
+    
     // Update selectedGenderIdentities state
     if (event.target.checked) {
-      setSelectedGenderIdentities(prev => [...prev, option.id]);
+      setSelectedGenderIdentities(prev => [...prev, id]);
     } else {
-      setSelectedGenderIdentities(prev => prev.filter(id => id !== option.id));
+      setSelectedGenderIdentities(prev => prev.filter(selectedId => selectedId !== id));
     }
   };
   

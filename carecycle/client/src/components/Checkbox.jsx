@@ -10,7 +10,7 @@ const Checkbox = ({ title, options, onChange, onSelectAll, onUnselectAll }) => {
     <div className="mb-4">
       {title && <h3 className="font-semibold text-lg mb-2">{title}</h3>}
       <div className="flex justify-between items-center mb-2">
-      <div>
+        <div>
           {onSelectAll && (
             <button
               type="button"
@@ -38,7 +38,7 @@ const Checkbox = ({ title, options, onChange, onSelectAll, onUnselectAll }) => {
           <label key={option.id} className="flex items-center cursor-pointer mr-2 mb-2 flex-nowrap" style={{ minWidth: '0', maxWidth: '100%' }}>
             <input
               type="checkbox"
-              id={option.id}
+              id={option.id} // Ensure each checkbox has a unique ID
               checked={option.checked}
               onChange={(event) => handleChange(event, option)}
               disabled={option.disabled}
