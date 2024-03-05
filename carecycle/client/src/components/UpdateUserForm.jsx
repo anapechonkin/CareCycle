@@ -234,19 +234,18 @@ const handleSubmit = async (e) => {
   }
 };
 
-
   // Preparing user options for the dropdown
-  const userOptions = users.map(user => ({
+  const userOptions = Array.isArray(users) ? users.map(user => ({
     value: user.user_id,
     label: `${user.firstname} ${user.lastname} (${user.username})`,
-  }));
+  })) : [];
 
   //Filter users based on the 'filter' state
-  const filteredUsers = users.filter(user => {
+  const filteredUsers = Array.isArray(users) ? users.filter(user => {
     if (filter === 'active') return user.is_active;
     if (filter === 'archived') return !user.is_active;
     return true; // 'all' case, no filtering needed
-  });
+  }) : [];
 
   const customSelectStyles = {
     control: (provided) => ({

@@ -1,23 +1,28 @@
 import React, { useState, useEffect } from "react";
 import Select from 'react-select';
 import Button from "./Button";
-import { getUsers, softDeleteUser } from "../api/userApi"; // Adjust the import path as needed
+import { getUsers, softDeleteUser } from "../api/userApi";
 
 const DeleteUserForm = ({ onUsersChanged }) => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [users, setUsers] = useState([]);
   const [feedbackMessage, setFeedbackMessage] = useState("");
-  const [feedbackType, setFeedbackType] = useState(""); // New state for feedback type
+  const [feedbackType, setFeedbackType] = useState("");
   const [clearSelect, setClearSelect] = useState(false);
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const fetchedUsers = await getUsers();
-      setUsers(fetchedUsers);
+      try {
+        const fetchedUsers = await getUsers();
+        setUsers(fetchedUsers.length ? fetchedUsers : []);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+        setFeedbackMessage("Failed to fetch users.");
+        setFeedbackType("error");
+      }
     };
-
     fetchUsers();
-  }, []);
+  }, [onUsersChanged]);
 
   useEffect(() => {
     if (clearSelect) {
@@ -28,33 +33,26 @@ const DeleteUserForm = ({ onUsersChanged }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (selectedUser && selectedUser.user_id) {
-      console.log("Attempting to archive user:", selectedUser); // Log before archiving
+    if (selectedUser && selectedUser.value) {
       try {
-        await softDeleteUser(selectedUser.user_id);
-        console.log("User successfully archived:", { ...selectedUser, is_active: false }); // Log after assuming success
-        onUsersChanged();
+        await softDeleteUser(selectedUser.value);
         setFeedbackMessage("User successfully archived.");
         setFeedbackType("success");
         setClearSelect(true);
-        
-        setTimeout(() => {
-          setFeedbackMessage("");
-        }, 3000); // Clear message after 3 seconds
+        onUsersChanged(); // Propagate change upwards to trigger a re-fetch or other actions
       } catch (error) {
         console.error('Error deleting user:', error);
         setFeedbackMessage("Failed to archive user.");
         setFeedbackType("error");
       }
     } else {
-      console.error('No user selected or user ID is undefined');
       setFeedbackMessage("No user selected.");
       setFeedbackType("error");
     }
   };
 
   const handleSelectChange = (selectedOption) => {
-    setSelectedUser(selectedOption ? selectedOption.user : null);
+    setSelectedUser(selectedOption ? selectedOption : null);
   };
 
   // Custom style for react-select
@@ -74,33 +72,35 @@ const DeleteUserForm = ({ onUsersChanged }) => {
   return (
     <div className="bg-white shadow-lg rounded-lg p-8 mt-10 mb-10">
       <h2 className="text-3xl font-semibold text-center text-gray-800 mb-6">Delete User</h2>
-      <Select
-        options={users.map(user => ({
-          value: user.user_id,
-          label: `${user.firstname} ${user.lastname} (${user.username})`,
-          user: user,
-        }))}
-        onChange={handleSelectChange}
-        placeholder="Search by username"
-        isClearable
-        value={selectedUser ? {
-          value: selectedUser.user_id,
-          label: `${selectedUser.firstname} ${selectedUser.lastname} (${selectedUser.username})`,
-          user: selectedUser,
-        } : null}
-        className="mb-4"
-        styles={customSelectStyles}
-      />
-      {selectedUser && (
-        <div className="space-y-4 mb-4">
-          <div><strong>First Name:</strong> {selectedUser.firstname}</div>
-          <div><strong>Last Name:</strong> {selectedUser.lastname}</div>
-          <div><strong>Username:</strong> {selectedUser.username}</div>
-        </div>
+      {users.length > 0 ? (
+        <>
+          <Select
+            options={users.map(user => ({
+              value: user.user_id,
+              label: `${user.firstname} ${user.lastname} (${user.username})`,
+              user: user,
+            }))}
+            onChange={handleSelectChange}
+            placeholder="Search by username"
+            isClearable
+            value={selectedUser}
+            className="mb-4"
+            styles={customSelectStyles}
+          />
+          {selectedUser && (
+            <div className="space-y-4 mb-4">
+              <div><strong>First Name:</strong> {selectedUser.user.firstname}</div>
+              <div><strong>Last Name:</strong> {selectedUser.user.lastname}</div>
+              <div><strong>Username:</strong> {selectedUser.user.username}</div>
+            </div>
+          )}
+          <Button type="button" onClick={handleSubmit} text="DELETE" className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" />
+        </>
+      ) : (
+        <p className="text-center text-gray-500">No users available for deletion.</p>
       )}
-      <Button type="button" onClick={handleSubmit} text="DELETE" className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" />
       {feedbackMessage && (
-        <div className={`text-center my-4 ${feedbackType === "success" ? "text-green-500" : "text-red-500"}`}>
+        <div className={`text-center my-4 ${feedbackType === "success" ? "text-green-500" : feedbackType === "error" ? "text-red-500" : "text-gray-500"}`}>
           {feedbackMessage}
         </div>
       )}
