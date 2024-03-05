@@ -35,6 +35,7 @@ app.post('/postal-codes/add', findPostalCode.addPostalCode);
 app.get('/dropdowns/primaryGender', dropDownDB.getPrimaryGenderIdentities);
 app.get('/dropdowns/mapRegions', dropDownDB.getMapRegions);
 app.get('/dropdowns/userTypes', dropDownDB.getUserTypes);
+app.get('/dropdowns/workshops', dropDownDB.getWorkshops);
 
 // User routes
 app.get('/users', userDB.getUsers);

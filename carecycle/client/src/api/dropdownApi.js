@@ -39,3 +39,17 @@ export const fetchPrimaryGenderIdentities = async () => {
       throw error;
     }
   };
+
+  // Function to fetch workshops
+  export const fetchWorkshops = async () => {
+    try {
+      const response = await fetch('/dropdowns/workshops');
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Failed to fetch workshops:', error);
+      throw error;
+    }
+  };

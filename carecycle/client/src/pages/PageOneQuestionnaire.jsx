@@ -5,31 +5,53 @@ import Shadow from '../components/Shadow';
 import Footer from '../components/Footer';
 import Dropdown from '../components/DropDown';
 import Button from '../components/Button';
-import Checkbox from '../components/Checkbox'; // Assuming Checkbox supports 'disabled'
+import Checkbox from '../components/Checkbox';
 import { useNavigate } from 'react-router-dom';
+import { useForm } from '../context/FormContext';
 
 const PageOneQuestionnaire = () => {
+  const [postalCode, setPostalCode] = useState('');
+  const [yearOfBirth, setYearOfBirth] = useState('');
   const [preferNotToAnswerPostal, setPreferNotToAnswerPostal] = useState(false);
   const [preferNotToAnswerYear, setPreferNotToAnswerYear] = useState(false);
   const [declined, setDeclined] = useState(null); // null for undecided, true for declined, false for accepted
+  const { formData, updateFormData } = useForm();
 
   const navigate = useNavigate();
 
-  const handleClick = () => {
-    if (declined !== null) {
-      console.log('Answer saved, reloading for the next client.');
-      window.location.reload();
-    } else {
-      navigate('/pageTwoQuestionnaire');
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    // Only update formData if "Prefer Not To Answer" is not checked
+    if (name === 'postalCode' && !preferNotToAnswerPostal) {
+      setPostalCode(value);
+      updateFormData({ [name]: value });
+    } else if (name === 'yearOfBirth' && !preferNotToAnswerYear) {
+      setYearOfBirth(value);
+      updateFormData({ [name]: value });
     }
   };
 
-  const handleSelect = (selectedOption) => {
-    console.log("Selected option:", selectedOption);
+  const handleCheckboxChange = (optionId, isChecked) => {
+    if (optionId === 'postal') {
+      setPreferNotToAnswerPostal(isChecked);
+      updateFormData({ postalCode: isChecked ? null : postalCode });
+    } else if (optionId === 'year') {
+      setPreferNotToAnswerYear(isChecked);
+      updateFormData({ yearOfBirth: isChecked ? null : yearOfBirth });
+    }
+    console.log(`Checkbox change - ${optionId}: ${isChecked ? 'Prefer not to answer' : 'Answer provided'}`);
   };
 
-  const handleConsentChange = (value) => {
-    setDeclined(value === 'decline');
+  const handleClick = () => {
+    console.log('FormData after page one for this client:', formData);
+    // Here, you might submit formData to your backend
+
+    if (declined !== null) {
+      console.log('Answer saved, navigating to the next page.');
+      navigate('/pageTwoQuestionnaire');
+    } else {
+      console.log('Please provide consent.');
+    }
   };
 
   return (
@@ -44,18 +66,17 @@ const PageOneQuestionnaire = () => {
           <Dropdown
             options={['English', 'French', 'Spanish', 'Hindi', 'Urdu', 'Punjabi']}
             placeholder="Select Language"
-            onSelect={handleSelect}
+            onSelect={(selectedOption) => console.log("Selected option:", selectedOption)}
           />
           <p className="m-8 text-xl">I consent to the data obtained from this questionnaire being used for grant applications</p>
           <div className="flex justify-center items-center space-x-8 mb-4">
-            {/* Consent radio buttons */}
             <label className="flex items-center cursor-pointer">
               <input
                 type="radio"
                 name="consent"
                 value="accept"
                 checked={declined === false}
-                onChange={() => handleConsentChange('accept')}
+                onChange={() => { setDeclined(false); console.log("Consent: Accepted"); }}
               />
               <span className="ml-2">I accept</span>
             </label>
@@ -65,7 +86,7 @@ const PageOneQuestionnaire = () => {
                 name="consent"
                 value="decline"
                 checked={declined === true}
-                onChange={() => handleConsentChange('decline')}
+                onChange={() => { setDeclined(true); console.log("Consent: Declined"); }}
               />
               <span className="ml-2">I decline</span>
             </label>
@@ -74,33 +95,27 @@ const PageOneQuestionnaire = () => {
             type="text"
             placeholder="Please Enter Your Postal Code"
             className="mt-4 p-2 border border-black rounded-lg w-full"
-            disabled={preferNotToAnswerPostal || declined}
+            onChange={handleInputChange}
+            name="postalCode"
+            disabled={preferNotToAnswerPostal || declined === true}
+            value={postalCode}
           />
           <Checkbox
-            title=""
-            options={[{
-              id: 'postal',
-              label: 'Prefer Not To Answer',
-              checked: preferNotToAnswerPostal,
-              disabled: declined // Disable when declined is true
-            }]}
-            onChange={() => setPreferNotToAnswerPostal(!preferNotToAnswerPostal)}
+            options={[{ id: 'postal', name: 'Prefer Not To Answer', checked: preferNotToAnswerPostal }]}
+            onChange={() => handleCheckboxChange('postal', !preferNotToAnswerPostal)}
           />
           <input
             type="text"
             placeholder="Please Enter Your Year of Birth (YYYY)"
             className="mt-4 p-2 border border-black rounded-lg w-full"
-            disabled={preferNotToAnswerYear || declined}
+            onChange={handleInputChange}
+            name="yearOfBirth"
+            disabled={preferNotToAnswerYear || declined === true}
+            value={yearOfBirth}
           />
           <Checkbox
-            title=""
-            options={[{
-              id: 'year',
-              label: 'Prefer Not To Answer',
-              checked: preferNotToAnswerYear,
-              disabled: declined // Disable when declined is true
-            }]}
-            onChange={() => setPreferNotToAnswerYear(!preferNotToAnswerYear)}
+            options={[{ id: 'year', name: 'Prefer Not To Answer', checked: preferNotToAnswerYear }]}
+            onChange={() => handleCheckboxChange('year', !preferNotToAnswerYear)}
           />
           <div className="flex flex-col items-center mt-8 space-y-4">
             <Button

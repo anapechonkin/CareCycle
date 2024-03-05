@@ -5,14 +5,18 @@ import Shadow from "../components/Shadow";
 import Footer from "../components/Footer";
 import Button from "../components/Button";
 import { useNavigate } from "react-router-dom";
+import { useForm } from '../context/FormContext'; 
 
 const PageTwoQuestionnaire = () => {
   const navigate = useNavigate();
-  const [selectedGender, setSelectedGender] = useState('');
+  const { formData, updateFormData } = useForm();
+  const [selectedPrimaryGender, setSelectedPrimaryGender] = useState('');
 
   // Function to navigate based on gender selection
   const handleNextClick = () => {
-    if (selectedGender === 'For More Options') {
+    console.log('FormData after page two for this client:', formData);
+    if (selectedPrimaryGender === 'For More Options') {
+      console.log('Answer saved, navigating to the next page.');
       navigate('/pageTwoExtraQuestionnaire'); // Navigate to extra questions for "Other" selection
     } else {
       navigate('/pageThreeQuestionnaire'); // Navigate to the next page for all other selections
@@ -23,7 +27,11 @@ const PageTwoQuestionnaire = () => {
   const handlePreviousClick = () => navigate('/pageOneQuestionnaire');
 
   // Function to handle gender selection
-  const handleGenderChange = (event) => setSelectedGender(event.target.value);
+  const handleGenderChange = (event) => {
+    const selectedPrimaryGender = event.target.value;
+    setSelectedPrimaryGender(selectedPrimaryGender);
+    updateFormData({ selectedPrimaryGender }); // Update form data with selected gender
+  };
 
   const genderOptions = [
     { label: "For More Options", imgSrc: "/icons/other.png" },
@@ -49,7 +57,7 @@ const PageTwoQuestionnaire = () => {
                   type="radio"
                   name="gender"
                   value={label}
-                  checked={selectedGender === label}
+                  checked={selectedPrimaryGender === label}
                   onChange={handleGenderChange}
                   className="mb-1"
                 />

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useUser } from '../context/UserContext'; 
 import { Link, useNavigate, useLocation  } from 'react-router-dom';
 import Modal from './Modal'; // Adjust this path to match your file structure
+import { useForm } from '../context/FormContext';
 
 const Navbar = () => {
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
@@ -10,6 +11,7 @@ const Navbar = () => {
   const [customReason, setCustomReason] = useState(''); // State for custom reason input
   const navigate = useNavigate();
   const location = useLocation(); 
+  const { clearWorkshopId } = useForm();
 
   const { userType } = useUser();
   console.log("Current userType in Navbar:", userType); 
@@ -44,10 +46,11 @@ const Navbar = () => {
   useEffect(() => {
     if (logoutConfirmed) {
       console.log('Navigating to login page...');
+      clearWorkshopId(); // Clear the workshopId from local storage
       navigate('/'); // Navigate to the login page
       setLogoutConfirmed(false); // Reset to prevent unintended navigation
     }
-  }, [logoutConfirmed, navigate]);
+  }, [logoutConfirmed, navigate, clearWorkshopId]);
 
   return (
     <>

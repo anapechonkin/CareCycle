@@ -33,8 +33,20 @@ const getUserTypes = async (req, res) => {
     }
 };
 
+// Fetch workshops
+const getWorkshops = async (req, res) => {
+    try {
+        const workshops = await pool.query('SELECT * FROM carecycle.workshop'); 
+        res.json(workshops.rows);
+    } catch (error) {
+        console.error('Error fetching workshops:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
 module.exports = {
     getPrimaryGenderIdentities,
     getMapRegions,
-    getUserTypes
+    getUserTypes,
+    getWorkshops
 };
