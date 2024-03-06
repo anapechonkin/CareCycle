@@ -30,7 +30,8 @@ const PageTwoQuestionnaire = () => {
   const handleGenderChange = (event) => {
     const selectedPrimaryGender = event.target.value;
     setSelectedPrimaryGender(selectedPrimaryGender);
-    updateFormData({ selectedPrimaryGender }); // Update form data with selected gender
+    const primaryGender = selectedPrimaryGender === 'For More Options' ? 'Other' : selectedPrimaryGender;
+    updateFormData({ primaryGender}); // Update form data with selected gender
   };
 
   const genderOptions = [

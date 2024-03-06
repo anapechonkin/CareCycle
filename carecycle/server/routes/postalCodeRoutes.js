@@ -3,8 +3,8 @@ const { pool } = require('../config/db');
 // Helper function to determine area_id based on postal code
 const determineAreaId = (postalCode) => {
     // Example logic, adjust according to your actual area categorization
-    if (postalCode.startsWith('H3N')) return 1; // Parc-X
-    if (['H2P', 'H2R', 'H2E'].some(prefix => postalCode.startsWith(prefix))) return 2; // Villeray
+    if (postalCode.startsWith('H3N')) return 2; // Parc-X
+    if (['H2P', 'H2R', 'H2E'].some(prefix => postalCode.startsWith(prefix))) return 3; // Villeray
     if (!postalCode.startsWith('H')) return 4; // Outside Montreal
     return 5; // Undefined or Rest of Montreal, adjust as necessary
 };

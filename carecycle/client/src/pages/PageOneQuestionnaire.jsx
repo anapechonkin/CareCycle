@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import NavBar from '../components/NavBar';
 import Banner from '../components/Banner';
 import Shadow from '../components/Shadow';
@@ -6,6 +6,7 @@ import Footer from '../components/Footer';
 import Dropdown from '../components/DropDown';
 import Button from '../components/Button';
 import Checkbox from '../components/Checkbox';
+import Modal from '../components/Modal';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from '../context/FormContext';
 
@@ -14,46 +15,71 @@ const PageOneQuestionnaire = () => {
   const [yearOfBirth, setYearOfBirth] = useState('');
   const [preferNotToAnswerPostal, setPreferNotToAnswerPostal] = useState(false);
   const [preferNotToAnswerYear, setPreferNotToAnswerYear] = useState(false);
-  const [declined, setDeclined] = useState(null); // null for undecided, true for declined, false for accepted
+  const [declined, setDeclined] = useState(null);
   const { formData, updateFormData } = useForm();
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalContent, setModalContent] = useState('');
   const navigate = useNavigate();
+
+  // Disable checkboxes when declined is true
+  useEffect(() => {
+    if (declined === true) {
+      setPreferNotToAnswerPostal(true);
+      setPreferNotToAnswerYear(true);
+    }
+  }, [declined]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    // Only update formData if "Prefer Not To Answer" is not checked
-    if (name === 'postalCode' && !preferNotToAnswerPostal) {
+    if (name === 'postalCode') {
       setPostalCode(value);
-      updateFormData({ [name]: value });
-    } else if (name === 'yearOfBirth' && !preferNotToAnswerYear) {
+    } else if (name === 'yearOfBirth') {
       setYearOfBirth(value);
-      updateFormData({ [name]: value });
     }
+    updateFormData({ ...formData, [name]: value });
   };
 
   const handleCheckboxChange = (optionId, isChecked) => {
+    const PNA_POSTALCODE = 'PNA';
+    const PNA_YEAROFBIRTH = '0000';
+
     if (optionId === 'postal') {
       setPreferNotToAnswerPostal(isChecked);
-      updateFormData({ postalCode: isChecked ? null : postalCode });
+      updateFormData({ ...formData, postalCode: isChecked ? PNA_POSTALCODE : postalCode });
     } else if (optionId === 'year') {
       setPreferNotToAnswerYear(isChecked);
-      updateFormData({ yearOfBirth: isChecked ? null : yearOfBirth });
+      updateFormData({ ...formData, yearOfBirth: isChecked ? PNA_YEAROFBIRTH : yearOfBirth });
     }
-    console.log(`Checkbox change - ${optionId}: ${isChecked ? 'Prefer not to answer' : 'Answer provided'}`);
   };
 
   const handleClick = () => {
-    console.log('FormData after page one for this client:', formData);
-    // Here, you might submit formData to your backend
-
-    if (declined !== null) {
-      console.log('Answer saved, navigating to the next page.');
-      navigate('/pageTwoQuestionnaire');
+    if (declined === null) {
+      setModalContent('Please select an option to provide consent before continuing with the questionnaire.');
+      setIsModalOpen(true);
+    } else if (declined === true) {
+      setModalContent('You have declined to participate in this questionnaire. Please give the device back to the volunteer/employee.');
+      setIsModalOpen(true);
     } else {
-      console.log('Please provide consent.');
+      console.log('FormData after page one:', formData);
+      navigate('/pageTwoQuestionnaire');
     }
   };
 
+  const handleModalConfirm = () => {
+    setIsModalOpen(false);
+    if (declined === true) {
+      // Reset form to its initial state
+      setPostalCode('');
+      setYearOfBirth('');
+      setPreferNotToAnswerPostal(false);
+      setPreferNotToAnswerYear(false);
+      setDeclined(null);
+      // Reset formData in the context
+      updateFormData({});
+      navigate('/pageOneQuestionnaire');
+    }
+  };
+  
   return (
     <div className="flex flex-col min-h-screen bg-[#f6cdd0]">
       <NavBar />
@@ -118,6 +144,11 @@ const PageOneQuestionnaire = () => {
             onChange={() => handleCheckboxChange('year', !preferNotToAnswerYear)}
           />
           <div className="flex flex-col items-center mt-8 space-y-4">
+            {isModalOpen && (
+              <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onConfirm={handleModalConfirm}>
+                {modalContent}
+              </Modal>
+            )}
             <Button
               text="NEXT QUESTION"
               className="text-white bg-[#16839B] hover:bg-[#0f6674]"
