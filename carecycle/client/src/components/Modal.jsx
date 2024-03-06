@@ -4,15 +4,25 @@ import DOMPurify from 'dompurify';
 const Modal = ({
   isOpen,
   onClose,
+  onConfirm,
   children,
   htmlContent,
   showOkButton = true,
-  buttonText = 'OK' // Default button text is "OK"
+  okButtonText = 'OK', // Default OK button text
+  showCancelButton = false, // Not showing a cancel button by default
+  cancelButtonText = 'Cancel', // Default cancel button text
 }) => {
   if (!isOpen) return null;
 
-  // Sanitize the HTML content if present
   const cleanHTML = htmlContent ? DOMPurify.sanitize(htmlContent) : null;
+
+  const handleConfirm = () => {
+    if (onConfirm) {
+      onConfirm();
+    } else {
+      onClose(); // Fallback to onClose if no onConfirm is provided
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 px-4">
@@ -22,13 +32,18 @@ const Modal = ({
         ) : (
           children
         )}
-        {showOkButton && (
-          <div className="text-right mt-4">
-            <button onClick={onClose} className="bg-black hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transition duration-150 ease-in-out">
-              {buttonText}
+        <div className="text-right mt-4 space-x-2">
+          {showCancelButton && (
+            <button onClick={onClose} className="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded transition duration-150 ease-in-out">
+              {cancelButtonText}
             </button>
-          </div>
-        )}
+          )}
+          {showOkButton && (
+            <button onClick={handleConfirm} className="bg-black hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transition duration-150 ease-in-out">
+              {okButtonText}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

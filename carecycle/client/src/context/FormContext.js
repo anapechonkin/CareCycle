@@ -16,9 +16,14 @@ export const FormProvider = ({ children }) => {
     }, [workshopId]);
 
     const updateFormData = (newData) => {
-        setFormData(prevFormData => ({ ...prevFormData, ...newData }));
+        // Check if newData is an empty object and reset formData if true
+        if (Object.keys(newData).length === 0) {
+            setFormData({});
+        } else {
+            setFormData(prevFormData => ({ ...prevFormData, ...newData }));
+        }
     };
-
+    
     const setWorkshopId = (newWorkshopId) => {
         setWorkshopIdInternal(newWorkshopId);
         localStorage.setItem('workshopId', newWorkshopId);

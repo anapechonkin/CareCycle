@@ -27,7 +27,7 @@ const PageOneQuestionnaire = () => {
       setPreferNotToAnswerPostal(true);
       setPreferNotToAnswerYear(true);
     }
-  }, [declined]);
+  }, [declined, preferNotToAnswerPostal, preferNotToAnswerYear]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -40,15 +40,12 @@ const PageOneQuestionnaire = () => {
   };
 
   const handleCheckboxChange = (optionId, isChecked) => {
-    const PNA_POSTALCODE = 'PNA';
-    const PNA_YEAROFBIRTH = '0000';
-
     if (optionId === 'postal') {
       setPreferNotToAnswerPostal(isChecked);
-      updateFormData({ ...formData, postalCode: isChecked ? PNA_POSTALCODE : postalCode });
+      updateFormData({ ...formData, postalCode: isChecked ? 'PNA' : postalCode });
     } else if (optionId === 'year') {
       setPreferNotToAnswerYear(isChecked);
-      updateFormData({ ...formData, yearOfBirth: isChecked ? PNA_YEAROFBIRTH : yearOfBirth });
+      updateFormData({ ...formData, yearOfBirth: isChecked ? '0000' : yearOfBirth });
     }
   };
 
@@ -67,17 +64,12 @@ const PageOneQuestionnaire = () => {
 
   const handleModalConfirm = () => {
     setIsModalOpen(false);
-    if (declined === true) {
-      // Reset form to its initial state
-      setPostalCode('');
-      setYearOfBirth('');
-      setPreferNotToAnswerPostal(false);
-      setPreferNotToAnswerYear(false);
-      setDeclined(null);
-      // Reset formData in the context
-      updateFormData({});
-      navigate('/pageOneQuestionnaire');
-    }
+    setPostalCode('');
+    setYearOfBirth('');
+    setPreferNotToAnswerPostal(false);
+    setPreferNotToAnswerYear(false);
+    setDeclined(null);
+    updateFormData({});
   };
   
   return (
@@ -145,7 +137,13 @@ const PageOneQuestionnaire = () => {
           />
           <div className="flex flex-col items-center mt-8 space-y-4">
             {isModalOpen && (
-              <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onConfirm={handleModalConfirm}>
+              // When setting up the Modal in your component's return statement
+              <Modal 
+                isOpen={isModalOpen} 
+                onClose={() => setIsModalOpen(false)} 
+                onConfirm={handleModalConfirm}
+                showCancelButton={false} // Example: Assuming you don't need a cancel button for now
+              >
                 {modalContent}
               </Modal>
             )}
