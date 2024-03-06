@@ -46,44 +46,43 @@ const PageTwoExtraQuestionnaire = () => {
   const handlePreviousClick = () => navigate('/pageTwoQuestionnaire');
 
   const handleNextClick = () => {
-    // Make a copy of the current form data to ensure we're not modifying state directly
-    const currentFormData = {...formData};
+    const currentFormData = { ...formData };
   
-    // Get the selected gender identities' IDs
-    const selectedGenderIdentityIds = Object.entries(selectedGenders)
-      .filter(([_, isSelected]) => isSelected)
-      .map(([genderId, _]) => genderId);
+    // Adjust logic to include "Prefer Not To Answer" in selectedGenderIdentityIds if set
+    let selectedGenderIdentityIds;
+    if (preferNotToAnswer) {
+      selectedGenderIdentityIds = ["1"]; // Include "Prefer Not To Answer" ID directly
+    } else {
+      selectedGenderIdentityIds = Object.entries(selectedGenders)
+        .filter(([_, isSelected]) => isSelected)
+        .map(([genderId, _]) => genderId);
+    }
   
-    // Save the selected gender identities' IDs directly
     currentFormData.genderIdentities = selectedGenderIdentityIds;
   
-    // For logging purposes: Map selected gender IDs to their types and log them
     const selectedGenderTypesForLogging = genderIdentities
       .filter(gender => selectedGenderIdentityIds.includes(gender.gender_identity_id.toString()))
       .map(gender => gender.type);
   
-    // Update form data in your state/context with the modified copy
     updateFormData(currentFormData);
   
-    // Log the selected gender types for clarity
     console.log('Selected Gender Identities Types:', selectedGenderTypesForLogging);
+    console.log('Updated FormData after page 2.5:', currentFormData);
   
-    // Log the updated form data including the selected gender identities' IDs
-    console.log('Updated FormData after page 2:', currentFormData);
-  
-    // Navigate to the next page
     navigate('/pageThreeQuestionnaire');
   };
 
   const handlePreferNotToAnswerChange = (isChecked) => {
     setPreferNotToAnswer(isChecked);
     if (isChecked) {
-        // Clear other selections if 'Prefer Not To Answer' is checked
-        setSelectedGenders({});
+      // Clear other selections if 'Prefer Not To Answer' is checked
+      setSelectedGenders({ "1": true }); // Assuming "Prefer Not To Answer" has ID 1
     } else {
-        // Optionally reset specific logic if 'Prefer Not To Answer' is unchecked
+      // Reset the selectedGenders state, removing "Prefer Not To Answer"
+      const { "1": _, ...rest } = selectedGenders;
+      setSelectedGenders(rest);
     }
-};
+  };
 
   // Adjust the toggle function to work with 'gender_identity_id'
   const toggleGenderSelection = (gender_identity_id) => {
