@@ -42,7 +42,7 @@ const PageOneQuestionnaire = () => {
   const handleCheckboxChange = (optionId, isChecked) => {
     if (optionId === 'postal') {
       setPreferNotToAnswerPostal(isChecked);
-      updateFormData({ ...formData, postalCode: isChecked ? 'PNA' : postalCode });
+      updateFormData({ ...formData, postalCode: isChecked ? 'Prefer Not To Answer' : postalCode });
     } else if (optionId === 'year') {
       setPreferNotToAnswerYear(isChecked);
       updateFormData({ ...formData, yearOfBirth: isChecked ? '0000' : yearOfBirth });

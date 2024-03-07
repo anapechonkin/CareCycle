@@ -4,6 +4,7 @@ import Banner from "../components/Banner";
 import Shadow from "../components/Shadow";
 import Footer from "../components/Footer";
 import Button from "../components/Button";
+import Modal from "../components/Modal";
 import { useNavigate } from "react-router-dom";
 import { useForm } from '../context/FormContext'; 
 
@@ -11,34 +12,46 @@ const PageTwoQuestionnaire = () => {
   const navigate = useNavigate();
   const { formData, updateFormData } = useForm();
   const [selectedPrimaryGender, setSelectedPrimaryGender] = useState('');
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  
   // Function to navigate based on gender selection
   const handleNextClick = () => {
-    console.log('FormData after page two for this client:', formData);
-    if (selectedPrimaryGender === 'For More Options') {
-      console.log('Answer saved, navigating to the next page.');
-      navigate('/pageTwoExtraQuestionnaire'); // Navigate to extra questions for "Other" selection
+    if (!selectedPrimaryGender) { // Check if no gender is selected
+      setIsModalOpen(true); // Show modal if no gender is selected
     } else {
-      navigate('/pageThreeQuestionnaire'); // Navigate to the next page for all other selections
+      console.log('FormData after page two for this client:', formData);
+      if (selectedPrimaryGender === 'For More Options') {
+        console.log('Answer saved, navigating to the next page.');
+        navigate('/pageTwoExtraQuestionnaire'); // Navigate to extra questions for "Other" selection
+      } else {
+        navigate('/pageThreeQuestionnaire'); // Navigate to the next page for all other selections
+      }
     }
   };
-  
+    
   //Function to navigate to previous page
   const handlePreviousClick = () => navigate('/pageOneQuestionnaire');
 
   // Function to handle gender selection
   const handleGenderChange = (event) => {
-    const selectedPrimaryGender = event.target.value;
-    setSelectedPrimaryGender(selectedPrimaryGender);
-    const primaryGender = selectedPrimaryGender === 'For More Options' ? 'Other' : selectedPrimaryGender;
-    updateFormData({ primaryGender}); // Update form data with selected gender
+    const selectedOption = genderOptions.find(option => option.label === event.target.value);
+    if (selectedOption) {
+      setSelectedPrimaryGender(selectedOption.label); // For UI state
+      updateFormData({
+        ...formData,
+        primaryGender: {
+          id: selectedOption.id,
+          label: selectedOption.label
+        }
+      });
+    }
   };
 
   const genderOptions = [
-    { label: "For More Options", imgSrc: "/icons/other.png" },
-    { label: "Male", imgSrc: "/icons/male.png" },
-    { label: "Female", imgSrc: "/icons/female.png" },
-    { label: "Prefer Not to Answer", imgSrc: "/icons/noAnswer.png"  } 
+    { id: 1, label: "Prefer Not to Answer", imgSrc: "/icons/noAnswer.png" },
+    { id: 2, label: "Male", imgSrc: "/icons/male.png" },
+    { id: 3, label: "Female", imgSrc: "/icons/female.png" },
+    { id: 4, label: "For More Options", imgSrc: "/icons/other.png" }
   ];
 
   return (
@@ -66,6 +79,13 @@ const PageTwoQuestionnaire = () => {
               </label>
             ))}
           </div>
+          <Modal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            htmlContent="<p>Please select a primary gender option to continue.</p>"
+            showOkButton={true}
+            okButtonText="OK"
+          />
           <div className="flex justify-between w-full mt-8">
             <Button 
               text="PREVIOUS QUESTION"

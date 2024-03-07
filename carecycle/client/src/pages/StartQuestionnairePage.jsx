@@ -5,12 +5,14 @@ import Shadow from "../components/Shadow";
 import Footer from "../components/Footer";
 import Dropdown from "../components/DropDown";
 import Button from "../components/Button";
+import Modal from "../components/Modal";
 import { useNavigate } from "react-router-dom";
 import { useForm } from '../context/FormContext';
 import { fetchWorkshops } from "../api/dropdownApi";
 
 const StartQuestionnairePage = () => {
   const [workshops, setWorkshops] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
   const { workshopId , setWorkshopId, clearWorkshopId } = useForm(); // Use the setWorkshopId directly for updating workshopId
 
@@ -40,8 +42,18 @@ const StartQuestionnairePage = () => {
   };
 
   const handleClick = () => {
-    navigate('/pageOneQuestionnaire'); // Navigate to the next part of the questionnaire
+    if (!workshopId) { // Check if no workshop is selected
+      setIsModalOpen(true);
+    } else {
+      // Find the workshop by ID to log both ID and name
+      const selectedWorkshop = workshops.find(workshop => workshop.value === workshopId);
+      if (selectedWorkshop) {
+        console.log(`Selected workshop ID: ${selectedWorkshop.value}, Name: ${selectedWorkshop.label}`);
+      }
+      navigate('/pageOneQuestionnaire');
+    }
   };
+  
 
   return (
     <div className="flex flex-col min-h-screen bg-[#f6cdd0]">
@@ -66,6 +78,14 @@ const StartQuestionnairePage = () => {
             className="w-full h-auto rounded shadow-lg border-2 border-black"
             src="/photos/DIYWorkshop.jpg"
             alt="Workshop"
+          />
+          <Modal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            onConfirm={() => setIsModalOpen(false)}
+            htmlContent="<p>Please select a workshop before starting the questionnaire.</p>"
+            showOkButton={true}
+            okButtonText="OK"
           />
           <Button 
             onClick={handleClick}

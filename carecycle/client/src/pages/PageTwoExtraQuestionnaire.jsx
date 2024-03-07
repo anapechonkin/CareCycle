@@ -46,32 +46,35 @@ const PageTwoExtraQuestionnaire = () => {
   const handlePreviousClick = () => navigate('/pageTwoQuestionnaire');
 
   const handleNextClick = () => {
-    const currentFormData = { ...formData };
+    // Adjusting the creation of selectedGenderIdentities to include both ID and name
+    const selectedGenderIdentities = Object.entries(selectedGenders)
+      .filter(([_, isSelected]) => isSelected)
+      .map(([id, _]) => ({
+        id: id, // Keep the ID
+        name: genderIdentities.find(identity => identity.gender_identity_id.toString() === id).type // Find and keep the name
+      }));
   
-    // Adjust logic to include "Prefer Not To Answer" in selectedGenderIdentityIds if set
-    let selectedGenderIdentityIds;
-    if (preferNotToAnswer) {
-      selectedGenderIdentityIds = ["1"]; // Include "Prefer Not To Answer" ID directly
+    if (selectedGenderIdentities.length === 0 && !preferNotToAnswer) {
+      // No selections made, show reminder modal
+      setModalContent("<p>Please select at least one gender identity or choose 'Prefer Not To Answer' to continue.</p>");
+      setShowModal(true);
     } else {
-      selectedGenderIdentityIds = Object.entries(selectedGenders)
-        .filter(([_, isSelected]) => isSelected)
-        .map(([genderId, _]) => genderId);
+      // Proceed with navigation and data handling as before, but with the updated structure
+      const currentFormData = { ...formData };
+      
+      // Update to include structured data
+      currentFormData.genderIdentities = preferNotToAnswer ? [{ id: "1", name: "Prefer Not To Answer" }] : selectedGenderIdentities;
+    
+      updateFormData(currentFormData);
+    
+      // Adjusted logging to reflect the new structure
+      console.log('Selected Gender Identities:', selectedGenderIdentities.map(identity => `${identity.name} (ID: ${identity.id})`));
+      console.log('Updated FormData after page 2.5:', currentFormData);
+    
+      navigate('/pageThreeQuestionnaire');
     }
-  
-    currentFormData.genderIdentities = selectedGenderIdentityIds;
-  
-    const selectedGenderTypesForLogging = genderIdentities
-      .filter(gender => selectedGenderIdentityIds.includes(gender.gender_identity_id.toString()))
-      .map(gender => gender.type);
-  
-    updateFormData(currentFormData);
-  
-    console.log('Selected Gender Identities Types:', selectedGenderTypesForLogging);
-    console.log('Updated FormData after page 2.5:', currentFormData);
-  
-    navigate('/pageThreeQuestionnaire');
   };
-
+  
   const handlePreferNotToAnswerChange = (isChecked) => {
     setPreferNotToAnswer(isChecked);
     if (isChecked) {
@@ -94,6 +97,11 @@ const PageTwoExtraQuestionnaire = () => {
     setModalContent(info);
     setShowModal(true);
   };
+
+  // const handleModalDisplay = (content) => {
+  //   setModalContent(content);
+  //   setShowModal(true);
+  // };
 
   const renderGenderIdentities = () => {
     return (
