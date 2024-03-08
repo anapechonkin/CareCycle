@@ -78,15 +78,15 @@ const getClientByPostalCodeId = async (request, response) => {
 
 // Adds a new clientStat with provided details to the database
 const addClientStat = async (request, response) => {
-    const { primaryGenderId, yearOfBirth, mapId, postalCodeId, workshopId, userId } = request.body;
+    const { primaryGenderId, yearOfBirth, mapId, postalCodeId, workshopId } = request.body;
     const query = `
         INSERT INTO carecycle.ClientStats 
         (primary_gender_id, year_of_birth, map_id, postal_code_id, workshop_id, user_id) 
         VALUES 
-        ($1, $2, $3, $4, $5, $6)
+        ($1, $2, $3, $4, $5, NULL)
         RETURNING *;`;
 
-    const values = [primaryGenderId, yearOfBirth, mapId, postalCodeId, workshopId, userId];
+    const values = [primaryGenderId, yearOfBirth, mapId, postalCodeId, workshopId];
 
     try {
         const results = await pool.query(query, values);

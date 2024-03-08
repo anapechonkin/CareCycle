@@ -24,6 +24,7 @@ app.get('/', (request, response) => {
 
 //Gender Identity Routes
 app.post('/users/:userId/gender-identities', genderIdentityRoutes.addUserGenderIdentities);  
+app.post('/clientstats/:clientStatId/gender-identities', genderIdentityRoutes.addClientStatGenderIdentities);
 app.get ('/gender-identities', genderIdentityRoutes.fetchGenderIdentities);
 app.put('/users/:userId/gender-identities', genderIdentityRoutes.updateUserGenderIdentities);
 

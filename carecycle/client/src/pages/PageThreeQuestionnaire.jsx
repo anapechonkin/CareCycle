@@ -12,7 +12,7 @@ import { useForm } from '../context/FormContext';
 
 const PageThreeQuestionnaire = () => {
   const navigate = useNavigate();
-  const { formData, updateFormData } = useForm();
+  const { formData, updateFormData, workshopId } = useForm();
   const [mapRegions, setMapRegions] = useState([]);
   const [showModal, setShowModal] = useState(false); // Add this state
   const [modalContent, setModalContent] = useState(''); // Add this state
@@ -40,6 +40,7 @@ const PageThreeQuestionnaire = () => {
     }
   
     // If a selection is made, potentially reset the modal content or handle as necessary
+    console.log("Current workshop ID:", workshopId);
     console.log('Selected map region:', formData.mapSelection.mapName);
     console.log('Updated FormData after page 3:', formData);
     

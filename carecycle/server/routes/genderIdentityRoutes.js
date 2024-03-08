@@ -43,6 +43,38 @@ async function addUserGenderIdentities(req, res) {
     }
 }
 
+// Function to add gender identities for a client stat
+async function addClientStatGenderIdentities(req, res) {
+    const { clientStatId } = req.params; // Assuming clientStatId is passed as a URL parameter
+    const { genderIdentityIds } = req.body; // Expect an array of gender_identity_id
+
+    let addedIdentitiesInfo = [];
+    try {
+        await pool.query('BEGIN');
+
+        for (let genderIdentityId of genderIdentityIds) {
+            const exists = await pool.query('SELECT 1 FROM carecycle.client_genderidentity WHERE cs_id = $1 AND gender_identity_id = $2', [clientStatId, genderIdentityId]);
+
+            if (exists.rowCount === 0) {
+                await pool.query('INSERT INTO carecycle.client_genderidentity (cs_id, gender_identity_id) VALUES ($1, $2)', [clientStatId, genderIdentityId]);
+                
+                // Fetch the gender identity type for the added identity
+                const result = await pool.query('SELECT type FROM carecycle.genderidentity WHERE gender_identity_id = $1', [genderIdentityId]);
+                if (result.rows.length > 0) {
+                    addedIdentitiesInfo.push({id: genderIdentityId, type: result.rows[0].type});
+                }
+            }
+        }
+
+        await pool.query('COMMIT');
+        res.json({ message: 'Gender identities added successfully for client stat.', addedIdentities: addedIdentitiesInfo });
+    } catch (error) {
+        await pool.query('ROLLBACK');
+        console.error('Error adding client stat gender identities:', error);
+        res.status(500).json({ message: 'Failed to add gender identities for client stat', error: error.message });
+    }
+}
+
 async function updateUserGenderIdentities(req, res) {
     const { userId } = req.params;
     const { genderIdentityIds } = req.body; // Expect an array of gender_identity_id
@@ -77,5 +109,6 @@ async function updateUserGenderIdentities(req, res) {
 module.exports = {
     fetchGenderIdentities,
     addUserGenderIdentities,
+    addClientStatGenderIdentities,
     updateUserGenderIdentities
 };

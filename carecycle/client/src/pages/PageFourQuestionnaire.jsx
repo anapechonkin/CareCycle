@@ -1,37 +1,78 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import NavBar from "../components/NavBar";
 import Banner from "../components/Banner";
 import Shadow from "../components/Shadow";
 import Footer from "../components/Footer";
 import Button from "../components/Button";
-import Modal from "../components/Modal"; 
-import { useNavigate } from "react-router-dom";
+import Modal from "../components/Modal";
+import { useForm } from '../context/FormContext';
+import { addClientStat } from '../api/clientStatApi';
+import { lookupPostalCode, addPostalCode } from '../api/postalCodeApi';
+import { addClientStatGenderIdentities } from '../api/genderIdentityApi'; // Ensure this is correctly imported
 
 const PageFourQuestionnaire = () => {
   const navigate = useNavigate();
+  const { formData, workshopId } = useForm();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const [rulesAccepted, setRulesAccepted] = useState(null);
 
-  const handleSubmitQuestionnaire = () => {
-    // Placeholder for actual submission logic
-    const submissionSuccess = true; // Simulate success
-
-    if (submissionSuccess) {
-      setModalMessage('You have successfully submitted the questionnaire.');
-    } else {
-      setModalMessage('There was an issue submitting your questionnaire. Please try again.');
+  const handlePostalCode = async (postalCode) => {
+    if (postalCode.toUpperCase() === "PREFER NOT TO ANSWER") {
+      return 1; // Assuming '1' is the ID reserved for "Prefer Not To Answer"
     }
-    setIsModalOpen(true);
+
+    try {
+      const lookupResult = await lookupPostalCode(postalCode);
+      return lookupResult.postal_code_id;
+    } catch (error) {
+      const addResult = await addPostalCode(postalCode);
+      return addResult.postal_code_id;
+    }
   };
+
+  const handleSubmitQuestionnaire = async () => {
+    try {
+      const postalCodeId = await handlePostalCode(formData.postalCode);
+  
+      const submissionData = {
+        yearOfBirth: formData.yearOfBirth,
+        primaryGenderId: formData.primaryGender.id,
+        mapId: formData.mapSelection.mapID,
+        postalCodeId,
+        workshopId,
+        userId: null // Assuming user authentication isn't set up yet, thus 'null'
+      };
+  
+      const clientStatResult = await addClientStat(submissionData);
+      console.log('ClientStat added successfully:', clientStatResult); // Log the clientStatResult
+  
+      // Correctly handling gender identities for the client stat
+      if (clientStatResult && formData.genderIdentities && formData.genderIdentities.length > 0) {
+        const genderIdentityIds = formData.genderIdentities.map(identity => identity.id); // Assuming your formData structures genderIdentities as {id, name}
+        const genderIdentityResult = await addClientStatGenderIdentities(clientStatResult.cs_id, genderIdentityIds);
+        console.log('Gender identities added successfully:', genderIdentityResult); // Log the gender identities result
+      }
+  
+      setModalMessage('You have successfully submitted the questionnaire.');
+      setIsModalOpen(true);
+      setTimeout(() => navigate('/pageOneQuestionnaire'), 3000); // Navigate away after showing success message
+    } catch (error) {
+      console.error('Submission error:', error);
+      setModalMessage('Failed to submit the questionnaire. Please try again.');
+      setIsModalOpen(true);
+    }
+  };
+  
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    navigate('/pageOneQuestionnaire'); // Navigate back to start a new session
+    navigate('/pageOneQuestionnaire');
   };
 
   const handlePreviousClick = () => navigate('/pageThreeQuestionnaire');
-
+  
   return (
     <div className="flex flex-col min-h-screen bg-[#f6cdd0]">
       <NavBar />

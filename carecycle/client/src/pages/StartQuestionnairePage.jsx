@@ -14,11 +14,7 @@ const StartQuestionnairePage = () => {
   const [workshops, setWorkshops] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
-  const { workshopId , setWorkshopId, clearWorkshopId } = useForm(); // Use the setWorkshopId directly for updating workshopId
-
-  const handleStartNewSession = () => {
-    clearWorkshopId(); // Clear workshopId to start a new session
-  };
+  const { workshopId, setWorkshopId } = useForm();
 
   useEffect(() => {
     const loadWorkshops = async () => {
@@ -37,7 +33,6 @@ const StartQuestionnairePage = () => {
   }, []);
 
   const handleSelect = (selectedOption) => {
-    console.log("Selected option:", selectedOption);
     setWorkshopId(selectedOption); // This updates the workshopId in the context
   };
 
@@ -63,16 +58,11 @@ const StartQuestionnairePage = () => {
       <div className="flex-grow pt-20 pb-20 mt-24 flex flex-col items-center justify-center w-full">
         <div className="max-w-[800px] w-full px-4 lg:px-8 space-y-12">
           <h1 className="text-6xl font-bold mb-16 text-center text-[#704218]">Client Stats Questionnaire</h1>
-          <Button 
-            onClick={handleStartNewSession} 
-            className="start-new-session-button-styles"
-            text="START NEW SESSION"
-          />
           <Dropdown
             options={workshops}
             placeholder="Choose Type of Activity"
             onSelect={handleSelect}
-            selectedValue={workshopId} // Ensure you are passing the correct value for controlled behavior
+            selectedValue={workshopId}
           />
           <img
             className="w-full h-auto rounded shadow-lg border-2 border-black"

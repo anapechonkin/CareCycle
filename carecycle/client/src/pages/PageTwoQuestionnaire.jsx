@@ -10,7 +10,7 @@ import { useForm } from '../context/FormContext';
 
 const PageTwoQuestionnaire = () => {
   const navigate = useNavigate();
-  const { formData, updateFormData } = useForm();
+  const { formData, updateFormData, workshopId } = useForm();
   const [selectedPrimaryGender, setSelectedPrimaryGender] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   
@@ -19,6 +19,7 @@ const PageTwoQuestionnaire = () => {
     if (!selectedPrimaryGender) { // Check if no gender is selected
       setIsModalOpen(true); // Show modal if no gender is selected
     } else {
+      console.log("Current workshop ID:", workshopId);
       console.log('FormData after page two for this client:', formData);
       if (selectedPrimaryGender === 'For More Options') {
         console.log('Answer saved, navigating to the next page.');

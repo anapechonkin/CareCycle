@@ -16,7 +16,7 @@ const PageOneQuestionnaire = () => {
   const [preferNotToAnswerPostal, setPreferNotToAnswerPostal] = useState(false);
   const [preferNotToAnswerYear, setPreferNotToAnswerYear] = useState(false);
   const [declined, setDeclined] = useState(null);
-  const { formData, updateFormData } = useForm();
+  const { formData, updateFormData, workshopId } = useForm();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState('');
   const navigate = useNavigate();
@@ -57,6 +57,7 @@ const PageOneQuestionnaire = () => {
       setModalContent('You have declined to participate in this questionnaire. Please give the device back to the volunteer/employee.');
       setIsModalOpen(true);
     } else {
+      console.log("Current workshop ID:", workshopId);
       console.log('FormData after page one:', formData);
       navigate('/pageTwoQuestionnaire');
     }

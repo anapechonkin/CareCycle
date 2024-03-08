@@ -14,7 +14,7 @@ import mockGenderIdentities from "../data/genderIdentities";
 
 const PageTwoExtraQuestionnaire = () => {
   const navigate = useNavigate();
-  const { formData, updateFormData } = useForm();
+  const { formData, updateFormData, workshopId } = useForm();
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState('');
   const [selectedGenders, setSelectedGenders] = useState({});
@@ -68,6 +68,7 @@ const PageTwoExtraQuestionnaire = () => {
       updateFormData(currentFormData);
     
       // Adjusted logging to reflect the new structure
+      console.log("Current workshop ID:", workshopId);
       console.log('Selected Gender Identities:', selectedGenderIdentities.map(identity => `${identity.name} (ID: ${identity.id})`));
       console.log('Updated FormData after page 2.5:', currentFormData);
     
