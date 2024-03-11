@@ -29,7 +29,7 @@ const getUserById = async (request, response) => {
 
     const userDetailsQuery = `
         SELECT 
-            u.user_id, u.username, u.firstname, u.lastname, u.vegetable,
+            u.user_id, u.username, u.email, u.firstname, u.lastname, u.vegetable,
             u.year_of_birth, u.is_active, u.usertype_id, u.map_id, u.created_at, u.updated_at,
             pg.gender_name, pg.primary_gender_id,
             pc.postal_code,
@@ -47,7 +47,7 @@ const getUserById = async (request, response) => {
         WHERE 
             u.user_id = $1
         GROUP BY 
-            u.user_id, u.username, u.firstname, u.lastname, u.vegetable,
+            u.user_id, u.username, u.email, u.firstname, u.lastname, u.vegetable,
             u.year_of_birth, u.is_active, u.usertype_id, u.map_id, u.created_at, u.updated_at,
             pg.gender_name, pc.postal_code, pg.primary_gender_id
     `;
@@ -103,17 +103,17 @@ const getUserByUsername = async (request, response) => {
 
 // Adds a new user with provided details, hashing the password for security
 const addUser = async (request, response) => {
-    const { username, password, firstName, lastName, vegetable, yearOfBirth, primaryGenderId, postalCodeId, isActive, userTypeID, mapID } = request.body;
+    const { username, email, password, firstName, lastName, vegetable, yearOfBirth, primaryGenderId, postalCodeId, isActive, userTypeID, mapID } = request.body;
 
     try {
         const hashedPassword = await bcrypt.hash(password, saltRounds);
         const result = await pool.query(`
             INSERT INTO carecycle.users 
-            (username, password, firstname, lastname, vegetable, year_of_birth, primary_gender_id, postal_code_id, is_active, usertype_id, map_id) 
+            (username, email, password, firstname, lastname, vegetable, year_of_birth, primary_gender_id, postal_code_id, is_active, usertype_id, map_id) 
             VALUES 
-            ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+            ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
             RETURNING *;`,
-            [username, hashedPassword, firstName, lastName, vegetable, yearOfBirth, primaryGenderId, postalCodeId, isActive, userTypeID, mapID]);
+            [username, email, hashedPassword, firstName, lastName, vegetable, yearOfBirth, primaryGenderId, postalCodeId, isActive, userTypeID, mapID]);
 
         response.status(201).json(result.rows[0]);
     } catch (error) {
@@ -122,9 +122,10 @@ const addUser = async (request, response) => {
     }
 };
 
+// Updates a user's details using their unique ID
 const updateUser = async (request, response) => {
     const id = parseInt(request.params.id);
-    const { username, firstName, lastName, primaryGenderId, vegetable, yearOfBirth, postalCodeId, isActive, userTypeID, mapID } = request.body;
+    const { username, email, firstName, lastName, primaryGenderId, vegetable, yearOfBirth, postalCodeId, isActive, userTypeID, mapID } = request.body;
 
     const updates = [];
     const values = [];
@@ -132,6 +133,7 @@ const updateUser = async (request, response) => {
 
     // Dynamically add fields to the updates array if they're present in the request
     if (username !== undefined) { updates.push(`username = $${valuePosition++}`); values.push(username); }
+    if (email !== undefined) { updates.push(`email = $${valuePosition++}`); values.push(email); }
     if (firstName !== undefined) { updates.push(`firstname = $${valuePosition++}`); values.push(firstName); }
     if (lastName !== undefined) { updates.push(`lastname = $${valuePosition++}`); values.push(lastName); }
     if (primaryGenderId !== undefined) { updates.push(`primary_gender_id = $${valuePosition++}`); values.push(primaryGenderId); }

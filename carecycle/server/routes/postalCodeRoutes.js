@@ -5,8 +5,8 @@ const determineAreaId = (postalCode) => {
     // Example logic, adjust according to your actual area categorization
     if (postalCode.startsWith('H3N')) return 2; // Parc-X
     if (['H2P', 'H2R', 'H2E'].some(prefix => postalCode.startsWith(prefix))) return 3; // Villeray
-    if (!postalCode.startsWith('H')) return 4; // Outside Montreal
-    return 5; // Undefined or Rest of Montreal, adjust as necessary
+    if (!postalCode.startsWith('H')) return 5; // Outside Montreal
+    return 6; // Undefined or Rest of Montreal, adjust as necessary
 };
 
 //Check if Postal Code is in DB

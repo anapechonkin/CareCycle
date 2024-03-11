@@ -11,6 +11,7 @@ const AddUserForm = ({ onAddUser }) => {
   const initialFormState = {
     userTypeID: '',
     username: '',
+    email: '',
     password: '',
     firstName: '',
     lastName: '',
@@ -87,6 +88,11 @@ const AddUserForm = ({ onAddUser }) => {
     }));
   };
 
+  const isValidEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
   
@@ -110,12 +116,22 @@ const AddUserForm = ({ onAddUser }) => {
                 throw new Error('Failed to add postal code');
             }
         }
+
+        // Format the email: trim and convert to lowercase
+        const formattedEmail = formData.email.trim().toLowerCase();
+        
+        // Validate the formatted email
+        if (!isValidEmail(formattedEmail)) {
+          setFeedback({ message: 'Invalid email format.', type: 'error' });
+          return; // Stop the form submission process
+        }
     
         // Prepare the data for user addition, including the postal code ID
         const dataToSend = {
             ...formData,
             postalCode: formattedPostalCode, // Use the formatted postal code
             postalCodeId, // Add the received postalCodeId to the user data
+            email: formattedEmail, // Use the formatted email
         };
     
         // Attempt to add the user with the updated data
@@ -183,6 +199,7 @@ const AddUserForm = ({ onAddUser }) => {
           onSelect={(value) => handleDropdownChange('userTypeID', value)}
         />
         {renderTextInput("username", "Username", formData.username)}
+        {renderTextInput("email", "Email", formData.email)}
         {renderTextInput("password", "Password", formData.password, true)}
         {renderTextInput("firstName", "First Name", formData.firstName)}
         {renderTextInput("lastName", "Last Name", formData.lastName)}
@@ -202,7 +219,7 @@ const AddUserForm = ({ onAddUser }) => {
           onSelect={(value) => handleDropdownChange('primaryGenderId', value)}
         />
         {
-          formData.primaryGenderId === 3 && // Use the actual value for "other"
+          formData.primaryGenderId === 4 && // Use the actual value for "other"
           <Checkbox
             title="Select Gender Identities"
             options={genderIdentities}

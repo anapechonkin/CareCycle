@@ -13,6 +13,7 @@ const UpdateUserForm = ({ onAddUser, users }) => {
   const [formData, setFormData] = useState({
     userTypeID: '',
     username: '',
+    email: '',
     firstName: '',
     lastName: '',
     yearOfBirth: '',
@@ -57,6 +58,7 @@ const UpdateUserForm = ({ onAddUser, users }) => {
         setFormData({
           userTypeID: userData.usertype_id || '',
           username: userData.username || '',
+          email: userData.email || '',
           firstName: userData.firstname || '',
           lastName: userData.lastname || '',
           yearOfBirth: userData.year_of_birth ? userData.year_of_birth.toString() : '',
@@ -101,6 +103,7 @@ const UpdateUserForm = ({ onAddUser, users }) => {
         setFormData({ // Reset formData to its initial state
           userTypeID: '',
           username: '',
+          email: '',
           firstName: '',
           lastName: '',
           yearOfBirth: '',
@@ -201,6 +204,7 @@ const handleSubmit = async (e) => {
       setFormData({
         userTypeID: '',
         username: '',
+        email: '',
         firstName: '',
         lastName: '',
         yearOfBirth: '',
@@ -300,6 +304,18 @@ const handleSubmit = async (e) => {
             type="text"
             name="username"
             value={formData.username}
+            onChange={handleChange}
+            className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email Address</label>
+          <input
+            id="email"
+            type="text"
+            name="email"
+            value={formData.email}
             onChange={handleChange}
             className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200"
           />
