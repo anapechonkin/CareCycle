@@ -99,12 +99,12 @@ const AddUserForm = ({ onAddUser }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
       const formattedPostalCode = formData.postalCode.toUpperCase().replace(/\s+/g, '');
       const postalCodeResponse = await lookupPostalCode(formattedPostalCode);
       let postalCodeId = null;
-
+  
       if (postalCodeResponse && postalCodeResponse.postal_code_id) {
         postalCodeId = postalCodeResponse.postal_code_id;
       } else {
@@ -115,35 +115,43 @@ const AddUserForm = ({ onAddUser }) => {
           throw new Error('Failed to add postal code');
         }
       }
-
+  
       const formattedEmail = formData.email.trim().toLowerCase();
       if (!isValidEmail(formattedEmail)) {
         setFeedback({ message: 'Invalid email format.', type: 'error' });
         return;
       }
-
+  
       const dataToSend = {
         ...formData,
         postalCode: formattedPostalCode,
         postalCodeId,
         email: formattedEmail,
       };
-
+  
       const addedUser = await addUser(dataToSend);
       console.log('User added successfully:', addedUser);
-
+  
       const userId = addedUser.user_id;
       if (selectedGenderIdentities.length > 0) {
         const genderIdentityResponse = await addUserGenderIdentities(userId, selectedGenderIdentities);
         console.log('Gender identities added successfully:', genderIdentityResponse);
       }
-
+  
       if (mapAreas.some(area => area.checked)) { // Check if any map area is selected
         const selectedMapAreas = mapAreas.filter(area => area.checked).map(area => area.map_id);
         const mapAreaResponse = await addUserMapAreas(userId, selectedMapAreas);
         console.log('Map areas added successfully:', mapAreaResponse);
       }
-
+  
+      // Clear map areas
+      setMapAreas([]);
+      const resetMapAreas = mapAreas.map(area => ({
+        ...area,
+        checked: false
+      }));
+      setMapAreas(resetMapAreas);
+  
       setSelectedGenderIdentities([]);
       const resetGenderIdentities = genderIdentities.map(genderIdentity => ({
         ...genderIdentity,
@@ -156,17 +164,17 @@ const AddUserForm = ({ onAddUser }) => {
       setTimeout(() => {
         setFeedback({ message: '', type: '' });
       }, 5000);
-
+  
       setFormData(initialFormState);
     } catch (error) {
       console.error('Failed to add user:', error);
       setFeedback({ message: `Failed to add user: ${error.message}`, type: 'error' });
-
+  
       setTimeout(() => {
         setFeedback({ message: '', type: '' });
       }, 5000);
     }
-  };
+  };  
 
   const handleMapCheckboxChange = (event, option) => {
     const id = parseInt(option.id.replace('map_', ''), 10);
