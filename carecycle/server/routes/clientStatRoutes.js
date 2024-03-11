@@ -78,15 +78,15 @@ const getClientByPostalCodeId = async (request, response) => {
 
 // Adds a new clientStat with provided details to the database
 const addClientStat = async (request, response) => {
-    const { primaryGenderId, yearOfBirth, mapId, postalCodeId, workshopId } = request.body;
+    const { primaryGenderId, yearOfBirth, postalCodeId, workshopId } = request.body;
     const query = `
         INSERT INTO carecycle.ClientStats 
-        (primary_gender_id, year_of_birth, map_id, postal_code_id, workshop_id, user_id) 
+        (primary_gender_id, year_of_birth, postal_code_id, workshop_id, user_id) 
         VALUES 
-        ($1, $2, $3, $4, $5, NULL)
+        ($1, $2, $3, $4, NULL)
         RETURNING *;`;
 
-    const values = [primaryGenderId, yearOfBirth, mapId, postalCodeId, workshopId];
+    const values = [primaryGenderId, yearOfBirth, postalCodeId, workshopId];
 
     try {
         const results = await pool.query(query, values);
@@ -100,7 +100,7 @@ const addClientStat = async (request, response) => {
 // Updates an existing clientStat based on its cs_id
 const updateClientStat = async (request, response) => {
     const cs_id = parseInt(request.params.cs_id);
-    const { primaryGenderId, yearOfBirth, mapId, postalCodeId, workshopId, userId } = request.body;
+    const { primaryGenderId, yearOfBirth, postalCodeId, workshopId, userId } = request.body;
 
     // Initialize an array to hold parts of the SQL SET clause
     const updates = [];
@@ -117,10 +117,6 @@ const updateClientStat = async (request, response) => {
     if (yearOfBirth !== undefined) {
         updates.push(`year_of_birth = $${valuePosition++}`);
         values.push(yearOfBirth);
-    }
-    if (mapId !== undefined) {
-        updates.push(`map_id = $${valuePosition++}`);
-        values.push(mapId);
     }
     if (postalCodeId !== undefined) {
         updates.push(`postal_code_id = $${valuePosition++}`);

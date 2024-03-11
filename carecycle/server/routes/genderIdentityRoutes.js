@@ -17,6 +17,7 @@ async function addUserGenderIdentities(req, res) {
     const { genderIdentityIds } = req.body; // Expect an array of gender_identity_id
 
     let addedIdentitiesInfo = [];
+    
     try {
         await pool.query('BEGIN');
 

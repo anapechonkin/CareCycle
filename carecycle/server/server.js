@@ -8,6 +8,7 @@ const clientStatDB = require('./routes/clientStatRoutes.js');
 const dropDownDB = require('./routes/dropDownRoutes.js');
 const findPostalCode = require('./routes/postalCodeRoutes.js');
 const genderIdentityRoutes = require('./routes/genderIdentityRoutes.js');
+const mapAreaRoutes = require('./routes/mapAreaRoutes.js');
 
 dotenv.config();
 
@@ -21,6 +22,11 @@ app.use(
 app.get('/', (request, response) => {
     response.json({ info: 'Node.js, Express, and Postgres API' })
   })
+
+// Map Area Routes
+app.get('/map-areas', mapAreaRoutes.fetchMapAreas);  
+app.post('/users/:userId/map-areas', mapAreaRoutes.addUserMapAreas);
+app.put('/users/:userId/map-areas', mapAreaRoutes.updateUserMapAreas);  
 
 //Gender Identity Routes
 app.post('/users/:userId/gender-identities', genderIdentityRoutes.addUserGenderIdentities);  
