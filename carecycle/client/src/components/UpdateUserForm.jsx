@@ -138,6 +138,11 @@ const UpdateUserForm = ({ onAddUser, users }) => {
     setSelectedGenderIdentities(updatedSelections);
 };
 
+const isValidEmail = (email) => {
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return regex.test(email);
+};
+
 const handleSubmit = async (e) => {
   e.preventDefault();
 
@@ -160,10 +165,20 @@ const handleSubmit = async (e) => {
       }
     }
 
+    // Format the email: trim and convert to lowercase
+    const formattedEmail = formData.email.trim().toLowerCase();
+
+    // Validate the formatted email
+    if (!isValidEmail(formattedEmail)) {
+      setFeedback({ message: 'Invalid email format.', type: 'error' });
+      return; // Stop the form submission process
+    }
+
     // Prepare the user information for update, now including the postalCodeId
     const userInfoToUpdate = {
       ...formData,
       postalCodeId, // Include the postalCodeId obtained from the DB
+      email: formattedEmail
     };
 
     // Remove the postalCode field as it's not expected by the updateUser API
