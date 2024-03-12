@@ -17,7 +17,7 @@ const PageOneQuestionnaire = () => {
   const [preferNotToAnswerPostal, setPreferNotToAnswerPostal] = useState(false);
   const [preferNotToAnswerYear, setPreferNotToAnswerYear] = useState(false);
   const [declined, setDeclined] = useState(null);
-  const { formData, updateFormData, workshopId } = useForm();
+  const { formData, updateFormData, workshopId, workshopName  } = useForm();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState('');
   const navigate = useNavigate();
@@ -85,6 +85,9 @@ const PageOneQuestionnaire = () => {
       <Shadow />
       <div className="flex-grow pt-20 pb-20 mt-24 flex flex-col items-center justify-center w-full">
         <div className="max-w-[800px] w-full px-4 lg:px-8">
+          <h2 className="text-2xl font-semibold mb-4 text-center">
+            Active Session For: {workshopName}
+          </h2>
           <h1 className="text-4xl font-bold mb-12 text-center text-[#704218] [text-shadow:0px_4px_4px_#00000040]">Stats Help Get Grants, Thank You!</h1>
           <h2 className="text-3xl font-bold mb-8 text-center text-[#8D5E32] [text-shadow:0px_4px_4px_#00000040]">Please Choose Language</h2>
           <Dropdown

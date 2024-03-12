@@ -14,7 +14,7 @@ const StartQuestionnairePage = () => {
   const [workshops, setWorkshops] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
-  const { workshopId, setWorkshopId } = useForm();
+  const { workshopId, setWorkshopId, setWorkshopName } = useForm();
 
   useEffect(() => {
     const loadWorkshops = async () => {
@@ -32,9 +32,18 @@ const StartQuestionnairePage = () => {
     loadWorkshops();
   }, []);
 
-  const handleSelect = (selectedOption) => {
-    setWorkshopId(selectedOption); // This updates the workshopId in the context
-  };
+  const handleSelect = (selectedOptionValue) => {
+    // Set the workshop ID in the context
+    setWorkshopId(selectedOptionValue);
+
+    // Find the workshop by its value (ID) in the workshops array
+    const selectedWorkshop = workshops.find(workshop => workshop.value === selectedOptionValue);
+
+    // If the workshop is found, set its name in the context
+    if (selectedWorkshop) {
+        setWorkshopName(selectedWorkshop.label);
+    }
+};
 
   const handleClick = () => {
     if (!workshopId) { // Check if no workshop is selected

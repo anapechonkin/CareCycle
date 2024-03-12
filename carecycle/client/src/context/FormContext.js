@@ -6,7 +6,8 @@ export const useForm = () => useContext(FormContext);
 
 export const FormProvider = ({ children }) => {
     const [formData, setFormData] = useState({});
-    
+    const [workshopName, setWorkshopName] = useState('');
+
     const getSavedWorkshopId = () => {
         const workshopData = localStorage.getItem('workshopId');
         if (workshopData) {
@@ -50,7 +51,9 @@ export const FormProvider = ({ children }) => {
             updateFormData,
             workshopId,
             setWorkshopId,
-            clearWorkshopId
+            clearWorkshopId,
+            workshopName,
+            setWorkshopName,
         }}>
             {children}
         </FormContext.Provider>
