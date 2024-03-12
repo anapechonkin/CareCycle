@@ -3,12 +3,13 @@ import Select from 'react-select';
 import Button from "./Button";
 import Checkbox from "./Checkbox";
 import Dropdown from "./DropDown";
-import { fetchUserTypes, fetchPrimaryGenderIdentities, fetchMapRegions } from "../api/dropdownApi";
+import { fetchUserTypes, fetchPrimaryGenderIdentities } from "../api/dropdownApi";
 import { updateUser, getUserById } from "../api/userApi";
 import { fetchGenderIdentities, updateUserGenderIdentities } from "../api/genderIdentityApi";
 import { lookupPostalCode, addPostalCode } from '../api/postalCodeApi';
+import { fetchMapAreas, updateUserMapAreas } from "../api/mapAreaApi";
 
-// Updated to accept `users` as a prop
+
 const UpdateUserForm = ({ onAddUser, users }) => {
   const [formData, setFormData] = useState({
     userTypeID: '',
@@ -28,23 +29,25 @@ const UpdateUserForm = ({ onAddUser, users }) => {
   const [filter, setFilter] = useState('all');
   const [userTypes, setUserTypes] = useState([]);
   const [primaryGenderIdentities, setPrimaryGenderIdentities] = useState([]);
-  const [mapRegions, setMapRegions] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState('');
   const [genderIdentities, setGenderIdentities] = useState([]);
   const [selectedGenderIdentities, setSelectedGenderIdentities] = useState([]);
   const [feedback, setFeedback] = useState({ message: '', type: '' });
-  const [checkboxOptions, setCheckboxOptions] = useState([]); 
+  const [mapAreas, setMapAreas] = useState([]);
+  const [selectedMapAreas, setSelectedMapAreas] = useState([]);
+  const [genderCheckboxOptions, setGenderCheckboxOptions] = useState([]);
+  const [mapAreaCheckboxOptions, setMapAreaCheckboxOptions] = useState([]);
 
   useEffect(() => {
     async function fetchData() {
       const userTypesData = await fetchUserTypes();
       const primaryGenderIdentitiesData = await fetchPrimaryGenderIdentities();
-      const mapRegionsData = await fetchMapRegions();
+      const mapRegionsData = await fetchMapAreas();
       const genderIdentitiesData = await fetchGenderIdentities();
 
       setUserTypes(userTypesData);
       setPrimaryGenderIdentities(primaryGenderIdentitiesData);
-      setMapRegions(mapRegionsData);
+      setMapAreas(mapRegionsData);
       setGenderIdentities(genderIdentitiesData);
     }
     fetchData();
@@ -62,7 +65,7 @@ const UpdateUserForm = ({ onAddUser, users }) => {
           firstName: userData.firstname || '',
           lastName: userData.lastname || '',
           yearOfBirth: userData.year_of_birth ? userData.year_of_birth.toString() : '',
-          primaryGenderId: userData.primary_gender_id,
+          primaryGenderId: userData.primary_gender_id || '',
           mapID: userData.map_id || '',
           postalCode: userData.postal_code || '',
           vegetable: userData.vegetable || '',
@@ -72,20 +75,32 @@ const UpdateUserForm = ({ onAddUser, users }) => {
         if (userData.gender_identities) {
           setSelectedGenderIdentities(userData.gender_identities.map(gi => gi.gender_identity_id));
         }
+        if (userData.map_areas) {
+          setSelectedMapAreas(userData.map_areas.map(area => area.map_id));
+        }
       }
     }
     fetchUserData();
   }, [selectedUserId]);
 
-  // Update the `checkboxOptions` state based on `genderIdentities` and `selectedGenderIdentities`
+  // Update the `checkboxOptions` state based on `genderIdentities` and `mapAreas`
   useEffect(() => {
-    const options = genderIdentities.map(identity => ({
-      id: identity.gender_identity_id,
+    const genderOptions = genderIdentities.map(identity => ({
+      ...identity,
+      id: `gender-${identity.gender_identity_id}`, // Prefixing 'gender-'
       name: identity.type,
       checked: selectedGenderIdentities.includes(identity.gender_identity_id),
     }));
-    setCheckboxOptions(options);
-  }, [genderIdentities, selectedGenderIdentities]);
+    setGenderCheckboxOptions(genderOptions);
+  
+    const mapOptions = mapAreas.map(area => ({
+      ...area,
+      id: `map-${area.map_id}`, // Prefixing 'map-'
+      name: area.map_area_name,
+      checked: selectedMapAreas.includes(area.map_id),
+    }));
+    setMapAreaCheckboxOptions(mapOptions);
+  }, [genderIdentities, selectedGenderIdentities, mapAreas, selectedMapAreas]);
 
   const handleDropdownChange = (name, value) => {
     setFormData(prev => ({
@@ -115,6 +130,7 @@ const UpdateUserForm = ({ onAddUser, users }) => {
           postalCodeId: '',
         });
         setSelectedGenderIdentities([]);
+        setSelectedMapAreas([]);
         // Reset any other state that depends on the selected user
       }
     } else {
@@ -131,91 +147,103 @@ const UpdateUserForm = ({ onAddUser, users }) => {
   };
 
   const handleGenderIdentityCheckboxChange = (event, option) => {
-    const updatedSelections = event.target.checked
-        ? [...selectedGenderIdentities, option.id] // Add ID if checked
-        : selectedGenderIdentities.filter(id => id !== option.id); // Remove ID if unchecked
+    console.log(`Before update:`, selectedGenderIdentities);
 
+    const originalId = option.id.replace('gender-', '');
+    const newId = parseInt(originalId, 10); // Convert newId to a number
+    console.log(`Checkbox for ID ${newId} clicked, checked: ${event.target.checked}`);
+
+    const updatedSelections = event.target.checked
+        ? [...selectedGenderIdentities, newId] // Add newId as a number
+        : selectedGenderIdentities.filter(id => id !== newId); // Correctly filter out using number comparison
+
+    console.log(`After update:`, updatedSelections);
     setSelectedGenderIdentities(updatedSelections);
 };
 
-const isValidEmail = (email) => {
-  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return regex.test(email);
+const handleMapAreasCheckboxesChange = (event, option) => {
+  console.log(`Before update:`, selectedMapAreas);
+  const originalId = option.id.replace('map-', '');
+  const newId = parseInt(originalId, 10); // Convert newId to a number
+  console.log(`Checkbox for ID ${newId} clicked, checked: ${event.target.checked}`);
+  const updatedSelections = event.target.checked
+      ? [...selectedMapAreas, newId] // Add newId as a number
+      : selectedMapAreas.filter(id => id !== newId); // Correctly filter out using number comparison
+
+  console.log(`After update:`, updatedSelections);
+  setSelectedMapAreas(updatedSelections);
 };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
 
-  try {
-    // Handle the Postal Code
-    const formattedPostalCode = formData.postalCode.toUpperCase().replace(/\s+/g, '');
-    let postalCodeId;
+  const isValidEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
 
-    // Attempt to lookup the postal code
-    const postalCodeResponse = await lookupPostalCode(formattedPostalCode);
-    if (postalCodeResponse && postalCodeResponse.postal_code_id) {
-      postalCodeId = postalCodeResponse.postal_code_id;
-    } else {
-      // If not found, add the postal code and get its ID
-      const addedPostalCodeResponse = await addPostalCode(formattedPostalCode);
-      if (addedPostalCodeResponse && addedPostalCodeResponse.postal_code_id) {
-        postalCodeId = addedPostalCodeResponse.postal_code_id;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    try {
+      // Normalize and validate the postal code.
+      const formattedPostalCode = formData.postalCode.toUpperCase().replace(/\s+/g, '');
+      let postalCodeId = null;
+  
+      const postalCodeResponse = await lookupPostalCode(formattedPostalCode);
+      if (postalCodeResponse && postalCodeResponse.postal_code_id) {
+        postalCodeId = postalCodeResponse.postal_code_id;
       } else {
-        throw new Error('Failed to add postal code');
+        const addedPostalCodeResponse = await addPostalCode(formattedPostalCode);
+        if (!addedPostalCodeResponse || !addedPostalCodeResponse.postal_code_id) {
+          throw new Error('Failed to add postal code');
+        }
+        postalCodeId = addedPostalCodeResponse.postal_code_id;
       }
-    }
-
-    // Format the email: trim and convert to lowercase
-    const formattedEmail = formData.email.trim().toLowerCase();
-
-    // Validate the formatted email
-    if (!isValidEmail(formattedEmail)) {
-      setFeedback({ message: 'Invalid email format.', type: 'error' });
-      return; // Stop the form submission process
-    }
-
-    // Prepare the user information for update, now including the postalCodeId
-    const userInfoToUpdate = {
-      ...formData,
-      postalCodeId, // Include the postalCodeId obtained from the DB
-      email: formattedEmail
-    };
-
-    // Remove the postalCode field as it's not expected by the updateUser API
-    delete userInfoToUpdate.postalCode;
-
-    // If the primary gender is updated from "Other" to "Male" or "Female",
-    // remove associated gender identities
-    if (formData.primaryGenderId !== 'Other') {
-      // Modify userInfoToUpdate to exclude gender identities
-      delete userInfoToUpdate.gender_identities;
-    } else if (selectedGenderIdentities.length > 0) {
-      // If the primary gender is "Other" and new gender identities are selected,
-      // include these identities in the userInfoToUpdate
-      userInfoToUpdate.gender_identities = selectedGenderIdentities;
-    }
-
-    // Update the user information with all fields
-    const updateResponse = await updateUser(selectedUserId, userInfoToUpdate);
-    console.log("Basic User Info Update Response:", updateResponse);
-
-    // If there's a change in gender identities, update them separately
-    if (formData.primaryGenderId !== 'Other' && selectedGenderIdentities.length > 0) {
-      const genderUpdateResponse = await updateUserGenderIdentities(selectedUserId, selectedGenderIdentities);
-      console.log("Gender Identities Update Response:", genderUpdateResponse);
-    }
-
-    // Fetch updated user data and log it
-    const updatedUserData = await getUserById(selectedUserId);
-    console.log("Updated User Data:", updatedUserData);
-
-    await onAddUser();
-
-    // Provide success feedback
-    setFeedback({ message: 'User updated successfully!', type: 'success' });
-
-    // Reset form data, selected user, and clear the feedback message after a few seconds
-    setTimeout(() => {
+  
+      // Validate the email format.
+      const formattedEmail = formData.email.trim().toLowerCase();
+      if (!isValidEmail(formattedEmail)) {
+        setFeedback({ message: 'Invalid email format.', type: 'error' });
+        return;
+      }
+  
+      // Prepare the data for the user update.
+      const userInfoToUpdate = {
+        ...formData,
+        postalCodeId,
+        email: formattedEmail,
+      };
+  
+      // Update the user information.
+      const updateResponse = await updateUser(selectedUserId, userInfoToUpdate);
+      console.log("User Update Response:", updateResponse);
+  
+      // Handle gender identities update
+      let genderIdentitiesUpdateResponse;
+      if (formData.primaryGenderId === 4 && selectedGenderIdentities.length > 0) {
+        genderIdentitiesUpdateResponse = await updateUserGenderIdentities(selectedUserId, selectedGenderIdentities);
+      } else {
+        genderIdentitiesUpdateResponse = await updateUserGenderIdentities(selectedUserId, []);
+      }
+      console.log("Gender Identities Update Response:", genderIdentitiesUpdateResponse);
+  
+      // Handle map areas update
+      let mapAreasUpdateResponse = {};
+      if (selectedMapAreas.length > 0) {
+        mapAreasUpdateResponse = await updateUserMapAreas(selectedUserId, selectedMapAreas);
+      }
+      console.log("Map Areas Update Response:", mapAreasUpdateResponse);
+  
+      // Fetch and log the updated user data
+      const updatedUserData = await getUserById(selectedUserId);
+      console.log("Updated User Data:", updatedUserData);
+  
+      // Provide success feedback
+      setFeedback({ message: 'User updated successfully!', type: 'success' });
+      if (typeof onAddUser === 'function') {
+        await onAddUser(); // Confirm this function's intended use and ensure it's properly defined.
+      }
+  
+      // Reset form data and clear selections
       setFormData({
         userTypeID: '',
         username: '',
@@ -230,29 +258,24 @@ const handleSubmit = async (e) => {
         isActive: false,
         postalCodeId: '',
       });
-
-      // Clear selected user and reset React Select
-      setSelectedUserId(null);
-
-      // Clear selected gender identities
+      setSelectedUserId('');
       setSelectedGenderIdentities([]);
-
-      // Optionally, reset checkboxes if necessary
-      const resetCheckboxOptions = checkboxOptions.map(option => ({
-        ...option,
-        checked: false,
-      }));
-      setCheckboxOptions(resetCheckboxOptions);
-
-      // Hide feedback message
-      setFeedback({ message: '', type: '' });
-    }, 5000); // Adjust the time as needed
-  } catch (error) {
-    console.error("Failed to update user:", error);
-    setFeedback({ message: `Failed to update user: ${error.message}`, type: 'error' });
-  }
-};
-
+      setSelectedMapAreas([]);
+  
+      // Optionally, reset checkboxes or other UI elements as necessary
+  
+      setTimeout(() => {
+        // Optionally clear the feedback message after some time
+        setFeedback({ message: '', type: '' });
+      }, 5000);
+    } catch (error) {
+      console.error("Failed to update user:", error);
+      setFeedback({ message: `Failed to update user: ${error.message}`, type: 'error' });
+      // Consider if you need to reset form state or perform other cleanup here in case of an error
+    }
+  };
+  
+  
   // Preparing user options for the dropdown
   const userOptions = Array.isArray(users) ? users.map(user => ({
     value: user.user_id,
@@ -282,7 +305,7 @@ const handleSubmit = async (e) => {
   return (
     <div className="bg-white shadow rounded-lg p-8">
       <h2 className="text-3xl font-semibold text-center text-gray-800 mb-6">Update User</h2>
-
+  
       <div className="flex justify-center gap-4 mb-4">
         {['all', 'active', 'archived'].map(f => (
           <button
@@ -296,7 +319,7 @@ const handleSubmit = async (e) => {
           </button>
         ))}
       </div>
-
+  
       <Select
         options={filteredUsers.map(user => ({
           value: user.user_id,
@@ -310,7 +333,7 @@ const handleSubmit = async (e) => {
         className="mb-4"
         styles={customSelectStyles}
       />
-
+  
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="username" className="block text-sm font-medium text-gray-700">Username</label>
@@ -323,7 +346,7 @@ const handleSubmit = async (e) => {
             className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200"
           />
         </div>
-
+  
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email Address</label>
           <input
@@ -335,7 +358,7 @@ const handleSubmit = async (e) => {
             className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200"
           />
         </div>
-
+  
         <div>
           <label htmlFor="userType" className="block text-sm font-medium text-gray-700">User Type</label>
           <Dropdown
@@ -345,7 +368,7 @@ const handleSubmit = async (e) => {
             placeholder="Select User Type"
           />
         </div>
-
+  
         <Checkbox
           title="Status"
           options={[{ id: "status", name: "Active", checked: formData.isActive }]}
@@ -359,7 +382,7 @@ const handleSubmit = async (e) => {
             });
           }}
         />
-
+  
         <div>
           <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">First Name</label>
           <input
@@ -371,7 +394,7 @@ const handleSubmit = async (e) => {
             className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200"
           />
         </div>
-
+  
         <div>
           <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">Last Name</label>
           <input
@@ -383,7 +406,7 @@ const handleSubmit = async (e) => {
             className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200"
           />
         </div>
-
+  
         <div>
           <label htmlFor="primaryGenderIdentity" className="block text-sm font-medium text-gray-700">Primary Gender Identity</label>
           <Dropdown
@@ -396,17 +419,17 @@ const handleSubmit = async (e) => {
             placeholder="Select Primary Gender Identity"
           />
         </div>
-
+  
         {/* Checkboxes for gender identities */}
         <div>
           <label className="block text-sm font-medium text-gray-700">Select Gender Identities</label>
           <Checkbox
             title="Gender Identities"
-            options={checkboxOptions}
+            options={genderCheckboxOptions}
             onChange={handleGenderIdentityCheckboxChange}
           />
         </div>
-
+  
         <div>
           <label htmlFor="yearOfBirth" className="block text-sm font-medium text-gray-700">Year of Birth</label>
           <input
@@ -418,20 +441,17 @@ const handleSubmit = async (e) => {
             className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200"
           />
         </div>
-
+  
+        {/* Checkboxes for map areas */}
         <div>
-          <label htmlFor="mapId" className="block text-sm font-medium text-gray-700">Place of Origin</label>
-          <Dropdown
-            options={mapRegions.map(({ map_id, map_area_name }) => ({
-              label: map_area_name,
-              value: map_id
-            }))}
-            selectedValue={formData.mapID}
-            onSelect={(value) => handleDropdownChange('mapID', value)}
-            placeholder="Select Place of Origin"
+          <label className="block text-sm font-medium text-gray-700">Select Map Areas</label>
+          <Checkbox
+            title="Map Areas"
+            options={mapAreaCheckboxOptions}
+            onChange={handleMapAreasCheckboxesChange}
           />
         </div>
-
+  
         <div>
           <label htmlFor="postalCodeId" className="block text-sm font-medium text-gray-700">Postal Code</label>
           <input
@@ -443,7 +463,7 @@ const handleSubmit = async (e) => {
             className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200"
           />
         </div>
-
+  
         <div>
           <label htmlFor="vegetable" className="block text-sm font-medium text-gray-700">Vegetable</label>
           <input
@@ -455,7 +475,7 @@ const handleSubmit = async (e) => {
             className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200"
           />
         </div>
-
+  
         <div className="flex justify-center">
           <Button type="submit" text="Update User" />
         </div>
@@ -467,10 +487,10 @@ const handleSubmit = async (e) => {
           </p>
         )}
       </form>
-
+  
     </div>
   );
-};
+ };
 
 export default UpdateUserForm;
 

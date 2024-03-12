@@ -20,6 +20,7 @@ const getUsers = async (request, response) => {
     }
 };
 
+// Fetches a single user by their unique ID
 const getUserById = async (request, response) => {
     const id = parseInt(request.params.id);
     // Check if the ID is a valid number to prevent errors.
@@ -35,7 +36,7 @@ const getUserById = async (request, response) => {
         pg.gender_name, pg.primary_gender_id,
         pc.postal_code,
         json_agg(distinct gi.*) FILTER (WHERE gi.gender_identity_id IS NOT NULL) AS gender_identities,
-        json_agg(distinct ma.map_area_name) FILTER (WHERE ma.map_id IS NOT NULL) AS map_areas
+        json_agg(distinct ma.*) FILTER (WHERE ma.map_id IS NOT NULL) AS map_areas
     FROM 
         carecycle.users u
     LEFT JOIN 
@@ -128,85 +129,86 @@ const addUser = async (request, response) => {
     }
 };
 
-// Updates a user's details using their unique ID
+// Updates an existing user with provided details
 const updateUser = async (request, response) => {
     const id = parseInt(request.params.id);
-    const { username, email, firstName, lastName, primaryGenderId, vegetable, yearOfBirth, postalCodeId, isActive, userTypeID, genderIdentities, mapAreas } = request.body;
-
+    const {
+      username,
+      email,
+      firstName,
+      lastName,
+      primaryGenderId,
+      vegetable,
+      yearOfBirth,
+      postalCodeId,
+      isActive,
+      userTypeID,
+      genderIdentities,
+      mapAreas
+    } = request.body;
+  
     try {
-        await pool.query('BEGIN'); // Begin transaction
+      await pool.query('BEGIN'); // Start transaction
+  
+      console.log("Updating user with ID:", id);
+      console.log("New primaryGenderId:", primaryGenderId);
+      // Proceed with the update operation...
 
-        const updates = [];
-        const values = [];
-        let valuePosition = 1;
-
-        // Dynamically add fields to the updates array if they're present in the request
-        if (username !== undefined) { updates.push(`username = $${valuePosition++}`); values.push(username); }
-        if (email !== undefined) { updates.push(`email = $${valuePosition++}`); values.push(email); }
-        if (firstName !== undefined) { updates.push(`firstname = $${valuePosition++}`); values.push(firstName); }
-        if (lastName !== undefined) { updates.push(`lastname = $${valuePosition++}`); values.push(lastName); }
-        if (primaryGenderId !== undefined) { updates.push(`primary_gender_id = $${valuePosition++}`); values.push(primaryGenderId); }
-        if (vegetable !== undefined) { updates.push(`vegetable = $${valuePosition++}`); values.push(vegetable); }
-        if (yearOfBirth !== undefined) { updates.push(`year_of_birth = $${valuePosition++}`); values.push(yearOfBirth); }
-        if (postalCodeId !== undefined) { updates.push(`postal_code_id = $${valuePosition++}`); values.push(postalCodeId); }
-        if (isActive !== undefined) { updates.push(`is_active = $${valuePosition++}`); values.push(isActive); }
-        if (userTypeID !== undefined) { updates.push(`usertype_id = $${valuePosition++}`); values.push(userTypeID); }
-        if (mapAreas !== undefined) { updates.push(`map_id = $${valuePosition++}`); values.push(mapAreas); }
-
-        // Check if primaryGenderId or genderIdentities were provided for update
-        if (primaryGenderId !== undefined || (genderIdentities && genderIdentities.length > 0)) {
-            // Clear existing gender identity associations
-            await pool.query('DELETE FROM carecycle.users_genderidentity WHERE user_id = $1', [id]);
-
-            // Insert new gender identities if provided
-            if (genderIdentities && genderIdentities.length > 0) {
-                for (const genderIdentityId of genderIdentities) {
-                    await pool.query('INSERT INTO carecycle.users_genderidentity (user_id, gender_identity_id) VALUES ($1, $2)', [id, genderIdentityId]);
-                }
-            }
+      const updates = [];
+      const values = [];
+      let valuePosition = 1;
+  
+      // Dynamically construct the update part of the query based on provided fields
+      if (username !== undefined) { updates.push(`username = $${valuePosition++}`); values.push(username); }
+      if (email !== undefined) { updates.push(`email = $${valuePosition++}`); values.push(email); }
+      if (firstName !== undefined) { updates.push(`firstname = $${valuePosition++}`); values.push(firstName); }
+      if (lastName !== undefined) { updates.push(`lastname = $${valuePosition++}`); values.push(lastName); }
+      if (primaryGenderId !== undefined) { updates.push(`primary_gender_id = $${valuePosition++}`); values.push(primaryGenderId); }
+      if (vegetable !== undefined) { updates.push(`vegetable = $${valuePosition++}`); values.push(vegetable); }
+      if (yearOfBirth !== undefined) { updates.push(`year_of_birth = $${valuePosition++}`); values.push(parseInt(yearOfBirth, 10)); }
+      if (postalCodeId !== undefined) { updates.push(`postal_code_id = $${valuePosition++}`); values.push(postalCodeId); }
+      if (isActive !== undefined) { updates.push(`is_active = $${valuePosition++}`); values.push(isActive); }
+      if (userTypeID !== undefined) { updates.push(`usertype_id = $${valuePosition++}`); values.push(userTypeID); }
+  
+      // Only proceed if there are fields to update
+      if (updates.length > 0) {
+        const updateUserSQL = `UPDATE carecycle.users SET ${updates.join(', ')} WHERE user_id = $${valuePosition} RETURNING *;`;
+        values.push(id); // User ID for the WHERE clause
+  
+        const userUpdateResult = await pool.query(updateUserSQL, values);
+        if (userUpdateResult.rows.length === 0) {
+          throw new Error('User not found or unable to update');
         }
-
-        // Check if mapAreas were provided for update
-        if (mapAreas) {
-            // Clear existing map area associations
-            await pool.query('DELETE FROM carecycle.users_maparea WHERE user_id = $1', [id]);
-            
-            // Re-add map areas if provided
-            if (mapAreas.length > 0) {
-                for (const mapAreaId of mapAreas) {
-                    await pool.query('INSERT INTO carecycle.users_maparea (user_id, map_id) VALUES ($1, $2)', [id, mapAreaId]);
-                }
-            }
+      }
+  
+      // Handle gender identities update
+      if (primaryGenderId !== undefined || genderIdentities) {
+        await pool.query('DELETE FROM carecycle.users_genderidentity WHERE user_id = $1', [id]);
+        if (Array.isArray(genderIdentities) && genderIdentities.length > 0) {
+          for (const genderIdentityId of genderIdentities) {
+            await pool.query('INSERT INTO carecycle.users_genderidentity (user_id, gender_identity_id) VALUES ($1, $2)', [id, genderIdentityId]);
+          }
         }
-
-        values.push(id); // Add the user ID for the WHERE clause
-
-        if (updates.length === 0) {
-            await pool.query('ROLLBACK');
-            return response.status(400).json({ error: 'No valid fields provided for update' });
+      }
+  
+      // Handle map areas update
+      if (mapAreas) {
+        await pool.query('DELETE FROM carecycle.users_maparea WHERE user_id = $1', [id]);
+        if (Array.isArray(mapAreas) && mapAreas.length > 0) {
+          for (const mapAreaId of mapAreas) {
+            await pool.query('INSERT INTO carecycle.users_maparea (user_id, map_id) VALUES ($1, $2)', [id, mapAreaId]);
+          }
         }
-
-        const sqlQuery = `
-            UPDATE carecycle.users
-            SET ${updates.join(', ')}
-            WHERE user_id = $${valuePosition}
-            RETURNING *;`;
-
-        const result = await pool.query(sqlQuery, values);
-
-        if (result.rowCount > 0) {
-            await pool.query('COMMIT'); // Commit transaction if successful
-            response.status(200).json(result.rows[0]);
-        } else {
-            await pool.query('ROLLBACK'); // Rollback transaction if no rows affected
-            response.status(404).json({ error: `User not found with ID: ${id}` });
-        }
+      }
+  
+      await pool.query('COMMIT'); // Commit the transaction
+      response.status(200).json({ message: 'User updated successfully' });
     } catch (error) {
-        await pool.query('ROLLBACK'); // Rollback transaction on error
-        console.error(`Error updating user with ID ${id}:`, error);
-        response.status(500).json({ error: 'Internal server error' });
+      await pool.query('ROLLBACK'); // Rollback the transaction on error
+      console.error(`Error updating user: ${error.message}`);
+      response.status(500).json({ error: error.message });
     }
-};
+  };
 
 // Soft deletes a user by deactivating their account using ID
 const softDeleteUserById = async (request, response) => {
