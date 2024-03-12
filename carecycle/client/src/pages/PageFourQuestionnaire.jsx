@@ -18,6 +18,7 @@ const PageFourQuestionnaire = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const [rulesAccepted, setRulesAccepted] = useState(null);
+  const [isSecondModalOpen, setIsSecondModalOpen] = useState(false);
 
   const handlePostalCode = async (postalCode) => {
     if (postalCode.toUpperCase() === "PREFER NOT TO ANSWER") {
@@ -42,7 +43,7 @@ const PageFourQuestionnaire = () => {
         primaryGenderId: formData.primaryGender.id,
         postalCodeId,
         workshopId,
-        userId: null // Assuming user authentication isn't set up yet, thus 'null'
+        userId: null, // Assuming user authentication isn't set up yet, thus 'null'
       };
   
       const clientStatResult = await addClientStat(submissionData);
@@ -60,6 +61,17 @@ const PageFourQuestionnaire = () => {
         console.log('Map areas added successfully:', mapAreaResult);
       }
   
+      // Decide which modal message to show based on rulesAccepted
+      if (rulesAccepted === false) {
+        // If the user declined, set up the first modal to inform and prompt to give back the device
+        setModalMessage('You have successfully submitted the questionnaire. Please give the device back to the volunteer or employee, thank you for your time.');
+        setIsModalOpen(true);
+      } else {
+        // If the user accepted or in any other case, just show the success message
+        setModalMessage('You have successfully submitted the questionnaire.');
+        setIsModalOpen(true);
+      }
+  
       // Reset formData to initial state after successful submission
       updateFormData({
         postalCode: "",
@@ -70,14 +82,6 @@ const PageFourQuestionnaire = () => {
         // Add other fields as required by your form's initial state
       });
   
-      setModalMessage('You have successfully submitted the questionnaire.');
-      setIsModalOpen(true);
-      // After showing success message, clear the form and navigate to the start or another page
-      setTimeout(() => {
-        navigate('/pageOneQuestionnaire'); // Adjust this navigation endpoint as necessary
-        // If necessary, also reset any other states related to the form submission here
-      }, 3000);
-  
     } catch (error) {
       console.error('Submission error:', error);
       setModalMessage('Failed to submit the questionnaire. Please try again.');
@@ -86,8 +90,22 @@ const PageFourQuestionnaire = () => {
   };  
 
   const handleCloseModal = () => {
-    setIsModalOpen(false);
-    navigate('/pageOneQuestionnaire');
+    if (rulesAccepted === false) {
+      // If declined, close the first modal and open the second
+      setIsModalOpen(false); // Close the first modal
+      setModalMessage('Client has declined the Rules and Values. Please decide what to do next.'); // Set message for the second modal
+      setIsSecondModalOpen(true); // Open the second modal
+    } else {
+      // If accepted or for any other cases, just close the modal and navigate as before
+      setIsModalOpen(false);
+      navigate('/pageOneQuestionnaire');
+    }
+  };
+
+  // New function to handle closing the second modal and then navigating back to the first page
+  const handleSecondModalClose = () => {
+    setIsSecondModalOpen(false); // Close the second modal
+    navigate('/pageOneQuestionnaire'); // Navigate back to the first page
   };
 
   const handlePreviousClick = () => navigate('/pageThreeQuestionnaire');
@@ -151,6 +169,11 @@ const PageFourQuestionnaire = () => {
         </div>
       </div>
       <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
+        <p>{modalMessage}</p>
+      </Modal>
+      
+      {/* Second modal for handling the decline case specifically */}
+      <Modal isOpen={isSecondModalOpen} onClose={handleSecondModalClose}>
         <p>{modalMessage}</p>
       </Modal>
       <Footer />
