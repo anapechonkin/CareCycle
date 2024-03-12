@@ -26,6 +26,7 @@ app.get('/', (request, response) => {
 // Map Area Routes
 app.get('/map-areas', mapAreaRoutes.fetchMapAreas);  
 app.post('/users/:userId/map-areas', mapAreaRoutes.addUserMapAreas);
+app.post('/clientstats/:clientStatId/map-areas', mapAreaRoutes.addClientStatsMapAreas);
 app.put('/users/:userId/map-areas', mapAreaRoutes.updateUserMapAreas);  
 
 //Gender Identity Routes

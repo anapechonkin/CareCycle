@@ -147,30 +147,23 @@ const UpdateUserForm = ({ onAddUser, users }) => {
   };
 
   const handleGenderIdentityCheckboxChange = (event, option) => {
-    console.log(`Before update:`, selectedGenderIdentities);
-
     const originalId = option.id.replace('gender-', '');
     const newId = parseInt(originalId, 10); // Convert newId to a number
-    console.log(`Checkbox for ID ${newId} clicked, checked: ${event.target.checked}`);
-
+    
     const updatedSelections = event.target.checked
         ? [...selectedGenderIdentities, newId] // Add newId as a number
         : selectedGenderIdentities.filter(id => id !== newId); // Correctly filter out using number comparison
 
-    console.log(`After update:`, updatedSelections);
     setSelectedGenderIdentities(updatedSelections);
 };
 
 const handleMapAreasCheckboxesChange = (event, option) => {
-  console.log(`Before update:`, selectedMapAreas);
   const originalId = option.id.replace('map-', '');
   const newId = parseInt(originalId, 10); // Convert newId to a number
-  console.log(`Checkbox for ID ${newId} clicked, checked: ${event.target.checked}`);
   const updatedSelections = event.target.checked
       ? [...selectedMapAreas, newId] // Add newId as a number
       : selectedMapAreas.filter(id => id !== newId); // Correctly filter out using number comparison
 
-  console.log(`After update:`, updatedSelections);
   setSelectedMapAreas(updatedSelections);
 };
 

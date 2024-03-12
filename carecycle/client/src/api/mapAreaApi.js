@@ -34,6 +34,27 @@ export const addUserMapAreas = async (userId, mapAreaIds) => {
     }
 };
 
+// Add map areas to client stats
+export const addClientStatsMapAreas = async (clientStatId, mapAreaIds) => {
+    try {
+        const response = await fetch(`/clientstats/${clientStatId}/map-areas`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ mapAreaIds }),
+        });
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('There has been a problem with your fetch operation:', error);
+        throw error; // Re-throw to let calling code handle it
+    }
+};
+
 // Replace user's map areas with a new set
 export const updateUserMapAreas = async (userId, mapAreaIds) => {
     try {

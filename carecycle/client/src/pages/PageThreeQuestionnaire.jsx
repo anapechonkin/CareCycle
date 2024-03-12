@@ -5,65 +5,67 @@ import Banner from "../components/Banner";
 import Shadow from "../components/Shadow";
 import Footer from "../components/Footer";
 import Button from "../components/Button";
-import Dropdown from "../components/DropDown";
+import Checkbox from "../components/Checkbox";
 import Modal from "../components/Modal"; 
-import { fetchMapRegions } from "../api/dropdownApi";
+import { fetchMapAreas } from "../api/mapAreaApi";
 import { useForm } from '../context/FormContext';
 
 const PageThreeQuestionnaire = () => {
   const navigate = useNavigate();
   const { formData, updateFormData, workshopId } = useForm();
-  const [mapRegions, setMapRegions] = useState([]);
-  const [showModal, setShowModal] = useState(false); // Add this state
-  const [modalContent, setModalContent] = useState(''); // Add this state
+  const [mapAreas, setMapAreas] = useState([]);
+  const [showModal, setShowModal] = useState(false); 
+  const [modalContent, setModalContent] = useState(''); 
 
   useEffect(() => {
-    const loadMapRegions = async () => {
+    const loadMapAreas = async () => {
       try {
-        const regions = await fetchMapRegions();
-        setMapRegions(regions);
+        const areas = await fetchMapAreas(); 
+        setMapAreas(areas.map(area => ({
+          ...area,
+          id: area.map_id,
+          name: area.map_area_name,
+          checked: formData.mapSelections?.some(selection => selection.mapID === area.map_id) || false,
+        })));
       } catch (error) {
-        console.error("Failed to fetch map regions:", error);
+        console.error("Failed to fetch map areas:", error);
       }
     };
-    loadMapRegions();
-  }, []);
+    loadMapAreas();
+  }, [formData.mapSelections]);
 
   const handleNextClick = () => {
-    // Check if a selection has been made
-    if (!formData.mapSelection || !formData.mapSelection.mapID) {
-      // Set the modal content to your reminder message
-      setModalContent("Please make a selection to continue to the next page.");
-      // Show the modal
+    if (!formData.mapSelections || formData.mapSelections.length === 0) {
+      setModalContent("Please select at least one map area to continue.");
       setShowModal(true);
-      return; // Prevent navigation to the next page
+      return;
     }
-  
-    // If a selection is made, potentially reset the modal content or handle as necessary
-    console.log("Current workshop ID:", workshopId);
-    console.log('Selected map region:', formData.mapSelection.mapName);
-    console.log('Updated FormData after page 3:', formData);
-    
-    // Proceed to the next page
-    navigate('/pageFourQuestionnaire');
+
+    // Before navigating, log the updated formData to the console
+    console.log("Proceeding with workshop ID:", workshopId);
+    console.log("Map areas selected:", formData.mapSelections);
+    console.log("Updated FormData after page 3:", formData);
+
+    navigate('/pageFourQuestionnaire'); // Adjust as necessary for your routing
   };
 
   const handlePreviousClick = () => navigate('/pageTwoExtraQuestionnaire');
 
-  const handleDropdownChange = (selectedValue) => {
-    // Find the selected map region object from the mapRegions array
-    const selectedRegion = mapRegions.find(region => region.map_id === selectedValue);
-  
-    // Update the formData with an object that includes both the id and the name of the selected region
-    if (selectedRegion) {
-      updateFormData({
-        ...formData,
-        mapSelection: {
-          mapID: selectedRegion.map_id,
-          mapName: selectedRegion.map_area_name
-        }
-      });
-    }
+  const handleCheckboxChange = (event, option) => {
+    // Toggle the checked state of the selected option
+    const updatedMapAreas = mapAreas.map(area => 
+      area.id === option.id ? {...area, checked: !area.checked} : area
+    );
+    setMapAreas(updatedMapAreas);
+
+    // Update the formData with the current selections
+    updateFormData({
+      ...formData,
+      mapSelections: updatedMapAreas.filter(area => area.checked).map(area => ({
+        mapID: area.id,
+        mapName: area.name,
+      }))
+    });
   };
 
   return (
@@ -74,26 +76,19 @@ const PageThreeQuestionnaire = () => {
       <div className="flex-grow pt-20 pb-20 mt-24 flex flex-col items-center justify-center w-full">
         <div className="max-w-[800px] w-full px-4 lg:px-8 space-y-12">
           <h1 className="text-5xl font-bold mb-16 text-center text-[#704218]">Place of Origin</h1>
-          <Dropdown
-            options={mapRegions.map(({ map_id, map_area_name }) => ({
-              label: map_area_name,
-              value: map_id
-            }))}
-            selectedValue={formData.mapSelection ? formData.mapSelection.mapID : null}
-            onSelect={handleDropdownChange}
-            placeholder="Select Place of Origin"
+          {/* Render the Checkbox component for map area selections */}
+          <Checkbox
+            title="Select Map Areas"
+            options={mapAreas}
+            onChange={handleCheckboxChange}
           />
-          <img
-            className="w-full h-auto rounded shadow-lg border-2 border-black mb-4"
-            src="/photos/map.jpeg"
-            alt="Map of the world."
-          />
+          
           <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
             {modalContent}
           </Modal>
           <div className="flex justify-between w-full mt-8">
-            <Button text="PREVIOUS QUESTION" onClick={handlePreviousClick} className="text-white bg-[#16839B] hover:bg-[#0f6a8b] font-bold py-2 px-4 rounded" />
-            <Button text="NEXT QUESTION" onClick={handleNextClick} className="text-white bg-[#16839B] hover:bg-[#0f6a8b] font-bold py-2 px-4 mx-4 rounded" />
+            <Button text="PREVIOUS QUESTION" onClick={handlePreviousClick} style={{ marginRight: '15px' }} />
+            <Button text="NEXT QUESTION" onClick={handleNextClick} />
           </div>
         </div>
       </div>

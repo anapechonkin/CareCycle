@@ -9,11 +9,12 @@ import Modal from "../components/Modal";
 import { useForm } from '../context/FormContext';
 import { addClientStat } from '../api/clientStatApi';
 import { lookupPostalCode, addPostalCode } from '../api/postalCodeApi';
-import { addClientStatGenderIdentities } from '../api/genderIdentityApi'; // Ensure this is correctly imported
+import { addClientStatGenderIdentities } from '../api/genderIdentityApi'; 
+import { addClientStatsMapAreas } from "../api/mapAreaApi";
 
 const PageFourQuestionnaire = () => {
   const navigate = useNavigate();
-  const { formData, workshopId } = useForm();
+  const { formData, updateFormData, workshopId } = useForm();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const [rulesAccepted, setRulesAccepted] = useState(null);
@@ -39,32 +40,50 @@ const PageFourQuestionnaire = () => {
       const submissionData = {
         yearOfBirth: formData.yearOfBirth,
         primaryGenderId: formData.primaryGender.id,
-        mapId: formData.mapSelection.mapID,
         postalCodeId,
         workshopId,
         userId: null // Assuming user authentication isn't set up yet, thus 'null'
       };
   
       const clientStatResult = await addClientStat(submissionData);
-      console.log('ClientStat added successfully:', clientStatResult); // Log the clientStatResult
+      console.log('ClientStat added successfully:', clientStatResult);
   
-      // Correctly handling gender identities for the client stat
       if (clientStatResult && formData.genderIdentities && formData.genderIdentities.length > 0) {
-        const genderIdentityIds = formData.genderIdentities.map(identity => identity.id); // Assuming your formData structures genderIdentities as {id, name}
+        const genderIdentityIds = formData.genderIdentities.map(identity => identity.id);
         const genderIdentityResult = await addClientStatGenderIdentities(clientStatResult.cs_id, genderIdentityIds);
-        console.log('Gender identities added successfully:', genderIdentityResult); // Log the gender identities result
+        console.log('Gender identities added successfully:', genderIdentityResult);
       }
+  
+      if (clientStatResult && formData.mapSelections && formData.mapSelections.length > 0) {
+        const mapAreaIds = formData.mapSelections.map(area => area.mapID);
+        const mapAreaResult = await addClientStatsMapAreas(clientStatResult.cs_id, mapAreaIds);
+        console.log('Map areas added successfully:', mapAreaResult);
+      }
+  
+      // Reset formData to initial state after successful submission
+      updateFormData({
+        postalCode: "",
+        primaryGender: {},
+        yearOfBirth: "",
+        genderIdentities: [],
+        mapSelections: [],
+        // Add other fields as required by your form's initial state
+      });
   
       setModalMessage('You have successfully submitted the questionnaire.');
       setIsModalOpen(true);
-      setTimeout(() => navigate('/pageOneQuestionnaire'), 3000); // Navigate away after showing success message
+      // After showing success message, clear the form and navigate to the start or another page
+      setTimeout(() => {
+        navigate('/pageOneQuestionnaire'); // Adjust this navigation endpoint as necessary
+        // If necessary, also reset any other states related to the form submission here
+      }, 3000);
+  
     } catch (error) {
       console.error('Submission error:', error);
       setModalMessage('Failed to submit the questionnaire. Please try again.');
       setIsModalOpen(true);
     }
-  };
-  
+  };  
 
   const handleCloseModal = () => {
     setIsModalOpen(false);

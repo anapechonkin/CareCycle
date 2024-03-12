@@ -45,6 +45,41 @@ async function addUserMapAreas(req, res) {
     }
 }
 
+// Function to add map areas to client stats
+async function addClientStatsMapAreas(req, res) {
+    const { clientStatId } = req.params; // Assuming clientStatId is passed as a URL parameter
+    const { mapAreaIds } = req.body; // Expect an array of map_id
+
+    let addedAreasInfo = [];
+
+    try {
+        await pool.query('BEGIN');
+
+        for (let mapAreaId of mapAreaIds) {
+            // Check if the association already exists to prevent duplicates
+            const exists = await pool.query('SELECT 1 FROM carecycle.clientstats_maparea WHERE cs_id = $1 AND map_id = $2', [clientStatId, mapAreaId]);
+
+            if (exists.rowCount === 0) {
+                await pool.query('INSERT INTO carecycle.clientstats_maparea (cs_id, map_id) VALUES ($1, $2)', [clientStatId, mapAreaId]);
+                
+                // Optionally fetch the map area name for the added area
+                const result = await pool.query('SELECT map_area_name FROM carecycle.maparea WHERE map_id = $1', [mapAreaId]);
+                if (result.rows.length > 0) {
+                    addedAreasInfo.push({id: mapAreaId, name: result.rows[0].map_area_name});
+                }
+            }
+        }
+
+        await pool.query('COMMIT');
+        res.json({ message: 'Map areas added successfully to client stats.', addedAreas: addedAreasInfo });
+    } catch (error) {
+        await pool.query('ROLLBACK');
+        console.error('Error adding map areas to client stats:', error);
+        res.status(500).json({ message: 'Failed to add map areas to client stats', error: error.message });
+    }
+}
+
+
 async function updateUserMapAreas(req, res) {
     const { userId } = req.params;
     const { mapAreaIds } = req.body; // Expect an array of map_id
@@ -79,5 +114,6 @@ async function updateUserMapAreas(req, res) {
 module.exports = {
     fetchMapAreas,
     addUserMapAreas,
+    addClientStatsMapAreas,
     updateUserMapAreas
 };

@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from '../context/FormContext';
 
 const PageOneQuestionnaire = () => {
+  const [selectedLanguage, setSelectedLanguage] = useState('');
   const [postalCode, setPostalCode] = useState('');
   const [yearOfBirth, setYearOfBirth] = useState('');
   const [preferNotToAnswerPostal, setPreferNotToAnswerPostal] = useState(false);
@@ -20,6 +21,10 @@ const PageOneQuestionnaire = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState('');
   const navigate = useNavigate();
+
+  const languageOptions = [
+    'English', 'French', 'Spanish', 'Hindi', 'Urdu', 'Punjabi'
+  ].map(language => ({ label: language, value: language }));
 
   // Disable checkboxes when declined is true
   useEffect(() => {
@@ -83,9 +88,13 @@ const PageOneQuestionnaire = () => {
           <h1 className="text-4xl font-bold mb-12 text-center text-[#704218] [text-shadow:0px_4px_4px_#00000040]">Stats Help Get Grants, Thank You!</h1>
           <h2 className="text-3xl font-bold mb-8 text-center text-[#8D5E32] [text-shadow:0px_4px_4px_#00000040]">Please Choose Language</h2>
           <Dropdown
-            options={['English', 'French', 'Spanish', 'Hindi', 'Urdu', 'Punjabi']}
+            options={languageOptions}
             placeholder="Select Language"
-            onSelect={(selectedOption) => console.log("Selected option:", selectedOption)}
+            onSelect={(selectedOption) => {
+              console.log("Selected option:", selectedOption);
+              setSelectedLanguage(selectedOption); 
+            }}
+            selectedValue={selectedLanguage} // Pass the selectedLanguage state to the DropDown component
           />
           <p className="m-8 text-xl">I consent to the data obtained from this questionnaire being used for grant applications</p>
           <div className="flex justify-center items-center space-x-8 mb-4">
