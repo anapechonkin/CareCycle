@@ -53,3 +53,17 @@ export const fetchPrimaryGenderIdentities = async () => {
       throw error;
     }
   };
+
+  // Function to fetch newcomer statuses
+  export const fetchNewcomerStatus = async () => {
+    try {
+      const response = await fetch('/dropdowns/newcomerStatus');
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Failed to fetch newcomer statuses:', error);
+      throw error;
+    }
+  };

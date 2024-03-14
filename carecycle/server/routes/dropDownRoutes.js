@@ -44,9 +44,21 @@ const getWorkshops = async (req, res) => {
     }
 };
 
+// Fetch newcomer status
+const getNewcomerStatus = async (req, res) => {
+    try {
+        const newcomerStatus = await pool.query('SELECT * FROM carecycle.newcomerstatus');
+        res.json(newcomerStatus.rows);
+    } catch (error) {
+        console.error('Error fetching newcomer statuses:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
 module.exports = {
     getPrimaryGenderIdentities,
     getMapRegions,
     getUserTypes,
-    getWorkshops
+    getWorkshops,
+    getNewcomerStatus
 };

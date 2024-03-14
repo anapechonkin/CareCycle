@@ -11,6 +11,7 @@ import { addClientStat } from '../api/clientStatApi';
 import { lookupPostalCode, addPostalCode } from '../api/postalCodeApi';
 import { addClientStatGenderIdentities } from '../api/genderIdentityApi'; 
 import { addClientStatsMapAreas } from "../api/mapAreaApi";
+import { addClientStatSelfIdentification } from "../api/selfIdApi";
 
 const PageFourQuestionnaire = () => {
   const navigate = useNavigate();
@@ -40,9 +41,12 @@ const PageFourQuestionnaire = () => {
   
       const submissionData = {
         yearOfBirth: formData.yearOfBirth,
+        customGender: formData.custom_gender,
         primaryGenderId: formData.primaryGender.id,
         postalCodeId,
         workshopId,
+        newcomerStatusId: formData.newcomerStatus.id,
+        newcomerComment: formData.newcomerComment,
         userId: null, // Assuming user authentication isn't set up yet, thus 'null'
       };
   
@@ -60,6 +64,13 @@ const PageFourQuestionnaire = () => {
         const mapAreaResult = await addClientStatsMapAreas(clientStatResult.cs_id, mapAreaIds);
         console.log('Map areas added successfully:', mapAreaResult);
       }
+
+      if (clientStatResult && formData.selfIdentificationOptions && formData.selfIdentificationOptions.length > 0) {
+        const selfIds = formData.selfIdentificationOptions.map(option => option.id);
+        const selfIdResult = await addClientStatSelfIdentification(clientStatResult.cs_id, selfIds);
+        console.log('Self-identification options added successfully:', selfIdResult);
+      }
+      
   
       // Decide which modal message to show based on rulesAccepted
       if (rulesAccepted === false) {
@@ -68,7 +79,7 @@ const PageFourQuestionnaire = () => {
         setIsModalOpen(true);
       } else {
         // If the user accepted or in any other case, just show the success message
-        setModalMessage('You have successfully submitted the questionnaire.');
+        setModalMessage('You have successfully submitted the questionnaire. Please give the device back to the volunteer or employee, thank you for your time.');
         setIsModalOpen(true);
       }
   
@@ -77,8 +88,12 @@ const PageFourQuestionnaire = () => {
         postalCode: "",
         primaryGender: {},
         yearOfBirth: "",
+        customGender: "",
         genderIdentities: [],
         mapSelections: [],
+        newcomerStatus: {},
+        newcomerComment: "",
+        selfIdentificationOptions: [],
         // Add other fields as required by your form's initial state
       });
   

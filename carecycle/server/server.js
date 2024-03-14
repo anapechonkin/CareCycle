@@ -9,7 +9,7 @@ const dropDownDB = require('./routes/dropDownRoutes.js');
 const findPostalCode = require('./routes/postalCodeRoutes.js');
 const genderIdentityRoutes = require('./routes/genderIdentityRoutes.js');
 const mapAreaRoutes = require('./routes/mapAreaRoutes.js');
-
+const selfIdRoutes = require('./routes/selfIdRoutes.js');
 dotenv.config();
 
 app.use(bodyParser.json())
@@ -22,6 +22,12 @@ app.use(
 app.get('/', (request, response) => {
     response.json({ info: 'Node.js, Express, and Postgres API' })
   })
+
+// Self-Identification Routes
+app.get('/self-id', selfIdRoutes.fetchSelfIdentificationOptions);
+app.post('/clientstats/:clientStatId/self-id', selfIdRoutes.addClientStatsSelfIdentification);
+app.put('/clientstats/:clientStatId/self-id', selfIdRoutes.updateClientStatsSelfIdentification);
+
 
 // Map Area Routes
 app.get('/map-areas', mapAreaRoutes.fetchMapAreas);  
@@ -44,6 +50,7 @@ app.get('/dropdowns/primaryGender', dropDownDB.getPrimaryGenderIdentities);
 app.get('/dropdowns/mapRegions', dropDownDB.getMapRegions);
 app.get('/dropdowns/userTypes', dropDownDB.getUserTypes);
 app.get('/dropdowns/workshops', dropDownDB.getWorkshops);
+app.get('/dropdowns/newcomerStatus', dropDownDB.getNewcomerStatus);
 
 // User routes
 app.get('/users', userDB.getUsers);

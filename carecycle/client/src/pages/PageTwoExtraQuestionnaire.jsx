@@ -20,6 +20,7 @@ const PageTwoExtraQuestionnaire = () => {
   const [selectedGenders, setSelectedGenders] = useState({});
   const [preferNotToAnswer, setPreferNotToAnswer] = useState(false);
   const [genderIdentities, setGenderIdentities] = useState([]);
+  const [otherGenderIdentity, setOtherGenderIdentity] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -46,35 +47,45 @@ const PageTwoExtraQuestionnaire = () => {
   const handlePreviousClick = () => navigate('/pageTwoQuestionnaire');
 
   const handleNextClick = () => {
-    // Adjusting the creation of selectedGenderIdentities to include both ID and name
     const selectedGenderIdentities = Object.entries(selectedGenders)
       .filter(([_, isSelected]) => isSelected)
       .map(([id, _]) => ({
         id: id, // Keep the ID
         name: genderIdentities.find(identity => identity.gender_identity_id.toString() === id).type // Find and keep the name
       }));
-  
-    if (selectedGenderIdentities.length === 0 && !preferNotToAnswer) {
-      // No selections made, show reminder modal
-      setModalContent("<p>Please select at least one gender identity or choose 'Prefer Not To Answer' to continue.</p>");
+    
+    // Validation logic to ensure either a selection is made or a custom gender is provided
+    if (selectedGenderIdentities.length === 0 && !preferNotToAnswer && !otherGenderIdentity.trim()) {
+      // No selections made and no custom gender provided, show reminder modal
+      setModalContent("<p>Please select at least one gender identity, choose 'Prefer Not To Answer', or specify another identity to continue.</p>");
       setShowModal(true);
-    } else {
-      // Proceed with navigation and data handling as before, but with the updated structure
-      const currentFormData = { ...formData };
-      
-      // Update to include structured data
-      currentFormData.genderIdentities = preferNotToAnswer ? [{ id: "1", name: "Prefer Not To Answer" }] : selectedGenderIdentities;
-    
-      updateFormData(currentFormData);
-    
-      // Adjusted logging to reflect the new structure
-      console.log("Current workshop ID:", workshopId);
-      console.log('Selected Gender Identities:', selectedGenderIdentities.map(identity => `${identity.name} (ID: ${identity.id})`));
-      console.log('Updated FormData after page 2.5:', currentFormData);
-    
-      navigate('/pageThreeQuestionnaire');
+      return; // Stop execution to prevent navigation
     }
+  
+    // Proceed with navigation and data handling as before, but with the updated structure
+    const currentFormData = { ...formData };
+    
+    // Include selected gender identities or 'Prefer Not To Answer' if that was chosen
+    currentFormData.genderIdentities = preferNotToAnswer ? [{ id: "1", name: "Prefer Not To Answer" }] : selectedGenderIdentities;
+  
+    // Include custom gender if provided
+    if (otherGenderIdentity.trim()) {
+      currentFormData.custom_gender = otherGenderIdentity.trim();
+    } else {
+      // Ensure there's no stale custom_gender value if none is provided
+      delete formData.custom_gender;
+    }
+  
+    updateFormData(currentFormData);
+  
+    // Log and navigate
+    console.log("Current workshop ID:", workshopId);
+    console.log('Selected Gender Identities:', selectedGenderIdentities.map(identity => `${identity.name} (ID: ${identity.id})`));
+    console.log('Updated FormData after page 2.5:', currentFormData);
+    
+    navigate('/pageThreeQuestionnaire');
   };
+  
   
   const handlePreferNotToAnswerChange = (isChecked) => {
     setPreferNotToAnswer(isChecked);
@@ -103,6 +114,14 @@ const PageTwoExtraQuestionnaire = () => {
   //   setModalContent(content);
   //   setShowModal(true);
   // };
+
+  // Assuming you have the otherGenderIdentity state setup
+const handleOtherGenderIdentityChange = (e) => {
+  const value = e.target.value;
+  setOtherGenderIdentity(value);
+  // Optionally update form data here if needed immediately, or do it before form submission
+};
+
 
   const renderGenderIdentities = () => {
     return (
@@ -145,6 +164,20 @@ const PageTwoExtraQuestionnaire = () => {
         <div className="max-w-[800px] w-full px-4 lg:px-8 space-y-12">
           <h1 className="text-5xl font-bold mb-16 text-center text-[#704218]">All Applicable Gender Identities</h1>
           {renderGenderIdentities()}
+          <div className="mt-4">
+                  <label htmlFor="customGenderIdentity" className="block text-sm font-medium text-gray-700">
+                    If you can't find your gender identity in the list, please specify:
+                  </label>
+                  <input
+                    type="text"
+                    name="customGenderIdentity"
+                    id="customGenderIdentity"
+                    value={otherGenderIdentity}
+                    onChange={handleOtherGenderIdentityChange}
+                    className="mt-1 block w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    placeholder="Custom Gender Identity"
+                  />
+                </div>
           <div className="flex justify-between w-full mt-8">
             <Button text="PREVIOUS QUESTION" onClick={handlePreviousClick} className="text-lg py-3 px-6" />
             <Button text="NEXT QUESTION" onClick={handleNextClick} className="text-lg py-3 px-6 mx-4" />

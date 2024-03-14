@@ -78,15 +78,17 @@ const getClientByPostalCodeId = async (request, response) => {
 
 // Adds a new clientStat with provided details to the database
 const addClientStat = async (request, response) => {
-    const { primaryGenderId, yearOfBirth, postalCodeId, workshopId } = request.body;
+    const { primaryGenderId, yearOfBirth, postalCodeId, workshopId, newcomerStatusId, newcomerComment, customGender } = request.body;
+    // Include newcomer_status_id in the INSERT statement
     const query = `
         INSERT INTO carecycle.ClientStats 
-        (primary_gender_id, year_of_birth, postal_code_id, workshop_id, user_id) 
+        (primary_gender_id, year_of_birth, postal_code_id, workshop_id, newcomer_status_id, newcomer_comment, custom_gender, user_id) 
         VALUES 
-        ($1, $2, $3, $4, NULL)
+        ($1, $2, $3, $4, $5, $6, $7, NULL)  
         RETURNING *;`;
 
-    const values = [primaryGenderId, yearOfBirth, postalCodeId, workshopId];
+    // Include newcomerStatusId in the values array
+    const values = [primaryGenderId, yearOfBirth, postalCodeId, workshopId, newcomerStatusId, newcomerComment, customGender];
 
     try {
         const results = await pool.query(query, values);
@@ -96,6 +98,7 @@ const addClientStat = async (request, response) => {
         response.status(500).json({ error: 'Internal server error' });
     }
 };
+
 
 // Updates an existing clientStat based on its cs_id
 const updateClientStat = async (request, response) => {
