@@ -207,11 +207,26 @@ const PageThreeQuestionnaire = () => {
               {`${newcomerComment.length}/255`}
             </div>
           </div>
-          <Checkbox
-            title="Do you consider yourself to be a:"
-            options={selfIdOptions}
-            onChange={handleSelfIdChange}
-          />
+          {/* Self-Identification Section */}
+          <div className="w-full">
+            <div className="mb-4">
+              <h2 className="text-xl font-semibold">Do you consider yourself to be a:</h2>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {selfIdOptions.map((option) => (
+                <Checkbox
+                  key={option.id}
+                  options={[{
+                    id: option.id.toString(),
+                    name: option.name,
+                    checked: option.checked,
+                  }]}
+                  onChange={(e) => handleSelfIdChange(e, option)}
+                  // Pass any additional props if necessary
+                />
+              ))}
+            </div>
+          </div>
           <Checkbox
             title="Where do you consider your origins to be?"
             options={mapAreas}
