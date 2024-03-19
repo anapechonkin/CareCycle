@@ -13,6 +13,15 @@ import { fetchSelfIdentificationOptions } from "../api/selfIdApi";
 import { fetchNewcomerStatus } from "../api/dropdownApi"; // Ensure this function is correctly implemented to fetch options
 import { useForm } from '../context/FormContext';
 
+const continentMapping = {
+  "Prefer Not To Answer": [1], // Special case, might not be associated with a specific continent
+  "Americas": [7, 8, 9, 10], // Adding the Caribbean
+  "Europe": [11, 12, 13], // Northwestern, Eastern, Mediterranean Europe
+  "Asia": [2, 3, 4, 5, 6], // Including Middle East, Near East, Southeastern Asia, South Asia, Central Asia
+  "Africa": [15, 16, 17, 18, 19], // Northern, Western, Central, Eastern, Southern Africa
+  "Oceania": [14], // South Pacific (including Australia)
+};
+
 const PageThreeQuestionnaire = () => {
   const navigate = useNavigate();
   // Accesses form context for global form state management.
@@ -25,7 +34,8 @@ const PageThreeQuestionnaire = () => {
   const [newcomerStatusOptions, setNewcomerStatusOptions] = useState([]);
   const [newcomerComment, setNewcomerComment] = useState('');
   const [selfIdOptions, setSelfIdOptions] = useState([]);
-  
+  const [groupedMapAreas, setGroupedMapAreas] = useState({});
+
   // Effect hook for loading self-identification options on component mount.
   useEffect(() => {
     const loadSelfIdOptions = async () => {
@@ -78,6 +88,18 @@ const PageThreeQuestionnaire = () => {
     };
     loadNewcomerStatusOptions();
   }, []);
+
+  useEffect(() => {
+    const grouped = Object.keys(continentMapping).reduce((acc, continent) => {
+      // Filter mapAreas by checking if the area's ID is included in the continentMapping for the current continent
+      acc[continent] = mapAreas.filter(area => continentMapping[continent].includes(area.id));
+      return acc;
+    }, {});
+  
+    setGroupedMapAreas(grouped);
+  }, [mapAreas]);
+  
+  
 
   const handleSelect = (selectedOptionValue) => {
     const selectedOption = newcomerStatusOptions.find(option => option.value === selectedOptionValue);
@@ -179,7 +201,7 @@ const PageThreeQuestionnaire = () => {
           mapSelections: selectedAreas,
       });
   };
-
+  
   return (
     <div className="flex flex-col min-h-screen bg-[#f6cdd0]">
       <NavBar />
@@ -212,7 +234,7 @@ const PageThreeQuestionnaire = () => {
             <div className="mb-4">
               <h2 className="text-xl font-semibold">Do you consider yourself to be a:</h2>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
               {selfIdOptions.map((option) => (
                 <Checkbox
                   key={option.id}
@@ -227,11 +249,32 @@ const PageThreeQuestionnaire = () => {
               ))}
             </div>
           </div>
-          <Checkbox
-            title="Where do you consider your origins to be?"
-            options={mapAreas}
-            onChange={handleMapAreaChange}
-          />
+          <div className="w-full">
+            <h2 className="text-xl font-semibold mb-4">Where do you consider your origins to be?</h2>
+            {Object.entries(groupedMapAreas).map(([continent, areas]) => (
+              <div key={continent}>
+                <h3 className="text-lg font-semibold">{continent}</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                  {areas.map((area) => (
+                    <div
+                      key={area.id}
+                      title={area.name} // Tooltip for the entire area
+                      className="p-2" // Add padding or any other required styles
+                    >
+                      <Checkbox
+                        options={[{
+                          id: area.id.toString(),
+                          name: area.name,
+                          checked: area.checked,
+                        }]}
+                        onChange={(e) => handleMapAreaChange(e, area)}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
           <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
             {modalContent}
           </Modal>
