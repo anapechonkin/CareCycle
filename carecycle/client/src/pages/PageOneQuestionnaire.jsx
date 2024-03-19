@@ -26,13 +26,19 @@ const PageOneQuestionnaire = () => {
     'English', 'French', 'Spanish', 'Hindi', 'Urdu', 'Punjabi'
   ].map(language => ({ label: language, value: language }));
 
-  // Disable checkboxes when declined is true
+ // Use the useEffect hook to update the "Prefer Not To Answer" states when the "declined" state changes
   useEffect(() => {
+    // If declined is true, disable the inputs and set "Prefer Not To Answer"
     if (declined === true) {
-      setPreferNotToAnswerPostal(true);
-      setPreferNotToAnswerYear(true);
+        setPreferNotToAnswerPostal(true);
+        setPreferNotToAnswerYear(true);
+    } else {
+        // If declined is not true (either false or null), ensure the form is re-enabled
+        // You might also want to clear "Prefer Not To Answer" selections here if that fits your logic
+        setPreferNotToAnswerPostal(false);
+        setPreferNotToAnswerYear(false);
     }
-  }, [declined, preferNotToAnswerPostal, preferNotToAnswerYear]);
+}, [declined]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
