@@ -145,7 +145,14 @@ const PageThreeQuestionnaire = () => {
   };
 
   // Navigation back to the previous page.
-  const handlePreviousClick = () => navigate('/pageTwoExtraQuestionnaire');
+  const handlePreviousClick = () => {
+    // Check if the primaryGender id matches the one you've designated for "Other"
+    if (formData.primaryGender && formData.primaryGender.id === 4) {
+      navigate('/pageTwoExtraQuestionnaire'); // Assuming this is the route for page 2.5
+    } else {
+      navigate('/pageTwoQuestionnaire'); // Assuming this is the route for page 2
+    }
+  };
 
   const PREFER_NOT_TO_ANSWER_ID = 1; 
 
