@@ -42,7 +42,16 @@ const PageTwoExtraQuestionnaire = () => {
           acc[curr.id] = true;
           return acc;
         }, {}) || {};
+  
+        // Include "Prefer Not To Answer" in selectedGenders if it's initially selected
+        if (formData.genderIdentities?.some(identity => identity.id === "1")) {
+          selectedFromFormData["1"] = true;
+        }
+  
         setSelectedGenders(selectedFromFormData);
+        
+        // Initialize preferNotToAnswer state based on form data
+        setPreferNotToAnswer(formData.genderIdentities?.some(identity => identity.id === "1"));
       } catch (error) {
         console.error("Failed to fetch gender identities", error);
       }
@@ -50,7 +59,6 @@ const PageTwoExtraQuestionnaire = () => {
     fetchData();
   }, [formData.genderIdentities]); // Depend on formData.genderIdentities to reset if it changes
   
-
   // Adjusted to handle the correct properties
   const handlePreviousClick = () => navigate('/pageTwoQuestionnaire');
 
