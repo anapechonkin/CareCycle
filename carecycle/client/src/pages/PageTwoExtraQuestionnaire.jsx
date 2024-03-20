@@ -26,22 +26,30 @@ const PageTwoExtraQuestionnaire = () => {
     const fetchData = async () => {
       try {
         const dbData = await fetchGenderIdentities();
-        // Directly use 'gender_identity_id' and 'type' without renaming
         const enhancedData = dbData.map(dbItem => {
           const additionalInfo = mockGenderIdentities.find(mockItem => mockItem.name.toLowerCase() === dbItem.type.toLowerCase());
           return {
-            gender_identity_id: dbItem.gender_identity_id, // use directly from DB
-            type: dbItem.type, // use directly from DB
+            gender_identity_id: dbItem.gender_identity_id,
+            type: dbItem.type,
             info: additionalInfo ? additionalInfo.info : 'No additional information.',
+            checked: formData.genderIdentities?.some(genderIdentity => genderIdentity.id === dbItem.gender_identity_id.toString()),
           };
         });
         setGenderIdentities(enhancedData);
+        
+        // Initialize selectedGenders based on formData
+        const selectedFromFormData = formData.genderIdentities?.reduce((acc, curr) => {
+          acc[curr.id] = true;
+          return acc;
+        }, {}) || {};
+        setSelectedGenders(selectedFromFormData);
       } catch (error) {
         console.error("Failed to fetch gender identities", error);
       }
     };
     fetchData();
-  }, []);
+  }, [formData.genderIdentities]); // Depend on formData.genderIdentities to reset if it changes
+  
 
   // Adjusted to handle the correct properties
   const handlePreviousClick = () => navigate('/pageTwoQuestionnaire');

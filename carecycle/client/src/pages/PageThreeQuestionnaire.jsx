@@ -45,7 +45,7 @@ const PageThreeQuestionnaire = () => {
           ...option,
           id: option.self_identification_id,
           name: option.option,
-          checked: false,
+          checked: formData.selfIdentificationOptions?.some(selection => selection.id === option.self_identification_id) || false,
         })));
       } catch (error) {
         console.error("Failed to fetch self-identification options:", error);
@@ -53,7 +53,7 @@ const PageThreeQuestionnaire = () => {
     };
     
     loadSelfIdOptions();
-  }, []);
+  }, [formData.selfIdentificationOptions]);
 
   // Effect hook for loading map area data on component mount or form data changes.
   useEffect(() => {
@@ -73,21 +73,30 @@ const PageThreeQuestionnaire = () => {
     loadMapAreas();
   }, [formData.mapSelections]);
 
-  // Loads newcomer status options from an API on component mount.
-  useEffect(() => {
-    const loadNewcomerStatusOptions = async () => {
-      try {
-        const statuses = await fetchNewcomerStatus();
-        setNewcomerStatusOptions(statuses.map(status => ({
-          value: status.newcomer_status_id,
-          label: status.status,
-        })));
-      } catch (error) {
-        console.error("Failed to fetch newcomer statuses:", error);
+  // Loads newcomer status options from an API on component mount and sets the initial value.
+useEffect(() => {
+  const loadNewcomerStatusOptions = async () => {
+    try {
+      const statuses = await fetchNewcomerStatus();
+      const mappedStatuses = statuses.map(status => ({
+        value: status.newcomer_status_id,
+        label: status.status,
+      }));
+      setNewcomerStatusOptions(mappedStatuses);
+
+      // If formData already has a newcomerStatus, set it as the initial value for the dropdown
+      if (formData.newcomerStatus) {
+        const existingStatus = mappedStatuses.find(status => status.value === formData.newcomerStatus.id);
+        if (existingStatus) {
+          setNewcomerStatus(formData.newcomerStatus.id); // Ensure this matches how you're storing the selected value
+        }
       }
-    };
-    loadNewcomerStatusOptions();
-  }, []);
+    } catch (error) {
+      console.error("Failed to fetch newcomer statuses:", error);
+    }
+  };
+  loadNewcomerStatusOptions();
+}, [formData.newcomerStatus]); // Depend on formData.newcomerStatus to reset if it changes
 
   useEffect(() => {
     const grouped = Object.keys(continentMapping).reduce((acc, continent) => {

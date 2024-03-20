@@ -11,13 +11,13 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from '../context/FormContext';
 
 const PageOneQuestionnaire = () => {
-  const [selectedLanguage, setSelectedLanguage] = useState('');
-  const [postalCode, setPostalCode] = useState('');
-  const [yearOfBirth, setYearOfBirth] = useState('');
-  const [preferNotToAnswerPostal, setPreferNotToAnswerPostal] = useState(false);
-  const [preferNotToAnswerYear, setPreferNotToAnswerYear] = useState(false);
-  const [declined, setDeclined] = useState(null);
   const { formData, updateFormData, workshopId, workshopName  } = useForm();
+  const [selectedLanguage, setSelectedLanguage] = useState(formData.language || '');
+  const [postalCode, setPostalCode] = useState(formData.postalCode || '');
+  const [yearOfBirth, setYearOfBirth] = useState(formData.yearOfBirth || '');
+  const [preferNotToAnswerPostal, setPreferNotToAnswerPostal] = useState(formData.postalCode === 'Prefer Not To Answer');
+  const [preferNotToAnswerYear, setPreferNotToAnswerYear] = useState(formData.yearOfBirth === '0000');
+  const [declined, setDeclined] = useState(false);  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState('');
   const [modalContext, setModalContext] = useState('');
@@ -41,6 +41,22 @@ const PageOneQuestionnaire = () => {
     }
 }, [declined]);
 
+useEffect(() => {
+  // Reflect formData updates
+  console.log("Initial formData.consent:", formData.consent);
+  setPreferNotToAnswerPostal(formData.postalCode === 'Prefer Not To Answer');
+  setPreferNotToAnswerYear(formData.yearOfBirth === '0000');
+  // Initialize declined state based on the initial value of formData.consent
+  if (formData.consent === 'decline') {
+    setDeclined(true);
+  } else if (formData.consent === 'accept') {
+    setDeclined(false);
+  } else {
+    // If formData.consent is undefined or null, keep declined as null
+    setDeclined(null);
+  }
+}, [formData]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     if (name === 'postalCode') {
@@ -53,12 +69,21 @@ const PageOneQuestionnaire = () => {
 
   const handleCheckboxChange = (optionId, isChecked) => {
     if (optionId === 'postal') {
+      setPostalCode('');
       setPreferNotToAnswerPostal(isChecked);
       updateFormData({ ...formData, postalCode: isChecked ? 'Prefer Not To Answer' : postalCode });
     } else if (optionId === 'year') {
+      setYearOfBirth('');
       setPreferNotToAnswerYear(isChecked);
       updateFormData({ ...formData, yearOfBirth: isChecked ? '0000' : yearOfBirth });
     }
+  };
+
+  const handleConsentChange = (event) => {
+    const value = event.target.value; // 'accept' or 'decline'
+    const isDeclined = value === 'decline';
+    updateFormData({ ...formData, consent: value });
+    setDeclined(isDeclined);
   };
 
   const handleClick = () => {
@@ -117,6 +142,7 @@ const PageOneQuestionnaire = () => {
             onSelect={(selectedOption) => {
               console.log("Selected option:", selectedOption);
               setSelectedLanguage(selectedOption); 
+              updateFormData({ ...formData, language: selectedOption });
             }}
             selectedValue={selectedLanguage} // Pass the selectedLanguage state to the DropDown component
           />
@@ -128,7 +154,7 @@ const PageOneQuestionnaire = () => {
                 name="consent"
                 value="accept"
                 checked={declined === false}
-                onChange={() => { setDeclined(false); console.log("Consent: Accepted"); }}
+                onChange={handleConsentChange}
               />
               <span className="ml-2">I accept</span>
             </label>
@@ -138,8 +164,7 @@ const PageOneQuestionnaire = () => {
                 name="consent"
                 value="decline"
                 checked={declined === true}
-                onChange={() => { setDeclined(true); console.log("Consent: Declined"); }}
-              />
+                onChange={handleConsentChange}              />
               <span className="ml-2">I decline</span>
             </label>
           </div>

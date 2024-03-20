@@ -95,6 +95,8 @@ const PageFourQuestionnaire = () => {
         newcomerStatus: {},
         newcomerComment: "",
         selfIdentificationOptions: [],
+        consent: null,
+        language: "",
         // Add other fields as required by your form's initial state
       });
 

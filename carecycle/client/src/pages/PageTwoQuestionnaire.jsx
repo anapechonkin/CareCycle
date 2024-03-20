@@ -11,7 +11,7 @@ import { useForm } from '../context/FormContext';
 const PageTwoQuestionnaire = () => {
   const navigate = useNavigate();
   const { formData, updateFormData, workshopId } = useForm();
-  const [selectedPrimaryGender, setSelectedPrimaryGender] = useState('');
+  const [selectedPrimaryGender, setSelectedPrimaryGender] = useState(formData.primaryGender?.label || '');
   const [isModalOpen, setIsModalOpen] = useState(false);
   
   // Function to navigate based on gender selection

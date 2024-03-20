@@ -57,6 +57,10 @@ export const FormProvider = ({ children }) => {
         setWorkshopNameInternal('');
     };
 
+    const clearFormData = () => {
+        setFormData({}); // Clear the form data
+    };
+
     const updateFormData = (newData) => {
         setFormData(prevFormData => ({
             ...prevFormData,
@@ -84,6 +88,7 @@ export const FormProvider = ({ children }) => {
             workshopId,
             setWorkshopId,
             clearWorkshopId,
+            clearFormData,
             workshopName,
             setWorkshopName,
             questionnaireCompleted,

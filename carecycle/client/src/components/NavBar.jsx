@@ -11,7 +11,7 @@ const Navbar = () => {
   const [customReason, setCustomReason] = useState(''); // State for custom reason input
   const navigate = useNavigate();
   const location = useLocation(); 
-  const { clearWorkshopId } = useForm();
+  const { clearWorkshopId, clearFormData } = useForm();
 
   const { userType } = useUser();
   console.log("Current userType in Navbar:", userType); 
@@ -47,10 +47,11 @@ const Navbar = () => {
     if (logoutConfirmed) {
       console.log('Navigating to login page...');
       clearWorkshopId(); // Clear the workshopId from local storage
+      clearFormData(); 
       navigate('/'); // Navigate to the login page
       setLogoutConfirmed(false); // Reset to prevent unintended navigation
     }
-  }, [logoutConfirmed, navigate, clearWorkshopId]);
+  }, [logoutConfirmed, navigate, clearWorkshopId, clearFormData]);
 
   return (
     <>
