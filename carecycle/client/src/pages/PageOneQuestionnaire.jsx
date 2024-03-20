@@ -20,6 +20,7 @@ const PageOneQuestionnaire = () => {
   const { formData, updateFormData, workshopId, workshopName  } = useForm();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState('');
+  const [modalContext, setModalContext] = useState('');
   const navigate = useNavigate();
 
   const languageOptions = [
@@ -65,24 +66,38 @@ const PageOneQuestionnaire = () => {
       setModalContent('Please select an option to provide consent before continuing with the questionnaire.');
       setIsModalOpen(true);
     } else if (declined === true) {
-      setModalContent('You have declined to participate in this questionnaire. Please give the device back to the volunteer/employee.');
+      setModalContent('You have declined to participate in this questionnaire. Do you want to continue with this action?');
+      setModalContext("declineConsent"); // This is fine as is
       setIsModalOpen(true);
     } else {
       console.log("Current workshop ID:", workshopId);
-      console.log('FormData after page one:', formData);
+      console.log('FormData after page one for this client:', formData);
       navigate('/pageTwoQuestionnaire');
     }
   };
-
-  const handleModalConfirm = () => {
+  
+  const handleModalOk = () => {
+    // Only navigate if the context is declineConsent
+    if (modalContext === "declineConsent") {
+      navigate('/pageFourQuestionnaire');
+    }
     setIsModalOpen(false);
+    setModalContext(''); // Reset the context to prevent unintended behavior
+  };
+  
+  const handleModalCancel = () => {
+    // Reset form states
+    setSelectedLanguage('');
     setPostalCode('');
     setYearOfBirth('');
     setPreferNotToAnswerPostal(false);
     setPreferNotToAnswerYear(false);
-    setDeclined(null);
+    setDeclined(null); // Optionally clear this if resetting decline state too
     updateFormData({});
+    setIsModalOpen(false);
+    setModalContext(''); // Reset context to clear it
   };
+  
   
   return (
     <div className="flex flex-col min-h-screen bg-[#f6cdd0]">
@@ -155,17 +170,17 @@ const PageOneQuestionnaire = () => {
             onChange={() => handleCheckboxChange('year', !preferNotToAnswerYear)}
           />
           <div className="flex flex-col items-center mt-8 space-y-4">
-            {isModalOpen && (
-              // When setting up the Modal in your component's return statement
-              <Modal 
-                isOpen={isModalOpen} 
-                onClose={() => setIsModalOpen(false)} 
-                onConfirm={handleModalConfirm}
-                showCancelButton={false} // Example: Assuming you don't need a cancel button for now
-              >
-                {modalContent}
-              </Modal>
-            )}
+          <Modal 
+            isOpen={isModalOpen} 
+            content={modalContent}
+            onConfirm={handleModalOk}
+            onClose={handleModalCancel} // Use handleModalCancel for both closing and canceling
+            showCancelButton={true}
+            showOkButton={true}
+          >
+            {modalContent}
+          </Modal>
+
             <Button
               text="NEXT QUESTION"
               className="text-white bg-[#16839B] hover:bg-[#0f6674]"

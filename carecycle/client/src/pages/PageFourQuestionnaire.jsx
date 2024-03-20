@@ -15,11 +15,12 @@ import { addClientStatSelfIdentification } from "../api/selfIdApi";
 
 const PageFourQuestionnaire = () => {
   const navigate = useNavigate();
-  const { formData, updateFormData, workshopId } = useForm();
+  const { formData, updateFormData, workshopId, questionnaireCompleted, resetQuestionnaireCompletion } = useForm();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const [rulesAccepted, setRulesAccepted] = useState(null);
   const [isSecondModalOpen, setIsSecondModalOpen] = useState(false);
+  const [submissionStatus, setSubmissionStatus] = useState(null);
 
   const handlePostalCode = async (postalCode) => {
     if (postalCode.toUpperCase() === "PREFER NOT TO ANSWER") {
@@ -41,7 +42,7 @@ const PageFourQuestionnaire = () => {
   
       const submissionData = {
         yearOfBirth: formData.yearOfBirth,
-        customGender: formData.custom_gender,
+        custom_gender: formData.custom_gender,
         primaryGenderId: formData.primaryGender.id,
         postalCodeId,
         workshopId,
@@ -96,32 +97,60 @@ const PageFourQuestionnaire = () => {
         selfIdentificationOptions: [],
         // Add other fields as required by your form's initial state
       });
+
+      return true;
   
     } catch (error) {
       console.error('Submission error:', error);
       setModalMessage('Failed to submit the questionnaire. Please try again.');
       setIsModalOpen(true);
+      return false;
     }
-  };  
-
-  const handleCloseModal = () => {
-    if (rulesAccepted === false) {
-      // If declined, close the first modal and open the second
-      setIsModalOpen(false); // Close the first modal
-      setModalMessage('Client has declined the Rules and Values. Please decide what to do next.'); // Set message for the second modal
-      setIsSecondModalOpen(true); // Open the second modal
+  }; 
+  
+  const handleAcceptOrDeclineRules = async () => {
+    let submissionSuccess = false;
+  
+    if (questionnaireCompleted) {
+      submissionSuccess = await handleSubmitQuestionnaire();
+      setSubmissionStatus(submissionSuccess ? 'success' : 'failure');
+    }
+  
+    if (rulesAccepted) {
+      setModalMessage("Thank you for your participation and for accepting our rules. Please return the device to the volunteer or employee.");
+      setIsModalOpen(true);
     } else {
-      // If accepted or for any other cases, just close the modal and navigate as before
-      setIsModalOpen(false);
+      setModalMessage("You are about to decline the rules and values, which may limit your access. If you wish to continue, please click OK and return the device to the volunteer or employee. Click 'Cancel' if you wish to change your decision.");
+      setIsModalOpen(true);
+    }
+  };
+  
+
+
+  // Adjust handleCloseModal to handle different scenarios more explicitly
+  const handleCloseModal = (action) => {
+    setIsModalOpen(false);
+
+    // Action parameter helps distinguish between 'OK' and 'Cancel' clicks
+    if (action === 'confirm' && !rulesAccepted) {
+      // If 'OK' is clicked after declining the rules
+      setModalMessage("The client has declined the rules and values. Please decide what to do next.");
+      setIsSecondModalOpen(true);
+    } else if (action === 'cancel') {
+      // If 'Cancel' is clicked, just close the modal
+    } else {
+      // This case handles the modal closing after accepting the rules or after any other scenario where we just need to close the modal and proceed
       navigate('/pageOneQuestionnaire');
+      resetQuestionnaireCompletion();
     }
   };
 
-  // New function to handle closing the second modal and then navigating back to the first page
   const handleSecondModalClose = () => {
-    setIsSecondModalOpen(false); // Close the second modal
-    navigate('/pageOneQuestionnaire'); // Navigate back to the first page
+    setIsSecondModalOpen(false);
+    navigate('/pageOneQuestionnaire');
+    resetQuestionnaireCompletion();
   };
+  
 
   const handlePreviousClick = () => navigate('/pageThreeQuestionnaire');
   
@@ -159,6 +188,19 @@ const PageFourQuestionnaire = () => {
               <span className="ml-2">Decline</span>
             </label>
           </div>
+          <div className="flex items-center justify-between w-full mt-4">
+            {submissionStatus && (
+              <div
+                style={{
+                  color: submissionStatus === 'success' ? 'green' : 'red',
+                }}
+              >
+                {submissionStatus === 'success'
+                  ? 'Questionnaire submitted successfully.'
+                  : 'Failed to submit the questionnaire.'}
+              </div>
+            )}
+          </div>
           <div className="flex items-center w-full mt-8">
             <Button
               text="PREVIOUS QUESTION"
@@ -167,7 +209,7 @@ const PageFourQuestionnaire = () => {
             />
             <Button
               text="SUBMIT QUESTIONNAIRE"
-              onClick={handleSubmitQuestionnaire}
+              onClick={handleAcceptOrDeclineRules}
               className="text-white bg-[#16839B] hover:bg-[#0f6a8b] font-bold py-2 px-4 mx-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-150 ease-in-out"
               disabled={rulesAccepted === null}
             />
@@ -183,12 +225,20 @@ const PageFourQuestionnaire = () => {
           </div>
         </div>
       </div>
-      <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
+      <Modal 
+        isOpen={isModalOpen} 
+        onClose={() => handleCloseModal('cancel')}
+        onConfirm={() => handleCloseModal('confirm')}
+        showCancelButton = {!rulesAccepted}
+      >
         <p>{modalMessage}</p>
       </Modal>
       
       {/* Second modal for handling the decline case specifically */}
-      <Modal isOpen={isSecondModalOpen} onClose={handleSecondModalClose}>
+      <Modal 
+        isOpen={isSecondModalOpen}
+        onClose={handleSecondModalClose}
+      >
         <p>{modalMessage}</p>
       </Modal>
       <Footer />

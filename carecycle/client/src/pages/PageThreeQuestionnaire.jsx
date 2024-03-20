@@ -25,7 +25,7 @@ const continentMapping = {
 const PageThreeQuestionnaire = () => {
   const navigate = useNavigate();
   // Accesses form context for global form state management.
-  const { formData, updateFormData, workshopId } = useForm();
+  const { formData, updateFormData, workshopId, markQuestionnaireCompleted } = useForm();
   // State management for dynamic form elements and modal.
   const [mapAreas, setMapAreas] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -137,6 +137,9 @@ const PageThreeQuestionnaire = () => {
     console.log("Map areas selected:", formData.mapSelections);
     console.log("Selected Self-Identification Options:", formData.selfIdentificationOptions);
     console.log("Updated FormData after page 3:", formData);
+
+    // Mark the questionnaire as completed before navigating to the next page
+    markQuestionnaireCompleted();
 
     navigate('/pageFourQuestionnaire');
   };
