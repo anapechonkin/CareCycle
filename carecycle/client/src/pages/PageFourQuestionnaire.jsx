@@ -29,6 +29,7 @@ const PageFourQuestionnaire = () => {
   const [rulesAccepted, setRulesAccepted] = useState(null);
   const [isSecondModalOpen, setIsSecondModalOpen] = useState(false);
   const [submissionStatus, setSubmissionStatus] = useState(null);
+  const [showOverlay, setShowOverlay] = useState(false);
 
   const handlePostalCode = async (postalCode) => {
     if (postalCode.toUpperCase() === "PREFER NOT TO ANSWER") {
@@ -143,12 +144,19 @@ const PageFourQuestionnaire = () => {
 
     // Action parameter helps distinguish between 'OK' and 'Cancel' clicks
     if (action === 'confirm' && !rulesAccepted) {
+      // Show the overlay
+      setShowOverlay(true);
       // If 'OK' is clicked after declining the rules
-      setModalMessage("The client has declined the rules and values. Please decide what to do next.");
-      setIsSecondModalOpen(true);
-    } else if (action === 'cancel') {
-      // If 'Cancel' is clicked, just close the modal
-    } else {
+      // Close the first modal and start a delay before showing the second modal
+      setTimeout(() => {
+        // Hide the overlay right before showing the second modal
+        setShowOverlay(false);
+        setModalMessage("The client has declined the rules and values. Please decide what to do next.");
+        setIsSecondModalOpen(true);
+      }, 5000); // Delay the second modal by 5 seconds (5000 milliseconds)
+      } else if (action === 'cancel') {
+        // If 'Cancel' is clicked, just close the modal
+      } else {
       // This case handles the modal closing after accepting the rules or after any other scenario where we just need to close the modal and proceed
       clearFormData();
       navigate('/pageOneQuestionnaire');
@@ -173,7 +181,7 @@ const PageFourQuestionnaire = () => {
       navigate('/pageThreeQuestionnaire');
     }
   };
-    
+
   return (
     <div className="flex flex-col min-h-screen bg-[#f6cdd0]">
       <NavBar />
@@ -262,6 +270,25 @@ const PageFourQuestionnaire = () => {
         <p>{modalMessage}</p>
       </Modal>
       <Footer />
+      {/* Overlay for processing */}
+    {showOverlay && (
+      <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          zIndex: 1000, // Ensure it's above other content
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          color: 'white',
+          fontSize: '24px',
+      }}>
+          Processing...
+      </div>
+    )}
     </div>
   );
 };
