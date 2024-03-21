@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from '../context/FormContext';
 
 const PageOneQuestionnaire = () => {
-  const { formData, updateFormData, workshopId, workshopName, clearFormData  } = useForm();
+  const { formData, updateFormData, workshopId, workshopName, clearFormData, enableSkippedToRules  } = useForm();
   const [selectedLanguage, setSelectedLanguage] = useState(formData.language || '');
   const [postalCode, setPostalCode] = useState(formData.postalCode || '');
   const [yearOfBirth, setYearOfBirth] = useState(formData.yearOfBirth || '');
@@ -104,6 +104,7 @@ useEffect(() => {
   const handleModalOk = () => {
     // Only navigate if the context is declineConsent
     if (modalContext === "declineConsent") {
+      enableSkippedToRules();
       navigate('/pageFourQuestionnaire');
     }
     setIsModalOpen(false);

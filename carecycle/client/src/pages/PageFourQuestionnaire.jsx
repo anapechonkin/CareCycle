@@ -15,7 +15,15 @@ import { addClientStatSelfIdentification } from "../api/selfIdApi";
 
 const PageFourQuestionnaire = () => {
   const navigate = useNavigate();
-  const { formData, updateFormData, workshopId, questionnaireCompleted, resetQuestionnaireCompletion } = useForm();
+  const { formData, 
+          updateFormData, 
+          workshopId, 
+          questionnaireCompleted, 
+          resetQuestionnaireCompletion, 
+          clearFormData,
+          skippedToRules,
+          resetSkippedToRules
+         } = useForm();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const [rulesAccepted, setRulesAccepted] = useState(null);
@@ -142,6 +150,7 @@ const PageFourQuestionnaire = () => {
       // If 'Cancel' is clicked, just close the modal
     } else {
       // This case handles the modal closing after accepting the rules or after any other scenario where we just need to close the modal and proceed
+      clearFormData();
       navigate('/pageOneQuestionnaire');
       resetQuestionnaireCompletion();
     }
@@ -149,13 +158,22 @@ const PageFourQuestionnaire = () => {
 
   const handleSecondModalClose = () => {
     setIsSecondModalOpen(false);
+    clearFormData();
     navigate('/pageOneQuestionnaire');
     resetQuestionnaireCompletion();
   };
   
 
-  const handlePreviousClick = () => navigate('/pageThreeQuestionnaire');
-  
+  const handlePreviousClick = () => {
+    if (skippedToRules) {
+      // Reset the flag when navigating back
+      resetSkippedToRules();
+      navigate('/pageOneQuestionnaire');
+    } else {
+      navigate('/pageThreeQuestionnaire');
+    }
+  };
+    
   return (
     <div className="flex flex-col min-h-screen bg-[#f6cdd0]">
       <NavBar />

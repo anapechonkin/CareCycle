@@ -9,6 +9,7 @@ export const FormProvider = ({ children }) => {
     const [workshopId, setWorkshopIdInternal] = useState('');
     const [workshopName, setWorkshopNameInternal] = useState('');
     const [questionnaireCompleted, setQuestionnaireCompleted] = useState(false);
+    const [skippedToRules, setSkippedToRules] = useState(false);
 
     useEffect(() => {
         const workshopData = localStorage.getItem('workshopId');
@@ -59,6 +60,7 @@ export const FormProvider = ({ children }) => {
 
     const clearFormData = () => {
         setFormData({}); // Clear the form data
+        setSkippedToRules(false);
     };
 
     const updateFormData = (newData) => {
@@ -81,6 +83,16 @@ export const FormProvider = ({ children }) => {
     setQuestionnaireCompleted(true);
   };
 
+  // New function to set skippedToRules to true
+  const enableSkippedToRules = () => {
+    setSkippedToRules(true);
+  };
+
+  // New function to reset skippedToRules to false
+  const resetSkippedToRules = () => {
+        setSkippedToRules(false);
+  };
+
     return (
         <FormContext.Provider value={{
             formData,
@@ -95,6 +107,9 @@ export const FormProvider = ({ children }) => {
             completeQuestionnaire,
             markQuestionnaireCompleted,
             resetQuestionnaireCompletion,
+            skippedToRules,
+            enableSkippedToRules,
+            resetSkippedToRules
         }}>
             {children}
         </FormContext.Provider>
