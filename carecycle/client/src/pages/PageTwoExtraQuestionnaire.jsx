@@ -52,12 +52,16 @@ const PageTwoExtraQuestionnaire = () => {
         
         // Initialize preferNotToAnswer state based on form data
         setPreferNotToAnswer(formData.genderIdentities?.some(identity => identity.id === "1"));
+      
+        // Initialize otherGenderIdentity state based on form data
+        setOtherGenderIdentity(formData.custom_gender || ''); // Set to custom_gender if available, otherwise empty string
+
       } catch (error) {
         console.error("Failed to fetch gender identities", error);
       }
     };
     fetchData();
-  }, [formData.genderIdentities]); // Depend on formData.genderIdentities to reset if it changes
+  }, [formData.genderIdentities, formData.custom_gender]); // Depend on formData.genderIdentities to reset if it changes
   
   // Adjusted to handle the correct properties
   const handlePreviousClick = () => navigate('/pageTwoQuestionnaire');
@@ -126,17 +130,17 @@ const PageTwoExtraQuestionnaire = () => {
     setShowModal(true);
   };
 
-  // const handleModalDisplay = (content) => {
-  //   setModalContent(content);
-  //   setShowModal(true);
-  // };
-
   // Assuming you have the otherGenderIdentity state setup
 const handleOtherGenderIdentityChange = (e) => {
   const value = e.target.value;
   setOtherGenderIdentity(value);
-  // Optionally update form data here if needed immediately, or do it before form submission
-};
+
+  // Update form data immediately
+  updateFormData({
+    ...formData,
+    customGender: value.trim() // Update custom_gender field
+  })
+;};
 
 
   const renderGenderIdentities = () => {

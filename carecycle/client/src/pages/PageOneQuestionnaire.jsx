@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from '../context/FormContext';
 
 const PageOneQuestionnaire = () => {
-  const { formData, updateFormData, workshopId, workshopName  } = useForm();
+  const { formData, updateFormData, workshopId, workshopName, clearFormData  } = useForm();
   const [selectedLanguage, setSelectedLanguage] = useState(formData.language || '');
   const [postalCode, setPostalCode] = useState(formData.postalCode || '');
   const [yearOfBirth, setYearOfBirth] = useState(formData.yearOfBirth || '');
@@ -91,7 +91,7 @@ useEffect(() => {
       setModalContent('Please select an option to provide consent before continuing with the questionnaire.');
       setIsModalOpen(true);
     } else if (declined === true) {
-      setModalContent('You have declined to participate in this questionnaire. Do you want to continue with this action?');
+      setModalContent('You have declined to participate in this questionnaire. Do you want to continue on to the rules and values page?');
       setModalContext("declineConsent"); // This is fine as is
       setIsModalOpen(true);
     } else {
@@ -111,18 +111,20 @@ useEffect(() => {
   };
   
   const handleModalCancel = () => {
-    // Reset form states
+    // Reset local component states
     setSelectedLanguage('');
     setPostalCode('');
     setYearOfBirth('');
     setPreferNotToAnswerPostal(false);
     setPreferNotToAnswerYear(false);
     setDeclined(null); // Optionally clear this if resetting decline state too
-    updateFormData({});
+  
+    // Use clearFormData to reset the form data in your context
+    clearFormData();
+  
     setIsModalOpen(false);
     setModalContext(''); // Reset context to clear it
-  };
-  
+  };  
   
   return (
     <div className="flex flex-col min-h-screen bg-[#f6cdd0]">
@@ -178,7 +180,12 @@ useEffect(() => {
             value={postalCode}
           />
           <Checkbox
-            options={[{ id: 'postal', name: 'Prefer Not To Answer', checked: preferNotToAnswerPostal }]}
+            options={[{
+              id: 'postal',
+              name: 'Prefer Not To Answer',
+              checked: preferNotToAnswerPostal,
+              disabled: declined === true // Disable this checkbox if declined is true
+            }]}
             onChange={() => handleCheckboxChange('postal', !preferNotToAnswerPostal)}
           />
           <input
@@ -191,7 +198,12 @@ useEffect(() => {
             value={yearOfBirth}
           />
           <Checkbox
-            options={[{ id: 'year', name: 'Prefer Not To Answer', checked: preferNotToAnswerYear }]}
+            options={[{
+              id: 'year',
+              name: 'Prefer Not To Answer',
+              checked: preferNotToAnswerYear,
+              disabled: declined === true // Disable this checkbox if declined is true
+            }]}
             onChange={() => handleCheckboxChange('year', !preferNotToAnswerYear)}
           />
           <div className="flex flex-col items-center mt-8 space-y-4">

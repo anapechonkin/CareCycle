@@ -98,6 +98,11 @@ useEffect(() => {
   loadNewcomerStatusOptions();
 }, [formData.newcomerStatus]); // Depend on formData.newcomerStatus to reset if it changes
 
+useEffect(() => {
+  // Initialize newcomerComment state based on form data
+  setNewcomerComment(formData.newcomerComment || ''); // Set to newcomerComment if available, otherwise set to an empty string
+}, [formData.newcomerComment]); // Depend on formData.newcomerComment to reset if it changes
+
   useEffect(() => {
     const grouped = Object.keys(continentMapping).reduce((acc, continent) => {
       // Filter mapAreas by checking if the area's ID is included in the continentMapping for the current continent

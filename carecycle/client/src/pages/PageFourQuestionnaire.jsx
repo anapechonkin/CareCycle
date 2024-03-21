@@ -42,7 +42,7 @@ const PageFourQuestionnaire = () => {
   
       const submissionData = {
         yearOfBirth: formData.yearOfBirth,
-        custom_gender: formData.custom_gender,
+        customGender: formData.custom_gender,
         primaryGenderId: formData.primaryGender.id,
         postalCodeId,
         workshopId,
