@@ -52,7 +52,20 @@ async function addPostalCode(req, res) {
     }
 }
 
+// Function to fetch all areas
+async function getAreas(req, res) {
+    try {
+        const result = await pool.query('SELECT area_id, area_name FROM carecycle.area');
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Error fetching areas:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+}
+
+
 module.exports = { 
     lookupPostalCode,
-    addPostalCode
+    addPostalCode,
+    getAreas
  };

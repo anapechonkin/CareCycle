@@ -44,6 +44,7 @@ app.put('/users/:userId/gender-identities', genderIdentityRoutes.updateUserGende
 // Postal code routes
 app.get('/postal-codes/lookup/:code', findPostalCode.lookupPostalCode);
 app.post('/postal-codes/add', findPostalCode.addPostalCode);
+app.get('/postal-codes/areas', findPostalCode.getAreas);
 
 // Dropdown routes
 app.get('/dropdowns/primaryGender', dropDownDB.getPrimaryGenderIdentities);

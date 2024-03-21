@@ -4,17 +4,58 @@ const { pool } = require('../config/db'); // Database connection pool
 // Retrieves all clientStats from the database
 const getClientStats = async (request, response) => {
     try {
-        const results = await pool.query('SELECT * FROM carecycle.clientstats');
+        const query = `
+            SELECT 
+                cs.cs_id, 
+                cs.year_of_birth, 
+                cs.custom_gender, 
+                cs.newcomer_comment, 
+                ns.status AS newcomer_status, 
+                pc.postal_code, 
+                a.area_name AS area,
+                pg.gender_name AS primary_gender, 
+                w.name AS workshop_name,
+                ARRAY_AGG(DISTINCT gi.type) FILTER (WHERE gi.type IS NOT NULL) AS gender_identities,
+                ARRAY_AGG(DISTINCT si.option) FILTER (WHERE si.option IS NOT NULL) AS self_identifications,
+                ARRAY_AGG(DISTINCT ma.map_area_name) FILTER (WHERE ma.map_area_name IS NOT NULL) AS map_areas
+            FROM 
+                carecycle.clientstats cs
+            LEFT JOIN carecycle.newcomerstatus ns ON cs.newcomer_status_id = ns.newcomer_status_id
+            LEFT JOIN carecycle.postalcode pc ON cs.postal_code_id = pc.postal_code_id
+            LEFT JOIN carecycle.area a ON pc.area_id = a.area_id
+            LEFT JOIN carecycle.primarygender pg ON cs.primary_gender_id = pg.primary_gender_id
+            LEFT JOIN carecycle.workshop w ON cs.workshop_id = w.workshop_id
+            LEFT JOIN carecycle.clientstats_maparea csma ON cs.cs_id = csma.cs_id
+            LEFT JOIN carecycle.maparea ma ON csma.map_id = ma.map_id
+            LEFT JOIN carecycle.client_genderidentity cgi ON cs.cs_id = cgi.cs_id
+            LEFT JOIN carecycle.genderidentity gi ON cgi.gender_identity_id = gi.gender_identity_id
+            LEFT JOIN carecycle.clientstats_selfidentification csi ON cs.cs_id = csi.cs_id
+            LEFT JOIN carecycle.selfidentification si ON csi.self_identification_id = si.self_identification_id
+            GROUP BY 
+                cs.cs_id, ns.status, pc.postal_code, a.area_name, pg.gender_name, w.name
+            ORDER BY 
+                cs.cs_id;
+        `;
+        const results = await pool.query(query);
         if (results.rows.length > 0) {
-            response.status(200).json(results.rows);
+            // Mapping through results to ensure unique values in arrays
+            const formattedResults = results.rows.map(row => ({
+                ...row,
+                gender_identities: Array.from(new Set(row.gender_identities)),
+                self_identifications: Array.from(new Set(row.self_identifications)),
+                map_areas: Array.from(new Set(row.map_areas)),
+            }));
+            response.status(200).json(formattedResults);
         } else {
             response.status(200).json({ message: 'No client stats found' });
         }
     } catch (error) {
-        console.error('Error fetching all client stats:', error);
+        console.error('Error fetching client stats with details:', error);
         response.status(500).json({ error: 'Internal server error' });
     }
 };
+
+
 
 // Fetches a single clientStat by their unique ID
 const getClientStatById = async (request, response) => {

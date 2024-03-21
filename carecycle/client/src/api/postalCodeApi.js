@@ -41,3 +41,16 @@ export const lookupPostalCode = async (postalCode) => {
         return null;
     }
 };
+
+export const fetchAreas = async () => {
+    try {
+      const response = await fetch('/postal-codes/areas');
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Failed to fetch map regions:', error);
+      throw error;
+    }
+  };
