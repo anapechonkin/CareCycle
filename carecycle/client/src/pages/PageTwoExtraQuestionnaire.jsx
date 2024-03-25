@@ -20,7 +20,7 @@ const PageTwoExtraQuestionnaire = () => {
   const [selectedGenders, setSelectedGenders] = useState({});
   const [preferNotToAnswer, setPreferNotToAnswer] = useState(false);
   const [genderIdentities, setGenderIdentities] = useState([]);
-  const [otherGenderIdentity, setOtherGenderIdentity] = useState('');
+  const [otherGenderIdentity, setOtherGenderIdentity] = useState(formData.custom_gender || '');
 
   useEffect(() => {
     const fetchData = async () => {

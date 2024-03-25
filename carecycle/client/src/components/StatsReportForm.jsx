@@ -230,61 +230,64 @@ const handleSeasonChange = (event) => {
   }
 };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setShowReport(false);
+const handleSubmit = async (event) => {
+  event.preventDefault();
+  setShowReport(false);
 
-    let filters = {};
-    Object.entries(selectedOptions).forEach(([category, selected]) => {
-        // Check if the category exists in categoryData and both selected and the corresponding categoryData[category] are not undefined
-        if (categoryData[category] && selected && categoryData[category].length !== undefined) {
-            if (selected.length < categoryData[category].length) {
-                filters[category] = selected.join(',');
-            }
-        } else if (selected !== 'ALL') { // Handle 'yearOfBirth' and similar single-value categories
-            filters[category] = selected;
-        }
-    });
+  let filters = {};
+  let hasNonDateFilters = false;
+  let dateRangeSelectedExplicitly = dateRangeSelected || seasonSelected; // Assuming these flags are correctly set based on user interaction
 
-    if (startDate) filters.startDate = startDate.toISOString();
-    if (endDate) {
-      // If the end date is the same as the start date, adjust it to the end of the day
-      if (endDate.getTime() === startDate.getTime()) {
-        endDate.setHours(23, 59, 59); // Set to the end of the day
+  // Iterate through selected options to build the filter object
+  Object.entries(selectedOptions).forEach(([category, selected]) => {
+    if (category !== 'season' && category !== 'yearOfBirth') {
+      if (selected.length > 0 && selected.length < categoryData[category]?.length) {
+        filters[category] = selected.join(',');
+        hasNonDateFilters = true;
       }
-      filters.endDate = endDate.toISOString();
+    } else if (category === 'yearOfBirth' && selected !== '' && selected !== 'ALL') {
+      filters[category] = selected;
+      hasNonDateFilters = true;
     }
+  });
 
-    // Handle season selection
+  // Apply date filters based on user's explicit action
+  if (dateRangeSelectedExplicitly) {
     if (selectedSeason && selectedSeason !== 'Custom') {
       const { startDate, endDate } = getSeasonDateRange(selectedSeason);
-      filters.startDate = startDate.toISOString();
-      filters.endDate = endDate.toISOString();
-    } else {
-      // Handle custom date range selection
-      if (startDate) filters.startDate = startDate.toISOString();
-      if (endDate) {
-        // Adjust endDate to include the full day if it's the same as startDate
-        if (endDate.getTime() === startDate.getTime()) {
-          endDate.setHours(23, 59, 59);
-        }
+      if (startDate && endDate) {
+        filters.startDate = startDate.toISOString();
         filters.endDate = endDate.toISOString();
       }
+    } else {
+      // Apply custom date range if selected
+      if (startDate) {
+        filters.startDate = startDate.toISOString();
+      }
+      if (endDate) {
+        const adjustedEndDate = new Date(endDate);
+        adjustedEndDate.setHours(23, 59, 59); // Adjust to end of the day for inclusivity
+        filters.endDate = adjustedEndDate.toISOString();
+      }
     }
+  }
 
-    console.log('Sending request with filters:', filters); 
+  // Reset filters if no filters (date or non-date) are explicitly selected
+  if (!hasNonDateFilters && !dateRangeSelectedExplicitly) {
+    filters = {};
+  }
 
-    try {
-        console.log('Filters to send:', filters)
-        const result = await getClientStats(filters); // Assuming getClientStats makes an API call and returns a promise
-        console.log("Fetched Report Data:", result); 
-        setReportData(result);
-        setShowReport(true);
-    } catch (error) {
-        console.error('Failed to fetch client stats:', error);
-    }
+  console.log('Sending request with filters:', filters);
+
+  try {
+    const result = await getClientStats(filters);
+    console.log("Fetched Report Data:", result);
+    setReportData(result);
+    setShowReport(true);
+  } catch (error) {
+    console.error('Failed to fetch client stats:', error);
+  }
 };
-
 
   // Function to select all options for a given category
   const handleSelectAll = (category) => {

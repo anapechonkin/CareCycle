@@ -6,16 +6,16 @@ const getClientStats = async (request, response) => {
     let queryParams = [];
     let whereConditions = [];
     let queryIndex = 1;
-  
+
     // Function to add conditions and parameters for array types
     const addArrayCondition = (condition, values) => {
-      if (values && values.length > 0) {
-        whereConditions.push(`${condition} = ANY($${queryIndex}::int[])`);
-        queryParams.push(values.split(',').map(Number)); // Convert string values to numbers
-        queryIndex++;
-      }
+        if (values && values.length > 0) {
+            whereConditions.push(`${condition} = ANY($${queryIndex}::int[])`);
+            queryParams.push(values.split(',').map(Number)); // Convert string values to numbers
+            queryIndex++;
+        }
     };
-  
+
     // Add conditions based on the filters provided
     addArrayCondition('ns.newcomer_status_id', filters.newcomerStatus);
     addArrayCondition('pg.primary_gender_id', filters.primaryGenders);
@@ -24,79 +24,83 @@ const getClientStats = async (request, response) => {
     addArrayCondition('a.area_id', filters.areas);
     addArrayCondition('w.workshop_id', filters.workshopTypes);
     addArrayCondition('si.self_identification_id', filters.selfIdentification);
-  
+
     // Add condition for yearOfBirth
-    if (filters.yearOfBirth && filters.yearOfBirth !== 'ALL') {
-      whereConditions.push(`cs.year_of_birth = $${queryIndex}`);
-      queryParams.push(parseInt(filters.yearOfBirth));
-      queryIndex++;
+    if (filters.yearOfBirth && filters.yearOfBirth !== 'ALL' && filters.yearOfBirth !== '') {
+        whereConditions.push(`cs.year_of_birth = $${queryIndex}`);
+        queryParams.push(parseInt(filters.yearOfBirth));
+        queryIndex++;
     }
 
-    // Handle date range filter
-    if (filters.startDate) {
+    // Handle date range filter only if explicitly provided
+    if (filters.startDate && filters.startDate !== '') {
         whereConditions.push(`cs.created_at >= $${queryIndex}`);
         queryParams.push(new Date(filters.startDate).toISOString());
         queryIndex++;
     }
-    // Extend the endDate to the end of the day by adding almost a full day (23 hours, 59 minutes, and 59 seconds)
-    if (filters.endDate) {
+    if (filters.endDate && filters.endDate !== '') {
         const endDate = new Date(filters.endDate);
         endDate.setHours(23, 59, 59); // Set to the end of the day
         whereConditions.push(`cs.created_at <= $${queryIndex}`);
         queryParams.push(endDate.toISOString());
         queryIndex++;
     }
-  
+
     // Build the SQL query
     let query = `
-      SELECT
-        cs.cs_id, 
-        cs.year_of_birth, 
-        cs.custom_gender, 
-        cs.newcomer_comment, 
-        ns.status AS newcomer_status, 
-        pg.gender_name AS primary_gender,
-        ARRAY_AGG(DISTINCT ma.map_area_name) FILTER (WHERE ma.map_area_name IS NOT NULL) AS map_areas,
-        ARRAY_AGG(DISTINCT gi.type) FILTER (WHERE gi.type IS NOT NULL) AS gender_identities,
-        ARRAY_AGG(DISTINCT si.option) FILTER (WHERE si.option IS NOT NULL) AS self_identifications,
-        w.name AS workshop_name,
-        p.postal_code,
-        a.area_name
-      FROM 
-        carecycle.ClientStats cs
-        LEFT JOIN carecycle.NewcomerStatus ns ON cs.newcomer_status_id = ns.newcomer_status_id
-        LEFT JOIN carecycle.PrimaryGender pg ON cs.primary_gender_id = pg.primary_gender_id
-        LEFT JOIN carecycle.clientStats_mapArea csm ON cs.cs_id = csm.cs_id
-        LEFT JOIN carecycle.MapArea ma ON csm.map_id = ma.map_id
-        LEFT JOIN carecycle.client_genderIdentity cgi ON cs.cs_id = cgi.cs_id
-        LEFT JOIN carecycle.GenderIdentity gi ON cgi.gender_identity_id = gi.gender_identity_id
-        LEFT JOIN carecycle.Workshop w ON cs.workshop_id = w.workshop_id
-        LEFT JOIN carecycle.PostalCode p ON cs.postal_code_id = p.postal_code_id
-        LEFT JOIN carecycle.Area a ON p.area_id = a.area_id
-        LEFT JOIN carecycle.ClientStats_SelfIdentification csi ON cs.cs_id = csi.cs_id
-        LEFT JOIN carecycle.SelfIdentification si ON csi.self_identification_id = si.self_identification_id
-      `;
-  
-    // Append WHERE clause if there are conditions
-    if (whereConditions.length) {
-      query += `WHERE ${whereConditions.join(" AND ")} `;
+        SELECT
+            cs.cs_id, 
+            cs.year_of_birth, 
+            cs.custom_gender, 
+            cs.newcomer_comment, 
+            ns.status AS newcomer_status, 
+            pg.gender_name AS primary_gender,
+            ARRAY_AGG(DISTINCT ma.map_area_name) FILTER (WHERE ma.map_area_name IS NOT NULL) AS map_areas,
+            ARRAY_AGG(DISTINCT gi.type) FILTER (WHERE gi.type IS NOT NULL) AS gender_identities,
+            ARRAY_AGG(DISTINCT si.option) FILTER (WHERE si.option IS NOT NULL) AS self_identifications,
+            w.name AS workshop_name,
+            p.postal_code,
+            a.area_name
+        FROM 
+            carecycle.ClientStats cs
+            LEFT JOIN carecycle.NewcomerStatus ns ON cs.newcomer_status_id = ns.newcomer_status_id
+            LEFT JOIN carecycle.PrimaryGender pg ON cs.primary_gender_id = pg.primary_gender_id
+            LEFT JOIN carecycle.clientStats_mapArea csm ON cs.cs_id = csm.cs_id
+            LEFT JOIN carecycle.MapArea ma ON csm.map_id = ma.map_id
+            LEFT JOIN carecycle.client_genderIdentity cgi ON cs.cs_id = cgi.cs_id
+            LEFT JOIN carecycle.GenderIdentity gi ON cgi.gender_identity_id = gi.gender_identity_id
+            LEFT JOIN carecycle.Workshop w ON cs.workshop_id = w.workshop_id
+            LEFT JOIN carecycle.PostalCode p ON cs.postal_code_id = p.postal_code_id
+            LEFT JOIN carecycle.Area a ON p.area_id = a.area_id
+            LEFT JOIN carecycle.ClientStats_SelfIdentification csi ON cs.cs_id = csi.cs_id
+            LEFT JOIN carecycle.SelfIdentification si ON csi.self_identification_id = si.self_identification_id
+    `;
+
+    // Append WHERE clause if filters are provided
+    if (whereConditions.length > 0) {
+        query += `WHERE ${whereConditions.join(" AND ")} `;
     }
-  
+
     // Finish the query with GROUP BY and ORDER BY clauses
     query += `
-      GROUP BY cs.cs_id, ns.status, pg.gender_name, w.name, p.postal_code, a.area_name
-      ORDER BY cs.cs_id;
+        GROUP BY cs.cs_id, ns.status, pg.gender_name, w.name, p.postal_code, a.area_name
+        ORDER BY cs.cs_id;
     `;
-  
+
     try {
-      const result = await pool.query(query, queryParams);
-      console.log('Query results:', result.rows);
-      response.status(200).json(result.rows);
+        // Log the query and query parameters for debugging
+        console.log('Query:', query);
+        console.log('Query Params:', queryParams);
+
+        // Assuming 'pool' is your database connection pool
+        const result = await pool.query(query, queryParams);
+        console.log('Query results:', result.rows);
+        response.status(200).json(result.rows);
     } catch (error) {
-      console.error('Error executing query:', error);
-      response.status(500).json({ error: 'Internal server error' });
+        console.error('Error executing query:', error);
+        response.status(500).json({ error: 'Internal server error' });
     }
-  };  
+};
 
 // Fetches a single clientStat by their unique ID
 const getClientStatById = async (request, response) => {

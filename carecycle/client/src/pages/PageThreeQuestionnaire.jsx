@@ -35,6 +35,7 @@ const PageThreeQuestionnaire = () => {
   const [newcomerComment, setNewcomerComment] = useState('');
   const [selfIdOptions, setSelfIdOptions] = useState([]);
   const [groupedMapAreas, setGroupedMapAreas] = useState({});
+  const [isFormValid, setIsFormValid] = useState(false); 
 
   // Effect hook for loading self-identification options on component mount.
   useEffect(() => {
@@ -113,7 +114,24 @@ useEffect(() => {
     setGroupedMapAreas(grouped);
   }, [mapAreas]);
   
-  
+  // Effect hook for validating the form on every change to the form data.
+  useEffect(() => {
+    // Perform validation checks
+    const validateForm = () => {
+      // Check for newcomer status selection
+      const hasNewcomerStatus = !!formData.newcomerStatus;
+      // Check for at least one map area selection
+      const hasMapSelection = formData.mapSelections && formData.mapSelections.length > 0;
+      // Check for at least one self-identification option selection
+      const hasSelfIdOption = formData.selfIdentificationOptions && formData.selfIdentificationOptions.length > 0;
+
+      // Update the isFormValid state based on these checks
+      setIsFormValid(hasNewcomerStatus && hasMapSelection && hasSelfIdOption);
+    };
+
+    validateForm();
+  }, [formData.newcomerStatus, formData.mapSelections, formData.selfIdentificationOptions]); // Depend on formData sections
+
 
   const handleSelect = (selectedOptionValue) => {
     const selectedOption = newcomerStatusOptions.find(option => option.value === selectedOptionValue);
@@ -140,23 +158,52 @@ useEffect(() => {
 
   // Handles navigation to the next page, ensuring at least one map area is selected.
   const handleNextClick = () => {
-    if (!formData.mapSelections || formData.mapSelections.length === 0) {
-      setModalContent("Please select at least one map area to continue.");
+    let missingSections = [];
+  
+    // Check if newcomer status is selected
+    if (!formData.newcomerStatus) {
+      missingSections.push("a newcomer status");
+    }
+  
+    // Check if at least one self-identification option is selected
+    if (!(formData.selfIdentificationOptions && formData.selfIdentificationOptions.length > 0)) {
+      missingSections.push("at least one self-identification option");
+    }
+  
+    // Check if at least one map area is selected
+    if (!(formData.mapSelections && formData.mapSelections.length > 0)) {
+      missingSections.push("at least one map area");
+    }
+  
+    // If any sections are missing, show a modal with a combined message and prevent navigation
+    if (missingSections.length > 0) {
+      let message = "Please select ";
+      if (missingSections.length === 1) {
+        message += missingSections[0];
+      } else {
+        // Combine all but the last missing section with commas, and add "and" before the last missing section
+        message += missingSections.slice(0, -1).join(", ") + ", and " + missingSections.slice(-1);
+      }
+      message += " to continue.";
+  
+      setModalContent(message);
       setShowModal(true);
       return;
     }
-
+  
+    // If all checks pass, proceed with the navigation
     console.log("Proceeding with workshop ID:", workshopId);
     console.log("Newcomer Status:", formData.newcomerStatus.label);
     console.log("Map areas selected:", formData.mapSelections);
     console.log("Selected Self-Identification Options:", formData.selfIdentificationOptions);
     console.log("Updated FormData after page 3:", formData);
-
+  
     // Mark the questionnaire as completed before navigating to the next page
     markQuestionnaireCompleted();
-
+  
     navigate('/pageFourQuestionnaire');
   };
+   
 
   // Navigation back to the previous page.
   const handlePreviousClick = () => {
@@ -304,7 +351,7 @@ useEffect(() => {
           </Modal>
           <div className="flex justify-between w-full mt-8">
             <Button text="PREVIOUS QUESTION" onClick={handlePreviousClick} style={{ marginRight: '15px' }} />
-            <Button text="NEXT QUESTION" onClick={handleNextClick} />
+            <Button text="NEXT QUESTION" onClick={handleNextClick} disabled={!isFormValid}/>
           </div>
         </div>
       </div>

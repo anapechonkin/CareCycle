@@ -87,19 +87,29 @@ useEffect(() => {
   };
 
   const handleClick = () => {
+    // Add validation to ensure required fields are answered
     if (declined === null) {
-      setModalContent('Please select an option to provide consent before continuing with the questionnaire.');
-      setIsModalOpen(true);
-    } else if (declined === true) {
-      setModalContent('You have declined to participate in this questionnaire. Do you want to continue on to the rules and values page?');
-      setModalContext("declineConsent"); // This is fine as is
-      setIsModalOpen(true);
-    } else {
-      console.log("Current workshop ID:", workshopId);
-      console.log('FormData after page one for this client:', formData);
-      navigate('/pageTwoQuestionnaire');
+        setModalContent('Please select an option to provide consent before continuing with the questionnaire.');
+        setIsModalOpen(true);
+        return;
+    } 
+    if (declined === true) {
+        setModalContent('You have declined to participate in this questionnaire. Do you want to continue on to the rules and values page?');
+        setModalContext("declineConsent");
+        setIsModalOpen(true);
+        return;
+    } 
+    // Check if postal code and year of birth are answered
+    if ((!postalCode && !preferNotToAnswerPostal) || (!yearOfBirth && !preferNotToAnswerYear)) {
+        setModalContent('Please answer all questions or select "Prefer Not To Answer" before continuing.');
+        setIsModalOpen(true);
+        return;
     }
-  };
+  
+    console.log("Current workshop ID:", workshopId);
+    console.log('FormData after page one for this client:', formData);
+    navigate('/pageTwoQuestionnaire');
+};
   
   const handleModalOk = () => {
     // Only navigate if the context is declineConsent
