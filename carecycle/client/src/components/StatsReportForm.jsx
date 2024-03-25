@@ -11,6 +11,7 @@ import { fetchAreas } from '../api/postalCodeApi';
 import { fetchSelfIdentificationOptions } from '../api/selfIdApi';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import * as XLSX from 'xlsx';
 
 const StatsReportForm = ({ headerTitle }) => {
   
@@ -38,6 +39,8 @@ const StatsReportForm = ({ headerTitle }) => {
   const [endDate, setEndDate] = useState(null);
   const [reportData, setReportData] = useState([]);
   const [showReport, setShowReport] = useState(false);
+  const [dateRangeSelected, setDateRangeSelected] = useState(false);
+  const [seasonSelected, setSeasonSelected] = useState(false);
 
   const navigate = useNavigate();
   
@@ -161,12 +164,6 @@ const StatsReportForm = ({ headerTitle }) => {
     loadAreas();
   }, []);
 
-  const onChange = (dates) => {
-    const [start, end] = dates;
-    setStartDate(start);
-    setEndDate(end);
-  };
-
   const handleCheckboxChange = (event, option, category) => {
     const { checked } = event.target;
     setSelectedOptions(prev => ({
@@ -209,34 +206,85 @@ const StatsReportForm = ({ headerTitle }) => {
     })
   ];
 
+  // Handle change in DatePicker selection
+const onChange = (dates) => {
+  const [start, end] = dates;
+  setStartDate(start);
+  setEndDate(end);
+  if (start && end) {
+    setDateRangeSelected(true);
+    setSeasonSelected(false); // Disable season selection
+    setSelectedSeason(""); // Reset season selection
+  }
+};
+
+// Handle change in season radio button selection
+const handleSeasonChange = (event) => {
+  const value = event.target.value;
+  setSelectedSeason(value);
+  if (value) {
+    setSeasonSelected(true);
+    setDateRangeSelected(false); // Disable date range selection
+    setStartDate(null);
+    setEndDate(null);
+  }
+};
+
   const handleSubmit = async (event) => {
-    event.preventDefault(); // Prevent default form submission
+    event.preventDefault();
     setShowReport(false);
 
-    // Prepare the filters object
-    let filters = {
-        newcomerStatus: selectedOptions.newcomerStatus.join(','),
-        selfIdentification: selectedOptions.selfIdentification.join(','),
-        primaryGenders: selectedOptions.primaryGenders.join(','),
-        genderIdentities: selectedOptions.genderIdentities.join(','),
-        areas: selectedOptions.areas.join(','),
-        mapRegions: selectedOptions.mapRegions.join(','),
-        workshopTypes: selectedOptions.workshopTypes.join(','),
-    };
+    let filters = {};
+    Object.entries(selectedOptions).forEach(([category, selected]) => {
+        // Check if the category exists in categoryData and both selected and the corresponding categoryData[category] are not undefined
+        if (categoryData[category] && selected && categoryData[category].length !== undefined) {
+            if (selected.length < categoryData[category].length) {
+                filters[category] = selected.join(',');
+            }
+        } else if (selected !== 'ALL') { // Handle 'yearOfBirth' and similar single-value categories
+            filters[category] = selected;
+        }
+    });
 
-    // Conditionally add dates to the filters object
     if (startDate) filters.startDate = startDate.toISOString();
-    if (endDate) filters.endDate = endDate.toISOString();
-    
+    if (endDate) {
+      // If the end date is the same as the start date, adjust it to the end of the day
+      if (endDate.getTime() === startDate.getTime()) {
+        endDate.setHours(23, 59, 59); // Set to the end of the day
+      }
+      filters.endDate = endDate.toISOString();
+    }
+
+    // Handle season selection
+    if (selectedSeason && selectedSeason !== 'Custom') {
+      const { startDate, endDate } = getSeasonDateRange(selectedSeason);
+      filters.startDate = startDate.toISOString();
+      filters.endDate = endDate.toISOString();
+    } else {
+      // Handle custom date range selection
+      if (startDate) filters.startDate = startDate.toISOString();
+      if (endDate) {
+        // Adjust endDate to include the full day if it's the same as startDate
+        if (endDate.getTime() === startDate.getTime()) {
+          endDate.setHours(23, 59, 59);
+        }
+        filters.endDate = endDate.toISOString();
+      }
+    }
+
+    console.log('Sending request with filters:', filters); 
+
     try {
-        const result = await getClientStats(filters);
-        console.log(result);
-        setReportData(result); // Set the fetched data for display
-        setShowReport(true); // Show the report table
+        console.log('Filters to send:', filters)
+        const result = await getClientStats(filters); // Assuming getClientStats makes an API call and returns a promise
+        console.log("Fetched Report Data:", result); 
+        setReportData(result);
+        setShowReport(true);
     } catch (error) {
         console.error('Failed to fetch client stats:', error);
     }
 };
+
 
   // Function to select all options for a given category
   const handleSelectAll = (category) => {
@@ -253,6 +301,98 @@ const StatsReportForm = ({ headerTitle }) => {
       [category]: [],
     }));
   };
+
+  const resetForm = () => {
+    // Reset the selections for your existing filters
+    setSelectedOptions({
+      primaryGenders: [],
+      genderIdentities: [],
+      newcomerStatus: [],
+      selfIdentification: [],
+      areas: [],
+      mapRegions: [],
+      workshopTypes: [],
+      season: "",
+      yearOfBirth: "",
+    });
+  
+    // Reset additional UI components and their states
+    setPrimaryGenders(primaryGenders.map(gender => ({ ...gender, checked: false })));
+    setGenderIdentities(genderIdentities.map(identity => ({ ...identity, checked: false })));
+    setNewcomerStatus(newcomerStatus.map(status => ({ ...status, checked: false })));
+    setSelfIdentification(selfIdentification.map(option => ({ ...option, checked: false })));
+    setMapRegions(mapRegions.map(region => ({ ...region, checked: false })));
+    setWorkshopTypes(workshopTypes.map(workshop => ({ ...workshop, checked: false })));
+    setAreas(areas.map(area => ({ ...area, checked: false })));
+  
+    // Clearing the date and season selection states
+    setSelectedSeason("");
+    setStartDate(new Date()); 
+    setEndDate(null);
+    setDateRangeSelected(false);
+    setSeasonSelected(false);
+  
+    // Ensure the report is not shown after reset
+    setShowReport(false);
+  };  
+
+  const handleExport = () => {
+    // Convert arrays to strings and nulls to a friendly value
+    const dataForExport = reportData.map((item) => ({
+      ...item,
+      map_areas: item.map_areas ? item.map_areas.join(', ') : 'N/A', 
+      gender_identities: item.gender_identities ? item.gender_identities.join(', ') : 'N/A', 
+      self_identifications: item.self_identifications ? item.self_identifications.join(', ') : 'N/A', 
+    }));
+  
+    const ws = XLSX.utils.json_to_sheet(dataForExport);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "ReportData");
+    XLSX.writeFile(wb, "report.xlsx");
+  };
+
+  const getSeasonDateRange = (season) => {
+    const today = new Date();
+    let startDate, endDate;
+  
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth();
+  
+    switch (season) {
+      case 'Bike Season':
+        if (currentMonth >= 4 && currentMonth <= 8) { // May to September
+          // Current year's May 1st to today's date
+          startDate = new Date(currentYear, 4, 1);
+          endDate = today;
+        } else {
+          // Last year's May 1st to last year's September 30th
+          startDate = new Date(currentYear - 1, 4, 1);
+          endDate = new Date(currentYear - 1, 8, 30);
+        }
+        break;
+      case 'Off Season':
+        if (currentMonth >= 9 || currentMonth <= 3) { // October to April
+          // Last year's October 1st to today's date
+          startDate = new Date(currentYear - 1, 9, 1);
+          endDate = today;
+        } else {
+          // Current year's October 1st to next year's April 30th
+          startDate = new Date(currentYear, 9, 1);
+          endDate = new Date(currentYear + 1, 3, 30);
+        }
+        break;
+      case 'Whole Year':
+        // One year back from today's date
+        startDate = new Date(currentYear - 1, currentMonth, today.getDate());
+        endDate = today;
+        break;
+      default:
+        // If not within the season, return nulls
+        return { startDate: null, endDate: null };
+    }
+  
+    return { startDate, endDate };
+  };  
   
   return (
     <div className="max-w-4xl mx-auto shadow-lg rounded-lg overflow-hidden">
@@ -270,45 +410,28 @@ const StatsReportForm = ({ headerTitle }) => {
             startDate={startDate}
             endDate={endDate}
             onChange={onChange}
+            disabled={seasonSelected} 
             className="form-input rounded-md shadow-sm mt-1 block w-[200px]"
           />
         </div>
-      <div className="flex flex-col space-y-2">
+      {/* Season selection radio buttons */}
+        <div className="flex flex-col space-y-2">
           <h3 className="font-semibold text-lg">Season</h3>
           <div className="flex items-center space-x-4">
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input
-                type="radio"
-                name="season"
-                value="Bike Season"
-                checked={selectedSeason === "Bike Season"}
-                onChange={(e) => setSelectedSeason(e.target.value)}
-                className="radio radio-primary"
-              />
-              <span>Bike Season</span>
-            </label>
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input
-                type="radio"
-                name="season"
-                value="Off Season"
-                checked={selectedSeason === "Off Season"}
-                onChange={(e) => setSelectedSeason(e.target.value)}
-                className="radio radio-primary"
-              />
-              <span>Off Season</span>
-            </label>
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input
-                type="radio"
-                name="season"
-                value="Whole Year"
-                checked={selectedSeason === "Whole Year"}
-                onChange={(e) => setSelectedSeason(e.target.value)}
-                className="radio radio-primary"
-              />
-              <span>Whole Year</span>
-            </label>
+            {["Bike Season", "Off Season", "Whole Year"].map(season => (
+              <label key={season} className="flex items-center space-x-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="season"
+                  value={season}
+                  checked={selectedSeason === season}
+                  onChange={handleSeasonChange}
+                  disabled={dateRangeSelected} // Disable radio buttons when date range is selected
+                  className="radio radio-primary"
+                />
+                <span>{season}</span>
+              </label>
+            ))}
           </div>
         </div>
         <DropDown
@@ -395,14 +518,33 @@ const StatsReportForm = ({ headerTitle }) => {
             onSelectAll={() => handleSelectAll('workshopTypes')} 
             onUnselectAll={() => handleUnselectAll('workshopTypes')} 
         />
-        <Button
-          type="submit"
-          text="View Report"
-          className="mt-5"
-        />
+        <div className="flex justify-end space-x-4 mt-5">
+  <Button
+    type="button"
+    text="Reset"
+    onClick={resetForm}
+    className="bg-gray-300 text-black" // Example of making the reset button visually distinct
+  />
+  <Button
+    type="submit"
+    text="View Report"
+    className="bg-[#0f6a8b] text-white"
+  />
+</div>
       </form>
       {/* Conditionally render the ReportTable */}
-      {showReport && <ReportTable data={reportData} />}
+      {showReport && (
+        <>
+          <ReportTable data={reportData} />
+          <div className="mt-6 flex justify-center">
+            <Button
+              text="Export to Excel"
+              onClick={handleExport}
+              className="bg-[#0f6a8b] text-white font-bold py-2 px-4 rounded hover:bg-[#0d5a7a] transition ease-in duration-200"
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 };

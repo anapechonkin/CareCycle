@@ -13,7 +13,7 @@ const ReportTable = ({ data }) => {
     "Primary Gender",
     "Gender Identity",
     "Custom Gender",
-    "Postal Code Area",
+    "Area",
     "Map Area Name",
     "Workshop Name",
     "Year of Birth",
@@ -63,7 +63,7 @@ const ReportTable = ({ data }) => {
               <td style={tdStyle}>{item.primary_gender}</td>
               <td style={tdStyle}>{item.gender_identities ? item.gender_identities.join(', ') : 'N/A'}</td>
               <td style={tdStyle}>{item.custom_gender || "N/A"}</td>
-              <td style={tdStyle}>{item.area}</td>
+              <td style={tdStyle}>{item.area_name}</td>
               <td style={tdStyle}>{item.map_areas ? item.map_areas.join(', ') : 'N/A'}</td>
               <td style={tdStyle}>{item.workshop_name}</td>
               <td style={tdStyle}>{item.year_of_birth}</td>
