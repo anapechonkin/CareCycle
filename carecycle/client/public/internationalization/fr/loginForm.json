@@ -1,0 +1,12 @@
+{
+  "languageToggle": "EN/FR",  
+  "loginTitle": "CONNEXION À CARECYCLE",
+  "userTypePlaceholder": "Sélectionnez le type d'utilisateur",
+  "usernamePlaceholder": "Nom d'utilisateur",
+  "passwordPlaceholder": "Mot de passe",
+  "loginButton": "CONNEXION",
+  "forgotPassword": "Mot de passe oublié ?",
+  "Admin": "Administrateur",
+  "Volunteer": "Bénévole",
+  "CA/Employee": "CA/Employé"
+}

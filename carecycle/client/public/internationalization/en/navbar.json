@@ -1,0 +1,18 @@
+{
+    "userRoleAdmin": "Admin",
+    "userRoleVolunteer": "Volunteer",
+    "userRoleCAEmployee": "CA + Employees",
+    "dashboard": "DASHBOARD",
+    "logout": "LOGOUT",
+    "languageToggle": "FR/EN",
+    "specialContextQuestion": "Is there a special context to the activity today?",
+    "badWeather": "Bad Weather",
+    "excellentWeather": "Excellent Weather",
+    "specialEvent": "Special Event",
+    "nothingInParticular": "Nothing in Particular",
+    "other": "Other",
+    "pleaseSpecify": "Please specify",
+    "confirmLogout": "Confirm Logout",
+    "cancel": "Cancel"
+  }
+  

@@ -1,0 +1,18 @@
+{
+    "userRoleAdmin": "Administrateur",
+    "userRoleVolunteer": "Bénévole",
+    "userRoleCAEmployee": "CA + Employés",
+    "dashboard": "TABLEAU DE BORD",
+    "logout": "DÉCONNEXION",
+    "languageToggle": "EN/FR",
+    "specialContextQuestion": "Y a-t-il un contexte spécial pour l'activité d'aujourd'hui ?",
+    "badWeather": "Mauvais temps",
+    "excellentWeather": "Temps magnifique",
+    "specialEvent": "Événement spécial",
+    "nothingInParticular": "Rien de particulier",
+    "other": "Autre",
+    "pleaseSpecify": "Veuillez spécifier",
+    "confirmLogout": "Confirmer la déconnexion",
+    "cancel": "Annuler"
+  }
+  

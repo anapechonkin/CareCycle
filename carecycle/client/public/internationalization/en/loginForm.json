@@ -1,0 +1,12 @@
+{
+  "languageToggle": "FR/EN", 
+  "loginTitle": "LOG IN TO CARECYCLE",
+  "userTypePlaceholder": "Select User Type",
+  "usernamePlaceholder": "Username",
+  "passwordPlaceholder": "Password",
+  "loginButton": "LOGIN",
+  "forgotPassword": "Forgot Password?",
+  "Admin": "Admin",
+  "Volunteer": "Volunteer",
+  "CA/Employee": "CA/Employee"
+}

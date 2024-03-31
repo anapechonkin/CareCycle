@@ -50,17 +50,17 @@ const getClientStats = async (request, response) => {
     let query = `
         SELECT
             cs.cs_id, 
-            cs.year_of_birth, 
-            cs.custom_gender, 
-            cs.newcomer_comment, 
-            ns.status AS newcomer_status, 
-            pg.gender_name AS primary_gender,
-            ARRAY_AGG(DISTINCT ma.map_area_name) FILTER (WHERE ma.map_area_name IS NOT NULL) AS map_areas,
-            ARRAY_AGG(DISTINCT gi.type) FILTER (WHERE gi.type IS NOT NULL) AS gender_identities,
-            ARRAY_AGG(DISTINCT si.option) FILTER (WHERE si.option IS NOT NULL) AS self_identifications,
-            w.name AS workshop_name,
             p.postal_code,
-            a.area_name
+            a.area_name,
+            cs.year_of_birth, 
+            pg.gender_name AS primary_gender,
+            ARRAY_AGG(DISTINCT gi.type) FILTER (WHERE gi.type IS NOT NULL) AS gender_identities,
+            cs.custom_gender, 
+            ns.status AS newcomer_status, 
+            cs.newcomer_comment, 
+            ARRAY_AGG(DISTINCT si.option) FILTER (WHERE si.option IS NOT NULL) AS self_identifications,
+            ARRAY_AGG(DISTINCT ma.map_area_name) FILTER (WHERE ma.map_area_name IS NOT NULL) AS map_areas,
+            w.name AS workshop_name
         FROM 
             carecycle.ClientStats cs
             LEFT JOIN carecycle.NewcomerStatus ns ON cs.newcomer_status_id = ns.newcomer_status_id
