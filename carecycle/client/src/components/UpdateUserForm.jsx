@@ -37,7 +37,9 @@ const UpdateUserForm = ({ onAddUser, users }) => {
   const [selectedMapAreas, setSelectedMapAreas] = useState([]);
   const [genderCheckboxOptions, setGenderCheckboxOptions] = useState([]);
   const [mapAreaCheckboxOptions, setMapAreaCheckboxOptions] = useState([]);
-
+  const PREFER_NOT_TO_ANSWER_GENDER_ID = 1; 
+  const PREFER_NOT_TO_ANSWER_MAP_ID = 1;
+  
   useEffect(() => {
     async function fetchData() {
       const userTypesData = await fetchUserTypes();
@@ -147,25 +149,85 @@ const UpdateUserForm = ({ onAddUser, users }) => {
   };
 
   const handleGenderIdentityCheckboxChange = (event, option) => {
-    const originalId = option.id.replace('gender-', '');
-    const newId = parseInt(originalId, 10); // Convert newId to a number
-    
-    const updatedSelections = event.target.checked
-        ? [...selectedGenderIdentities, newId] // Add newId as a number
-        : selectedGenderIdentities.filter(id => id !== newId); // Correctly filter out using number comparison
+    const id = parseInt(option.id.replace('gender-', ''), 10); // Ensure correct parsing
+  
+    // Handling "Prefer Not to Answer" selection
+    if (id === PREFER_NOT_TO_ANSWER_GENDER_ID) {
+      if (event.target.checked) {
+        setSelectedGenderIdentities([id]);
+        setGenderCheckboxOptions(genderCheckboxOptions.map(opt => ({
+          ...opt,
+          checked: opt.id === `gender-${id}`,
+        })));
+      } else {
+        setSelectedGenderIdentities([]);
+        setGenderCheckboxOptions(genderCheckboxOptions.map(opt => ({
+          ...opt,
+          checked: false,
+        })));
+      }
+    } else {
+      const isPNASelected = selectedGenderIdentities.includes(PREFER_NOT_TO_ANSWER_GENDER_ID);
+      const isSelected = selectedGenderIdentities.includes(id);
+      if (event.target.checked && isPNASelected) {
+        // If PNA is selected and user selects another, remove PNA and add new selection
+        setSelectedGenderIdentities([id]);
+      } else if (event.target.checked && !isSelected) {
+        // Add new selection without PNA logic
+        setSelectedGenderIdentities(prev => [...prev.filter(identityId => identityId !== PREFER_NOT_TO_ANSWER_GENDER_ID), id]);
+      } else {
+        // Remove selection
+        setSelectedGenderIdentities(prev => prev.filter(identityId => identityId !== id));
+      }
+      
+      // Update checkboxes
+      setGenderCheckboxOptions(genderCheckboxOptions.map(opt => ({
+        ...opt,
+        checked: selectedGenderIdentities.includes(parseInt(opt.id.replace('gender-', ''), 10)),
+      })));
+    }
+  };
+  
 
-    setSelectedGenderIdentities(updatedSelections);
-};
-
-const handleMapAreasCheckboxesChange = (event, option) => {
-  const originalId = option.id.replace('map-', '');
-  const newId = parseInt(originalId, 10); // Convert newId to a number
-  const updatedSelections = event.target.checked
-      ? [...selectedMapAreas, newId] // Add newId as a number
-      : selectedMapAreas.filter(id => id !== newId); // Correctly filter out using number comparison
-
-  setSelectedMapAreas(updatedSelections);
-};
+  const handleMapAreasCheckboxesChange = (event, option) => {
+    const id = parseInt(option.id.replace('map-', ''), 10); // Ensure correct parsing
+  
+    if (id === PREFER_NOT_TO_ANSWER_MAP_ID) {
+      if (event.target.checked) {
+        setSelectedMapAreas([id]);
+        setMapAreaCheckboxOptions(mapAreaCheckboxOptions.map(opt => ({
+          ...opt,
+          checked: opt.id === `map-${id}`,
+        })));
+      } else {
+        setSelectedMapAreas([]);
+        setMapAreaCheckboxOptions(mapAreaCheckboxOptions.map(opt => ({
+          ...opt,
+          checked: false,
+        })));
+      }
+    } else {
+      const isPNASelected = selectedMapAreas.includes(PREFER_NOT_TO_ANSWER_MAP_ID);
+      const isSelected = selectedMapAreas.includes(id);
+      if (event.target.checked && isPNASelected) {
+        // Remove PNA and add new selection
+        setSelectedMapAreas([id]);
+      } else if (event.target.checked && !isSelected) {
+        // Add new selection without PNA logic
+        setSelectedMapAreas(prev => [...prev.filter(mapId => mapId !== PREFER_NOT_TO_ANSWER_MAP_ID), id]);
+      } else {
+        // Remove selection
+        setSelectedMapAreas(prev => prev.filter(mapId => mapId !== id));
+      }
+  
+      // Update checkboxes
+      setMapAreaCheckboxOptions(mapAreaCheckboxOptions.map(opt => ({
+        ...opt,
+        checked: selectedMapAreas.includes(parseInt(opt.id.replace('map-', ''), 10)),
+      })));
+    }
+  };
+  
 
 
   const isValidEmail = (email) => {

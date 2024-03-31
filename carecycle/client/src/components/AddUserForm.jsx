@@ -62,20 +62,52 @@ const AddUserForm = ({ onAddUser }) => {
     fetchData();
   }, []);
 
-  const handleGenderIdentityCheckboxChange = (event, option) => {
-    const id = parseInt(option.id.replace('gender_', ''), 10);
+const PREFER_NOT_TO_ANSWER_GENDER_ID = 1;
 
-    const updatedGenderIdentities = genderIdentities.map(identity =>
-      identity.id === option.id ? { ...identity, checked: event.target.checked } : identity
-    );
-    setGenderIdentities(updatedGenderIdentities);
+const handleGenderIdentityCheckboxChange = (event, option) => {
+  const id = parseInt(option.id.replace('gender_', ''), 10);
 
+  if (id === PREFER_NOT_TO_ANSWER_GENDER_ID) {
     if (event.target.checked) {
-      setSelectedGenderIdentities(prev => [...prev, id]);
+      // If "Prefer Not to Answer" is selected, clear all other selections
+      setSelectedGenderIdentities([id]);
+      setGenderIdentities(genderIdentities.map(identity => ({
+        ...identity,
+        checked: identity.gender_identity_id === PREFER_NOT_TO_ANSWER_GENDER_ID,
+      })));
     } else {
-      setSelectedGenderIdentities(prev => prev.filter(selectedId => selectedId !== id));
+      // Allow user to deselect "Prefer Not to Answer"
+      setSelectedGenderIdentities([]);
+      setGenderIdentities(genderIdentities.map(identity => ({
+        ...identity,
+        checked: false,
+      })));
     }
-  };
+  } else {
+    if (event.target.checked) {
+      // Deselect "Prefer Not to Answer" if other options are selected
+      setSelectedGenderIdentities(prev => [
+        ...prev.filter(identityId => identityId !== PREFER_NOT_TO_ANSWER_GENDER_ID),
+        id
+      ]);
+      setGenderIdentities(genderIdentities.map(identity => {
+        if (identity.gender_identity_id === id) {
+          return { ...identity, checked: true };
+        } else if (identity.gender_identity_id === PREFER_NOT_TO_ANSWER_GENDER_ID) {
+          return { ...identity, checked: false };
+        }
+        return identity;
+      }));
+    } else {
+      // Simply remove the deselected ID from selections
+      setSelectedGenderIdentities(prev => prev.filter(identityId => identityId !== id));
+      setGenderIdentities(genderIdentities.map(identity => ({
+        ...identity,
+        checked: identity.gender_identity_id === id ? false : identity.checked,
+      })));
+    }
+  }
+};
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -176,15 +208,46 @@ const AddUserForm = ({ onAddUser }) => {
     }
   };  
 
+  const PREFER_NOT_TO_ANSWER_MAP_ID = 1; 
+
   const handleMapCheckboxChange = (event, option) => {
     const id = parseInt(option.id.replace('map_', ''), 10);
-
-    const updatedMapAreas = mapAreas.map(area =>
-      area.id === option.id ? { ...area, checked: event.target.checked } : area
-    );
-    setMapAreas(updatedMapAreas);
-  };
-
+  
+    if (id === PREFER_NOT_TO_ANSWER_MAP_ID) {
+      if (event.target.checked) {
+        // If "Prefer Not to Answer" is selected, deselect all others and only keep this option
+        setMapAreas(mapAreas.map(area => ({
+          ...area,
+          checked: area.map_id === PREFER_NOT_TO_ANSWER_MAP_ID,
+        })));
+      } else {
+        // Allow user to deselect "Prefer Not to Answer" and clear all selections
+        setMapAreas(mapAreas.map(area => ({
+          ...area,
+          checked: false,
+        })));
+      }
+    } else {
+      if (event.target.checked) {
+        // Deselect "Prefer Not to Answer" if other options are selected and keep the current selection
+        setMapAreas(mapAreas.map(area => {
+          if (area.map_id === id) {
+            return { ...area, checked: true };
+          } else if (area.map_id === PREFER_NOT_TO_ANSWER_MAP_ID) {
+            return { ...area, checked: false };
+          }
+          return area;
+        }));
+      } else {
+        // Simply remove the deselected ID from selections
+        setMapAreas(mapAreas.map(area => ({
+          ...area,
+          checked: area.map_id === id ? false : area.checked,
+        })));
+      }
+    }
+  };  
+  
   const renderTextInput = (name, placeholder, value, isPassword = false) => (
     <input
       type={isPassword ? "password" : "text"}
