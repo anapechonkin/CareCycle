@@ -1,27 +1,76 @@
 // LoginForm.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext"; // Adjust the import path as needed
 import Button from "./Button"; // Adjust the import path as needed
 import DropDown from "./DropDown"; // Adjust the import path as needed
 import { useTranslation } from 'react-i18next';
+import { fetchUserTypes } from '../api/dropdownApi';
 
 const LoginForm = () => {
+  const [formData, setFormData] = useState({
+    userTypeID: '', 
+    username: '',
+    password: '',
+    // Add other form fields as necessary
+  });
+  
   const { setUserType } = useUser();
   const [localUserType, setLocalUserType] = useState('');
+  const [userTypes, setUserTypes] = useState([]); 
+  const [loading, setLoading] = useState(true);
   const { t, i18n } = useTranslation('loginForm');
   const navigate = useNavigate();
 
-  const handleUserTypeChange = (selectedOption) => {
-    setLocalUserType(selectedOption); 
+  // Fetch user types from the API
+  useEffect(() => {
+    let isMounted = true;
+    const loadUserTypes = async () => {
+      try {
+        const types = await fetchUserTypes();
+        if (isMounted) {
+          setUserTypes(types);
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error("Error fetching user types:", error);
+        if (isMounted) setLoading(false);
+      }
+    };
+  
+    loadUserTypes();
+    return () => {
+      isMounted = false;
+    };
+  }, []);  
+
+  useEffect(() => {
+    console.log("Checking generated translation keys:");
+    userTypes.forEach(type => {
+      console.log(`Generated key for ${type.role}: userTypes.${type.role.replace('/', '_')}`);
+    });
+  }, [userTypes, t]); 
+
+  const handleDropdownChange = (name, value) => {
+    setFormData(prevFormData => ({
+      ...prevFormData,
+      [name]: value,
+    }));
   };
 
-  const handleSubmit = (event) => {
+  console.log("Manual test for CA_Employee translation:", t('userTypes.CA_Employee'));
+  
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    setUserType(localUserType || 'admin'); // Hardcode to 'Admin' or use the selected value
-    console.log('User Type set to:', localUserType || 'admin');
-    // Here, add your authentication logic
-    navigate('/dashboard'); // Navigate after successful login
+    try {
+      await setUserType(localUserType || 'admin');
+      console.log('User Type set to:', localUserType || 'admin');
+      // Ensure navigation only occurs after the state is updated
+      navigate('/dashboard');
+    } catch (error) {
+      console.error("Error during login:", error);
+      // Handle error (e.g., showing an error message to the user)
+    }
   };
 
   const handleForgotPasswordClick = (event) => {
@@ -31,6 +80,10 @@ const LoginForm = () => {
   };
 
   const isMobile = window.innerWidth < 768;
+
+  if (loading) {
+    return <div>Loading...</div>; // Render loading state
+  }
 
   return (
     <form
@@ -50,10 +103,14 @@ const LoginForm = () => {
         </div>
         <h2 className="text-2xl font-medium text-gray-700 mb-4 text-center">{t('loginForm:loginTitle')}</h2>
         <DropDown
-          options={[t('loginForm:Admin'), t('loginForm:Volunteer'), t('loginForm:CA/Employee')]}
+          options={userTypes.map(type => ({
+            // Replace or adjust the role string to match the new key format
+            label: t(`userTypes.${type.role.replace('/', '_')}`), 
+            value: type.usertype_id
+          }))}
           placeholder={t('loginForm:userTypePlaceholder')}
-          selectedOption={localUserType}
-          onSelect={handleUserTypeChange}
+          selectedValue={formData.userType}
+          onSelect={(value) => handleDropdownChange('userType', value)}
         />
         <input
           type="text"

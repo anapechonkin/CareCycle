@@ -6,7 +6,9 @@
   "passwordPlaceholder": "Mot de passe",
   "loginButton": "CONNEXION",
   "forgotPassword": "Mot de passe oublié ?",
-  "Admin": "Administrateur",
-  "Volunteer": "Bénévole",
-  "CA/Employee": "CA/Employé"
+  "userTypes": {
+    "Admin": "Administrateur",
+    "Volunteer": "Bénévole",
+    "CA_Employee": "CA/Employé"
+  }
 }
