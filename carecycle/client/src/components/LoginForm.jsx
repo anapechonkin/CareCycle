@@ -1,5 +1,5 @@
 // LoginForm.js
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, startTransition } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext"; // Adjust the import path as needed
 import Button from "./Button"; // Adjust the import path as needed
@@ -16,7 +16,7 @@ const LoginForm = () => {
   });
   
   const { setUserType } = useUser();
-  const [localUserType, setLocalUserType] = useState('');
+  //const [localUserType, setLocalUserType] = useState('');
   const [userTypes, setUserTypes] = useState([]); 
   const [loading, setLoading] = useState(true);
   const { t, i18n } = useTranslation('loginForm');
@@ -44,12 +44,12 @@ const LoginForm = () => {
     };
   }, []);  
 
-  useEffect(() => {
-    console.log("Checking generated translation keys:");
-    userTypes.forEach(type => {
-      console.log(`Generated key for ${type.role}: userTypes.${type.role.replace('/', '_')}`);
-    });
-  }, [userTypes, t]); 
+  // useEffect(() => {
+  //   console.log("Checking generated translation keys:");
+  //   userTypes.forEach(type => {
+  //     console.log(`Generated key for ${type.role}: userTypes.${type.role.replace('/', '_')}`);
+  //   });
+  // }, [userTypes, t]); 
 
   const handleDropdownChange = (name, value) => {
     setFormData(prevFormData => ({
@@ -58,20 +58,29 @@ const LoginForm = () => {
     }));
   };
 
-  console.log("Manual test for CA_Employee translation:", t('userTypes.CA_Employee'));
+  //console.log("Manual test for CA_Employee translation:", t('userTypes.CA_Employee'));
   
   const handleSubmit = async (event) => {
     event.preventDefault();
+  
+    // Temporarily hardcode the user type as "admin"
+    const hardCodedUserType = 'admin';
+    
     try {
-      await setUserType(localUserType || 'admin');
-      console.log('User Type set to:', localUserType || 'admin');
-      // Ensure navigation only occurs after the state is updated
-      navigate('/dashboard');
+      // Set the user type to "admin" without waiting for user input
+      await setUserType(hardCodedUserType);
+      console.log('User Type set to:', hardCodedUserType);
+  
+      // Use startTransition for navigation to make it smoother and prevent any potential issues
+      startTransition(() => {
+        navigate('/dashboard');
+      });
     } catch (error) {
       console.error("Error during login:", error);
       // Handle error (e.g., showing an error message to the user)
     }
   };
+  
 
   const handleForgotPasswordClick = (event) => {
     event.preventDefault();

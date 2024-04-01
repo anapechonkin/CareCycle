@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 
-const DropDown = ({ options, placeholder, onSelect, selectedValue }) => {
+const DropDown = ({ options, placeholder, onSelect, selectedValue, disabled }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const toggleDropdown = () => setIsOpen(!isOpen);
+  const toggleDropdown = () => !disabled && setIsOpen(!isOpen);
 
   const isOptionObject = (option) => typeof option === 'object' && option !== null && 'label' in option && 'value' in option;
 
@@ -25,8 +25,9 @@ const DropDown = ({ options, placeholder, onSelect, selectedValue }) => {
   return (
     <div className="relative w-full">
       <div
-        className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200 cursor-pointer text-base flex justify-between items-center bg-white"
-        onClick={toggleDropdown}
+        className={`block w-full p-3 mb-4 border rounded-lg focus:outline-none transition duration-200 text-base flex justify-between items-center 
+          ${disabled ? 'bg-gray-100 text-black cursor-not-allowed' : 'border-gray-300 focus:ring-2 focus:ring-[#16839B] cursor-pointer bg-white'}`}
+        onClick={!disabled ? toggleDropdown : undefined}
       >
         <span>{selectedOptionLabel || placeholder}</span>
         <span className={`transform transition-transform duration-200 ${isOpen ? "rotate-180" : "rotate-0"}`}>

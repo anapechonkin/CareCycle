@@ -33,24 +33,37 @@ const DeleteUserForm = ({ onUsersChanged }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (selectedUser && selectedUser.value) {
-      try {
-        await softDeleteUser(selectedUser.value);
-        setFeedbackMessage("User successfully archived.");
-        setFeedbackType("success");
-        setClearSelect(true);
+  
+    // A helper function to manage feedback messages
+    const handleFeedback = (message, type) => {
+      setFeedbackMessage(message);
+      setFeedbackType(type);
+      // Automatically clear feedback message after 3 seconds
+      setTimeout(() => {
+        setFeedbackMessage("");
+        setFeedbackType("");
+      }, 3000);
+    };
+  
+    if (!selectedUser || !selectedUser.value) {
+      handleFeedback("No user selected.", "error");
+      return; // Exit if no user is selected
+    }
+  
+    try {
+      await softDeleteUser(selectedUser.value);
+      console.log("User successfully archived:", selectedUser);
+      handleFeedback("User successfully archived.", "success");
+      setClearSelect(true); // Clear the select input after successful deletion
+      if (typeof onUsersChanged === "function") {
         onUsersChanged(); // Propagate change upwards to trigger a re-fetch or other actions
-      } catch (error) {
-        console.error('Error deleting user:', error);
-        setFeedbackMessage("Failed to archive user.");
-        setFeedbackType("error");
       }
-    } else {
-      setFeedbackMessage("No user selected.");
-      setFeedbackType("error");
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      handleFeedback("Failed to archive user.", "error");
     }
   };
-
+  
   const handleSelectChange = (selectedOption) => {
     setSelectedUser(selectedOption ? selectedOption : null);
   };

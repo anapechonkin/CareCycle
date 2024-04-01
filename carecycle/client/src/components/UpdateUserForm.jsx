@@ -142,11 +142,18 @@ const UpdateUserForm = ({ onAddUser, users }) => {
   };
 
   const handleChange = ({ target: { name, value, checked, type } }) => {
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
-  };
+    console.log(`Before change:`, { ...formData }); // Log current state before change
+    
+    setFormData(prev => {
+      const newState = {
+        ...prev,
+        [name]: type === 'checkbox' ? checked : value,
+      };
+      
+      console.log(`After change:`, { ...newState }); // Log what the new state will be
+      return newState;
+    });
+  };  
 
   const handleGenderIdentityCheckboxChange = (event, option) => {
     const id = parseInt(option.id.replace('gender-', ''), 10); // Ensure correct parsing
@@ -228,8 +235,6 @@ const UpdateUserForm = ({ onAddUser, users }) => {
     }
   };
   
-
-
   const isValidEmail = (email) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
@@ -270,32 +275,33 @@ const UpdateUserForm = ({ onAddUser, users }) => {
   
       // Update the user information.
       const updateResponse = await updateUser(selectedUserId, userInfoToUpdate);
-      console.log("User Update Response:", updateResponse);
   
-      // Handle gender identities update
-      let genderIdentitiesUpdateResponse;
+      // Log updated user info to the console
+      console.log('Updated User Info:', userInfoToUpdate);
+
+      // Handle gender identities and map areas updates only if needed.
       if (formData.primaryGenderId === 4 && selectedGenderIdentities.length > 0) {
-        genderIdentitiesUpdateResponse = await updateUserGenderIdentities(selectedUserId, selectedGenderIdentities);
-      } else {
-        genderIdentitiesUpdateResponse = await updateUserGenderIdentities(selectedUserId, []);
+        await updateUserGenderIdentities(selectedUserId, selectedGenderIdentities);
       }
-      console.log("Gender Identities Update Response:", genderIdentitiesUpdateResponse);
   
-      // Handle map areas update
-      let mapAreasUpdateResponse = {};
       if (selectedMapAreas.length > 0) {
-        mapAreasUpdateResponse = await updateUserMapAreas(selectedUserId, selectedMapAreas);
+        await updateUserMapAreas(selectedUserId, selectedMapAreas);
       }
-      console.log("Map Areas Update Response:", mapAreasUpdateResponse);
+
+      // Map selected IDs to their detailed objects for logging
+      const detailedGenderIdentities = selectedGenderIdentities.map(id => 
+        genderIdentities.find(identity => identity.gender_identity_id === id)
+      );
+      const detailedMapAreas = selectedMapAreas.map(id => 
+        mapAreas.find(area => area.map_id === id)
+      );
+      console.log('Updated Gender Identities:', detailedGenderIdentities);
+      console.log('Updated Map Areas:', detailedMapAreas);
   
-      // Fetch and log the updated user data
-      const updatedUserData = await getUserById(selectedUserId);
-      console.log("Updated User Data:", updatedUserData);
-  
-      // Provide success feedback
+      // Provide success feedback and potentially update user list or other parent component states
       setFeedback({ message: 'User updated successfully!', type: 'success' });
       if (typeof onAddUser === 'function') {
-        await onAddUser(); // Confirm this function's intended use and ensure it's properly defined.
+        onAddUser();
       }
   
       // Reset form data and clear selections
@@ -317,10 +323,8 @@ const UpdateUserForm = ({ onAddUser, users }) => {
       setSelectedGenderIdentities([]);
       setSelectedMapAreas([]);
   
-      // Optionally, reset checkboxes or other UI elements as necessary
-  
+      // Clear the feedback message after some time
       setTimeout(() => {
-        // Optionally clear the feedback message after some time
         setFeedback({ message: '', type: '' });
       }, 5000);
     } catch (error) {
@@ -328,8 +332,7 @@ const UpdateUserForm = ({ onAddUser, users }) => {
       setFeedback({ message: `Failed to update user: ${error.message}`, type: 'error' });
       // Consider if you need to reset form state or perform other cleanup here in case of an error
     }
-  };
-  
+  };  
   
   // Preparing user options for the dropdown
   const userOptions = Array.isArray(users) ? users.map(user => ({
@@ -357,10 +360,18 @@ const UpdateUserForm = ({ onAddUser, users }) => {
     }),
   };
 
+  // Only display the notice if a user is selected and the user is archived
+  const archivedNotice = selectedUserId && !formData.isActive ? (
+    <div className="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4 mb-4" role="alert">
+      <p>This user is archived and can only be modified if the active status is updated.</p>
+    </div>
+  ) : null;
+
   return (
     <div className="bg-white shadow rounded-lg p-8">
       <h2 className="text-3xl font-semibold text-center text-gray-800 mb-6">Update User</h2>
-  
+      {/* Notice for Archived Users */}
+      {archivedNotice}
       <div className="flex justify-center gap-4 mb-4">
         {['all', 'active', 'archived'].map(f => (
           <button
@@ -398,6 +409,7 @@ const UpdateUserForm = ({ onAddUser, users }) => {
             name="username"
             value={formData.username}
             onChange={handleChange}
+            disabled={selectedUserId && !formData.isActive}
             className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200"
           />
         </div>
@@ -410,6 +422,7 @@ const UpdateUserForm = ({ onAddUser, users }) => {
             name="email"
             value={formData.email}
             onChange={handleChange}
+            disabled={selectedUserId && !formData.isActive}
             className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200"
           />
         </div>
@@ -421,6 +434,7 @@ const UpdateUserForm = ({ onAddUser, users }) => {
             selectedValue={formData.userTypeID}
             onSelect={(value) => handleSelectChange('userTypeID', { value })}
             placeholder="Select User Type"
+            disabled={selectedUserId && !formData.isActive}
           />
         </div>
   
@@ -431,7 +445,7 @@ const UpdateUserForm = ({ onAddUser, users }) => {
             handleChange({
               target: {
                 name: "isActive",
-                value: event.target.checked,
+                checked: event.target.checked, // Make sure this is correctly capturing the checkbox's checked state
                 type: 'checkbox',
               },
             });
@@ -446,6 +460,7 @@ const UpdateUserForm = ({ onAddUser, users }) => {
             name="firstName"
             value={formData.firstName}
             onChange={handleChange}
+            disabled={selectedUserId && !formData.isActive}
             className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200"
           />
         </div>
@@ -458,6 +473,7 @@ const UpdateUserForm = ({ onAddUser, users }) => {
             name="lastName"
             value={formData.lastName}
             onChange={handleChange}
+            disabled={selectedUserId && !formData.isActive}
             className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200"
           />
         </div>
@@ -472,6 +488,7 @@ const UpdateUserForm = ({ onAddUser, users }) => {
             selectedValue={formData.primaryGenderId}
             onSelect={value => handleDropdownChange('primaryGenderId', value)}
             placeholder="Select Primary Gender Identity"
+            disabled={selectedUserId && !formData.isActive}
           />
         </div>
   
@@ -482,6 +499,7 @@ const UpdateUserForm = ({ onAddUser, users }) => {
             title="Gender Identities"
             options={genderCheckboxOptions}
             onChange={handleGenderIdentityCheckboxChange}
+            disabled={selectedUserId && !formData.isActive}
           />
         </div>
   
@@ -493,6 +511,7 @@ const UpdateUserForm = ({ onAddUser, users }) => {
             name="yearOfBirth"
             value={formData.yearOfBirth}
             onChange={handleChange}
+            disabled={selectedUserId && !formData.isActive}
             className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200"
           />
         </div>
@@ -504,6 +523,7 @@ const UpdateUserForm = ({ onAddUser, users }) => {
             title="Map Areas"
             options={mapAreaCheckboxOptions}
             onChange={handleMapAreasCheckboxesChange}
+            disabled={selectedUserId && !formData.isActive}
           />
         </div>
   
@@ -515,6 +535,7 @@ const UpdateUserForm = ({ onAddUser, users }) => {
             name="postalCode"
             value={formData.postalCode} // Ensure this uses postalCode, not postalCodeId
             onChange={handleChange}
+            disabled={selectedUserId && !formData.isActive}
             className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200"
           />
         </div>
@@ -527,6 +548,7 @@ const UpdateUserForm = ({ onAddUser, users }) => {
             name="vegetable"
             value={formData.vegetable}
             onChange={handleChange}
+            disabled={selectedUserId && !formData.isActive}
             className="block w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16839B] transition duration-200"
           />
         </div>

@@ -1,3 +1,4 @@
+import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { UserProvider } from './context/UserContext';
 import LoginPage from './pages/LoginPage';
@@ -11,26 +12,67 @@ import Dashboard from './pages/Dashboard';
 import UserAccountPage from './pages/UserAccountPage'; 
 import ClientStatsReportPage from './pages/ClientStatsReportPage'; 
 import { FormProvider } from './context/FormContext';
+import ErrorBoundary from './components/ErrorBoundary'; // Ensure this path is correct
 
 function App() {
   return (
     <UserProvider>
       <Router>
-         <FormProvider>
-                <Routes>
-                  <Route path="/" element={<LoginPage />} />
-                  <Route path="/startQuestionnaire" element={<StartQuestionnairePage />} />
-                  <Route path="/pageOneQuestionnaire" element={<PageOneQuestionnaire />} />
-                  <Route path="/pageTwoQuestionnaire" element={<PageTwoQuestionnaire />} />
-                  <Route path="/pageTwoExtraQuestionnaire" element={<PageTwoExtraQuestionnaire />} />
-                  <Route path="/pageThreeQuestionnaire" element={<PageThreeQuestionnaire />} />
-                  <Route path="/pageFourQuestionnaire" element={<PageFourQuestionnaire />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/userAccount" element={<UserAccountPage />} /> 
-                  <Route path="/clientStatsReport" element={<ClientStatsReportPage />} /> 
-                </Routes>
-           </FormProvider>
-        </Router>
+        <FormProvider>
+          <Routes>
+            <Route path="/" element={
+              <ErrorBoundary>
+                <LoginPage />
+              </ErrorBoundary>} 
+            />
+            <Route path="/startQuestionnaire" element={
+              <ErrorBoundary>
+                <StartQuestionnairePage />
+              </ErrorBoundary>} 
+            />
+            <Route path="/pageOneQuestionnaire" element={
+              <ErrorBoundary>
+                <PageOneQuestionnaire />
+              </ErrorBoundary>} 
+            />
+            <Route path="/pageTwoQuestionnaire" element={
+              <ErrorBoundary>
+                <PageTwoQuestionnaire />
+              </ErrorBoundary>} 
+            />
+            <Route path="/pageTwoExtraQuestionnaire" element={
+              <ErrorBoundary>
+                <PageTwoExtraQuestionnaire />
+              </ErrorBoundary>} 
+            />
+            <Route path="/pageThreeQuestionnaire" element={
+              <ErrorBoundary>
+                <PageThreeQuestionnaire />
+              </ErrorBoundary>} 
+            />
+            <Route path="/pageFourQuestionnaire" element={
+              <ErrorBoundary>
+                <PageFourQuestionnaire />
+              </ErrorBoundary>} 
+            />
+            <Route path="/dashboard" element={
+              <ErrorBoundary>
+                <Dashboard />
+              </ErrorBoundary>} 
+            />
+            <Route path="/userAccount" element={
+              <ErrorBoundary>
+                <UserAccountPage />
+              </ErrorBoundary>} 
+            /> 
+            <Route path="/clientStatsReport" element={
+              <ErrorBoundary>
+                <ClientStatsReportPage />
+              </ErrorBoundary>} 
+            /> 
+          </Routes>
+        </FormProvider>
+      </Router>
     </UserProvider>
   );
 }
