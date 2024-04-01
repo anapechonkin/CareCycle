@@ -1,0 +1,14 @@
+{
+      "titleStartQuestionnaire": "Questionnaire Statistiques Client",
+      "chooseActivity": "Choisissez le Type d'Activité",
+      "startButtonQuestionnaire": "COMMENCER LE QUESTIONNAIRE",
+      "modalContentSelectWorkshop": "Veuillez sélectionner un atelier avant de commencer le questionnaire.",
+      "okButton": "OK",
+      "workshops": {
+        "Wednesday_DIY": "DIY Mercredi",
+        "Regular_DIY": "DIY Régulier",
+        "Moonday": "Lundi Lune",
+        "Special_Event": "Événement Spécial",
+        "Other": "Autre"
+      }
+  }

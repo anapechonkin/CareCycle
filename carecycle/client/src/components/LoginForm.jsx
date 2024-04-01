@@ -114,7 +114,7 @@ const LoginForm = () => {
         <DropDown
           options={userTypes.map(type => ({
             // Replace or adjust the role string to match the new key format
-            label: t(`userTypes.${type.role.replace('/', '_')}`), 
+            label: t(`loginForm:userTypes.${type.role.replace('/', '_')}`), 
             value: type.usertype_id
           }))}
           placeholder={t('loginForm:userTypePlaceholder')}

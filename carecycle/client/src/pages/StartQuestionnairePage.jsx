@@ -9,12 +9,14 @@ import Modal from "../components/Modal";
 import { useNavigate } from "react-router-dom";
 import { useForm } from '../context/FormContext';
 import { fetchWorkshops } from "../api/dropdownApi";
+import { useTranslation } from 'react-i18next';
 
 const StartQuestionnairePage = () => {
   const [workshops, setWorkshops] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
   const { workshopId, setWorkshopId, setWorkshopName } = useForm();
+  const { t } = useTranslation('startQuestionnaire');
 
   useEffect(() => {
     const loadWorkshops = async () => {
@@ -22,7 +24,7 @@ const StartQuestionnairePage = () => {
         const workshopsData = await fetchWorkshops();
         setWorkshops(workshopsData.map(workshop => ({
           value: workshop.workshop_id, 
-          label: workshop.name
+          label: t(`startQuestionnaire:workshops.${workshop.name.replace(/[\s/]/g, '_')}`)
         })));
       } catch (error) {
         console.error("Error loading workshops:", error);
@@ -30,7 +32,7 @@ const StartQuestionnairePage = () => {
     };
 
     loadWorkshops();
-  }, []);
+  }, [t]); // Include t in the dependency array to reload workshops when language changes
 
   const handleSelect = (selectedOptionValue) => {
     // Set the workshop ID in the context
@@ -66,10 +68,10 @@ const StartQuestionnairePage = () => {
       <Shadow />
       <div className="flex-grow pt-20 pb-20 mt-24 flex flex-col items-center justify-center w-full">
         <div className="max-w-[800px] w-full px-4 lg:px-8 space-y-12">
-          <h1 className="text-6xl font-bold mb-16 text-center text-[#704218]">Client Stats Questionnaire</h1>
+          <h1 className="text-6xl font-bold mb-16 text-center text-[#704218]">{t('startQuestionnaire:titleStartQuestionnaire')}</h1>
           <Dropdown
             options={workshops}
-            placeholder="Choose Type of Activity"
+            placeholder={t('startQuestionnaire:chooseActivity')}
             onSelect={handleSelect}
             selectedValue={workshopId}
           />
@@ -82,13 +84,13 @@ const StartQuestionnairePage = () => {
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
             onConfirm={() => setIsModalOpen(false)}
-            htmlContent="<p>Please select a workshop before starting the questionnaire.</p>"
+            htmlContent={t('startQuestionnaire:modalContentSelectWorkshop')}
             showOkButton={true}
-            okButtonText="OK"
+            okButtonText={t('startQuestionnaire:okButton')}
           />
           <Button 
             onClick={handleClick}
-            text="START QUESTIONNAIRE"
+            text={t('startQuestionnaire:startButtonQuestionnaire')}
             className="text-white bg-[#16839B] hover:bg-[#0f6a8b] font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-150 ease-in-out"
           />
         </div>

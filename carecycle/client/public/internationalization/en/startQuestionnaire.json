@@ -1,0 +1,15 @@
+{
+    "titleStartQuestionnaire": "Client Stats Questionnaire",
+    "chooseActivity": "Choose Type of Activity",
+    "startButtonQuestionnaire": "START QUESTIONNAIRE",
+    "modalContentSelectWorkshop": "Please select a workshop before starting the questionnaire.",
+    "okButton": "OK",
+    "workshops": {
+      "Wednesday_DIY": "Wednesday DIY",
+      "Regular_DIY": "Regular DIY",
+      "Moonday": "Moonday",
+      "Special_Event": "Special Event",
+      "Other": "Other"
+    }
+  }
+  
