@@ -59,7 +59,6 @@ const StartQuestionnairePage = () => {
       navigate('/pageOneQuestionnaire');
     }
   };
-  
 
   return (
     <div className="flex flex-col min-h-screen bg-[#f6cdd0]">

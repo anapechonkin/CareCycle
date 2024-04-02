@@ -9,6 +9,8 @@ import Checkbox from '../components/Checkbox';
 import Modal from '../components/Modal';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from '../context/FormContext';
+import { fetchPreferredLanguage } from '../api/dropdownApi';
+import { useTranslation } from 'react-i18next'; 
 
 const PageOneQuestionnaire = () => {
   const { formData, updateFormData, workshopId, workshopName, clearFormData, enableSkippedToRules  } = useForm();
@@ -21,12 +23,62 @@ const PageOneQuestionnaire = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState('');
   const [modalContext, setModalContext] = useState('');
+  const [languageOptions, setLanguageOptions] = useState([]);
+  const [selectedLanguageId, setSelectedLanguageId] = useState(formData.language?.id || '');
+  const [selectedLanguageLabel, setSelectedLanguageLabel] = useState(formData.language?.label || '');
+  const { t, i18n } = useTranslation('pageOneQuestionnaire', 'startQuestionnaire'); 
+
   const navigate = useNavigate();
 
-  const languageOptions = [
-    'English', 'French', 'Spanish', 'Hindi', 'Urdu', 'Punjabi'
-  ].map(language => ({ label: language, value: language }));
+  // Fetch preferred language options from the server
+  useEffect(() => {
+    const loadLanguages = async () => {
+      try {
+        const fetchedLanguages = await fetchPreferredLanguage();
+        const languageOptions = fetchedLanguages.map((lang) => ({
+          value: lang.language_id,
+          label: t(`pageOneQuestionnaire:languages.${lang.language_name}`),
+        }));
+        setLanguageOptions(languageOptions);
+        // After language fetch, ensure disabled states are correct based on `declined`
+        setPreferNotToAnswerPostal(declined || formData.postalCode === 'Prefer Not To Answer');
+        setPreferNotToAnswerYear(declined || formData.yearOfBirth === '0000');
+      } catch (error) {
+        console.error("Error loading languages:", error);
+      }
+    };
+  
+    loadLanguages();
+  }, [t, declined, formData.postalCode, formData.yearOfBirth]);  
 
+  // Define the handleLanguageSelect function
+  const handleLanguageSelect = (selectedOptionValue) => {
+    const selectedLanguageOption = languageOptions.find(lang => lang.value === selectedOptionValue);
+    
+    if (selectedLanguageOption) {
+      // Update formData with structured language information
+      const updatedFormData = {
+        ...formData,
+        language: {
+          id: selectedOptionValue,
+          label: selectedLanguageOption.label
+        }
+      };
+      updateFormData(updatedFormData);
+  
+      // Update local state if necessary, but ensure formData is the source of truth for form submissions
+      setSelectedLanguageId(selectedOptionValue);
+      setSelectedLanguageLabel(selectedLanguageOption.label);
+    }
+  };
+
+  useEffect(() => {
+    if (formData.language) {
+      setSelectedLanguageId(formData.language.id);
+      setSelectedLanguageLabel(formData.language.label);
+    }
+  }, [formData.language]);
+  
  // Use the useEffect hook to update the "Prefer Not To Answer" states when the "declined" state changes
   useEffect(() => {
     // If declined is true, disable the inputs and set "Prefer Not To Answer"
@@ -83,30 +135,31 @@ useEffect(() => {
     const value = event.target.value; // 'accept' or 'decline'
     const isDeclined = value === 'decline';
     updateFormData({ ...formData, consent: value });
-    setDeclined(isDeclined);
+    //setDeclined(isDeclined);
   };
 
   const handleClick = () => {
     // Add validation to ensure required fields are answered
     if (declined === null) {
-        setModalContent('Please select an option to provide consent before continuing with the questionnaire.');
+        setModalContent('modal.consentRequired');
         setIsModalOpen(true);
         return;
     } 
     if (declined === true) {
-        setModalContent('You have declined to participate in this questionnaire. Do you want to continue on to the rules and values page?');
+        setModalContent('modal.declineMessage');
         setModalContext("declineConsent");
         setIsModalOpen(true);
         return;
     } 
     // Check if postal code and year of birth are answered
     if ((!postalCode && !preferNotToAnswerPostal) || (!yearOfBirth && !preferNotToAnswerYear)) {
-        setModalContent('Please answer all questions or select "Prefer Not To Answer" before continuing.');
+        setModalContent('modal.answerAllQuestions');
         setIsModalOpen(true);
         return;
     }
   
     console.log("Current workshop ID:", workshopId);
+    console.log("Current workshop name:", workshopName);
     console.log('FormData after page one for this client:', formData);
     navigate('/pageTwoQuestionnaire');
 };
@@ -136,7 +189,7 @@ useEffect(() => {
     setIsModalOpen(false);
     setModalContext(''); // Reset context to clear it
   };  
-  
+
   return (
     <div className="flex flex-col min-h-screen bg-[#f6cdd0]">
       <NavBar />
@@ -145,21 +198,17 @@ useEffect(() => {
       <div className="flex-grow pt-20 pb-20 mt-24 flex flex-col items-center justify-center w-full">
         <div className="max-w-[800px] w-full px-4 lg:px-8">
           <h2 className="text-2xl font-semibold mb-4 text-center">
-            Active Session For: {workshopName}
+            {t('pageOneQuestionnaire:activeSession', { workshopName })}
           </h2>
-          <h1 className="text-4xl font-bold mb-12 text-center text-[#704218] [text-shadow:0px_4px_4px_#00000040]">Stats Help Get Grants, Thank You!</h1>
-          <h2 className="text-3xl font-bold mb-8 text-center text-[#8D5E32] [text-shadow:0px_4px_4px_#00000040]">Please Choose Language</h2>
+          <h1 className="text-4xl font-bold mb-12 text-center text-[#704218] [text-shadow:0px_4px_4px_#00000040]">{t('pageOneQuestionnaire:pageTitle')}</h1>
+          <h2 className="text-3xl font-bold mb-8 text-center text-[#8D5E32] [text-shadow:0px_4px_4px_#00000040]">{t('pageOneQuestionnaire:chooseLanguage')}</h2>
           <Dropdown
             options={languageOptions}
-            placeholder="Select Language"
-            onSelect={(selectedOption) => {
-              console.log("Selected option:", selectedOption);
-              setSelectedLanguage(selectedOption); 
-              updateFormData({ ...formData, language: selectedOption });
-            }}
-            selectedValue={selectedLanguage} // Pass the selectedLanguage state to the DropDown component
+            placeholder={t('pageOneQuestionnaire:chooseLanguage')}
+            onSelect={handleLanguageSelect}
+            selectedValue={selectedLanguageId}
           />
-          <p className="m-8 text-xl">I consent to the data obtained from this questionnaire being used for grant applications</p>
+          <p className="m-8 text-xl">{t('pageOneQuestionnaire:consentText')}</p>
           <div className="flex justify-center items-center space-x-8 mb-4">
             <label className="flex items-center cursor-pointer">
               <input
@@ -169,7 +218,7 @@ useEffect(() => {
                 checked={declined === false}
                 onChange={handleConsentChange}
               />
-              <span className="ml-2">I accept</span>
+              <span className="ml-2">{t('pageOneQuestionnaire:accept')}</span>
             </label>
             <label className="flex items-center cursor-pointer">
               <input
@@ -178,12 +227,12 @@ useEffect(() => {
                 value="decline"
                 checked={declined === true}
                 onChange={handleConsentChange}              />
-              <span className="ml-2">I decline</span>
+              <span className="ml-2">{t('pageOneQuestionnaire:decline')}</span>
             </label>
           </div>
           <input
             type="text"
-            placeholder="Please Enter Your Postal Code"
+            placeholder={t('pageOneQuestionnaire:enterPostalCode')}
             className="mt-4 p-2 border border-black rounded-lg w-full"
             onChange={handleInputChange}
             name="postalCode"
@@ -193,7 +242,7 @@ useEffect(() => {
           <Checkbox
             options={[{
               id: 'postal',
-              name: 'Prefer Not To Answer',
+              name: t('pageOneQuestionnaire:preferNotToAnswer'),
               checked: preferNotToAnswerPostal,
               disabled: declined === true // Disable this checkbox if declined is true
             }]}
@@ -201,7 +250,7 @@ useEffect(() => {
           />
           <input
             type="text"
-            placeholder="Please Enter Your Year of Birth (YYYY)"
+            placeholder={t('pageOneQuestionnaire:enterYearOfBirth')}
             className="mt-4 p-2 border border-black rounded-lg w-full"
             onChange={handleInputChange}
             name="yearOfBirth"
@@ -211,7 +260,7 @@ useEffect(() => {
           <Checkbox
             options={[{
               id: 'year',
-              name: 'Prefer Not To Answer',
+              name: t('pageOneQuestionnaire:preferNotToAnswer'),
               checked: preferNotToAnswerYear,
               disabled: declined === true // Disable this checkbox if declined is true
             }]}
@@ -220,17 +269,17 @@ useEffect(() => {
           <div className="flex flex-col items-center mt-8 space-y-4">
           <Modal 
             isOpen={isModalOpen} 
-            content={modalContent}
+            content={t(modalContent)} 
             onConfirm={handleModalOk}
             onClose={handleModalCancel} // Use handleModalCancel for both closing and canceling
             showCancelButton={true}
             showOkButton={true}
           >
-            {modalContent}
+            {t(modalContent)}
           </Modal>
 
             <Button
-              text="NEXT QUESTION"
+              text={t('pageOneQuestionnaire:nextPage')}
               className="text-white bg-[#16839B] hover:bg-[#0f6674]"
               onClick={handleClick}
             />

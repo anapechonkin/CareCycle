@@ -1,0 +1,26 @@
+{
+    "activeSession": "Active Session For: {{workshopName}}",
+    "pageTitle": "Stats Help Get Grants, Thank You!",
+    "chooseLanguage": "Please Choose Language",
+    "consentText": "I consent to the data obtained from this questionnaire being used for grant applications",
+    "accept": "I accept",
+    "decline": "I decline",
+    "enterPostalCode": "Please Enter Your Postal Code",
+    "enterYearOfBirth": "Please Enter Your Year of Birth (YYYY)",
+    "preferNotToAnswer": "Prefer Not To Answer",
+    "nextPage": "NEXT PAGE",
+    "modal": {
+      "consentRequired": "Please select an option to provide consent before continuing with the questionnaire.",
+      "declineMessage": "You have declined to participate in this questionnaire. Do you want to continue on to the rules and values page?",
+      "answerAllQuestions": "Please answer all questions or select \"Prefer Not To Answer\" before continuing."
+    },
+    "languages": {
+      "English": "English",
+      "French": "French",
+      "Spanish": "Spanish",
+      "Hindi": "Hindi",
+      "Urdu": "Urdu",
+      "Punjabi": "Punjabi"
+    }
+  }
+  

@@ -1,3 +1,17 @@
+//Fetch preferred language
+export const fetchPreferredLanguage = async () => {
+    try {
+      const response = await fetch('/dropdowns/preferredLanguage');
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Failed to fetch preferred language:', error);
+      throw error;
+    }
+  }
+
 // Function to fetch primary gender identities
 export const fetchPrimaryGenderIdentities = async () => {
     try {

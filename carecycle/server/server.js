@@ -52,6 +52,7 @@ app.get('/dropdowns/mapRegions', dropDownDB.getMapRegions);
 app.get('/dropdowns/userTypes', dropDownDB.getUserTypes);
 app.get('/dropdowns/workshops', dropDownDB.getWorkshops);
 app.get('/dropdowns/newcomerStatus', dropDownDB.getNewcomerStatus);
+app.get('/dropdowns/preferredLanguage', dropDownDB.getPreferredLanguage);
 
 // User routes
 app.get('/users', userDB.getUsers);

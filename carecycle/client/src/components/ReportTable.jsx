@@ -17,6 +17,7 @@ const ReportTable = ({ data }) => {
     "Map Area Name",
     "Workshop Name",
     "Year of Birth",
+    "Preferred Language",
   ];
 
   // Styling
@@ -67,6 +68,7 @@ const ReportTable = ({ data }) => {
               <td style={tdStyle}>{item.map_areas ? item.map_areas.join(', ') : 'N/A'}</td>
               <td style={tdStyle}>{item.workshop_name}</td>
               <td style={tdStyle}>{item.year_of_birth}</td>
+              <td style={tdStyle}>{item.language_name}</td>
             </tr>
           ))}
         </tbody>

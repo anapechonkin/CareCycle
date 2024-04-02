@@ -10,7 +10,7 @@ i18n
   .init({
     fallbackLng: 'en', // Use English if the detected language is not available
     debug: true, // Set to false in production
-    ns: ['navbar', 'loginForm', 'startQuestionnaire'], // Namespace used, you can add more namespaces here
+    ns: ['navbar','footer','dashboard','loginForm','startQuestionnaire','pageOneQuestionnaire'], // Namespace used, you can add more namespaces here
     defaultNS: 'navbar',
     backend: {
       loadPath: '/internationalization/{{lng}}/{{ns}}.json',

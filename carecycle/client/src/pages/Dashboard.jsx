@@ -43,7 +43,7 @@ const Dashboard = () => {
           <div className="absolute inset-0 bg-custom-blue opacity-75"></div>
         </div>
         <div className="text-center mb-20" style={{ paddingTop: '4rem' }}>
-          <h1 className="text-6xl font-bold text-white [text-shadow:0px_4px_4px_#00000040]">{t('dashboardTitle')}</h1>
+          <h1 className="text-6xl font-bold text-white [text-shadow:0px_4px_4px_#00000040]">{t('dashboard:dashboardTitle')}</h1>
         </div>
         <div className="flex justify-center mt-8 mb-32"> 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">

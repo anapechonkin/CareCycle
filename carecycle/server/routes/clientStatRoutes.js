@@ -48,32 +48,35 @@ const getClientStats = async (request, response) => {
 
     // Build the SQL query
     let query = `
-        SELECT
-            cs.cs_id, 
-            p.postal_code,
-            a.area_name,
-            cs.year_of_birth, 
-            pg.gender_name AS primary_gender,
-            ARRAY_AGG(DISTINCT gi.type) FILTER (WHERE gi.type IS NOT NULL) AS gender_identities,
-            cs.custom_gender, 
-            ns.status AS newcomer_status, 
-            cs.newcomer_comment, 
-            ARRAY_AGG(DISTINCT si.option) FILTER (WHERE si.option IS NOT NULL) AS self_identifications,
-            ARRAY_AGG(DISTINCT ma.map_area_name) FILTER (WHERE ma.map_area_name IS NOT NULL) AS map_areas,
-            w.name AS workshop_name
-        FROM 
-            carecycle.ClientStats cs
-            LEFT JOIN carecycle.NewcomerStatus ns ON cs.newcomer_status_id = ns.newcomer_status_id
-            LEFT JOIN carecycle.PrimaryGender pg ON cs.primary_gender_id = pg.primary_gender_id
-            LEFT JOIN carecycle.clientStats_mapArea csm ON cs.cs_id = csm.cs_id
-            LEFT JOIN carecycle.MapArea ma ON csm.map_id = ma.map_id
-            LEFT JOIN carecycle.client_genderIdentity cgi ON cs.cs_id = cgi.cs_id
-            LEFT JOIN carecycle.GenderIdentity gi ON cgi.gender_identity_id = gi.gender_identity_id
-            LEFT JOIN carecycle.Workshop w ON cs.workshop_id = w.workshop_id
-            LEFT JOIN carecycle.PostalCode p ON cs.postal_code_id = p.postal_code_id
-            LEFT JOIN carecycle.Area a ON p.area_id = a.area_id
-            LEFT JOIN carecycle.ClientStats_SelfIdentification csi ON cs.cs_id = csi.cs_id
-            LEFT JOIN carecycle.SelfIdentification si ON csi.self_identification_id = si.self_identification_id
+    SELECT
+        cs.cs_id, 
+        p.postal_code,
+        a.area_name,
+        cs.year_of_birth, 
+        pg.gender_name AS primary_gender,
+        ARRAY_AGG(DISTINCT gi.type) FILTER (WHERE gi.type IS NOT NULL) AS gender_identities,
+        cs.custom_gender, 
+        ns.status AS newcomer_status, 
+        cs.newcomer_comment, 
+        ARRAY_AGG(DISTINCT si.option) FILTER (WHERE si.option IS NOT NULL) AS self_identifications,
+        ARRAY_AGG(DISTINCT ma.map_area_name) FILTER (WHERE ma.map_area_name IS NOT NULL) AS map_areas,
+        w.name AS workshop_name,
+        pl.language_id,
+        pl.language_name
+    FROM 
+        carecycle.ClientStats cs
+        LEFT JOIN carecycle.NewcomerStatus ns ON cs.newcomer_status_id = ns.newcomer_status_id
+        LEFT JOIN carecycle.PrimaryGender pg ON cs.primary_gender_id = pg.primary_gender_id
+        LEFT JOIN carecycle.clientStats_mapArea csm ON cs.cs_id = csm.cs_id
+        LEFT JOIN carecycle.MapArea ma ON csm.map_id = ma.map_id
+        LEFT JOIN carecycle.client_genderIdentity cgi ON cs.cs_id = cgi.cs_id
+        LEFT JOIN carecycle.GenderIdentity gi ON cgi.gender_identity_id = gi.gender_identity_id
+        LEFT JOIN carecycle.Workshop w ON cs.workshop_id = w.workshop_id
+        LEFT JOIN carecycle.PostalCode p ON cs.postal_code_id = p.postal_code_id
+        LEFT JOIN carecycle.Area a ON p.area_id = a.area_id
+        LEFT JOIN carecycle.ClientStats_SelfIdentification csi ON cs.cs_id = csi.cs_id
+        LEFT JOIN carecycle.SelfIdentification si ON csi.self_identification_id = si.self_identification_id
+        LEFT JOIN carecycle.PreferredLanguage pl ON cs.language_id = pl.language_id
     `;
 
     // Append WHERE clause if filters are provided
@@ -83,7 +86,7 @@ const getClientStats = async (request, response) => {
 
     // Finish the query with GROUP BY and ORDER BY clauses
     query += `
-        GROUP BY cs.cs_id, ns.status, pg.gender_name, w.name, p.postal_code, a.area_name
+        GROUP BY cs.cs_id, ns.status, pg.gender_name, w.name, p.postal_code, a.area_name, pl.language_id, pl.language_name
         ORDER BY cs.cs_id;
     `;
 
@@ -95,7 +98,12 @@ const getClientStats = async (request, response) => {
         // Assuming 'pool' is your database connection pool
         const result = await pool.query(query, queryParams);
         console.log('Query results:', result.rows);
-        response.status(200).json(result.rows);
+        // Ensure that the response includes the language_name
+        const processedResults = result.rows.map(row => ({
+            ...row,
+            language_name: row.language_name || 'N/A' // Provide a default value if language_name is not set
+        }));
+        response.status(200).json(processedResults);
     } catch (error) {
         console.error('Error executing query:', error);
         response.status(500).json({ error: 'Internal server error' });
@@ -164,17 +172,17 @@ const getClientByPostalCodeId = async (request, response) => {
 
 // Adds a new clientStat with provided details to the database
 const addClientStat = async (request, response) => {
-    const { primaryGenderId, yearOfBirth, postalCodeId, workshopId, newcomerStatusId, newcomerComment, customGender } = request.body;
+    const { primaryGenderId, yearOfBirth, postalCodeId, workshopId, newcomerStatusId, newcomerComment, customGender, languageId } = request.body;
     // Include newcomer_status_id in the INSERT statement
     const query = `
         INSERT INTO carecycle.ClientStats 
-        (primary_gender_id, year_of_birth, postal_code_id, workshop_id, newcomer_status_id, newcomer_comment, custom_gender, user_id) 
+        (primary_gender_id, year_of_birth, postal_code_id, workshop_id, newcomer_status_id, newcomer_comment, custom_gender, language_id, user_id) 
         VALUES 
-        ($1, $2, $3, $4, $5, $6, $7, NULL)  
+        ($1, $2, $3, $4, $5, $6, $7, $8, NULL)  
         RETURNING *;`;
 
     // Include newcomerStatusId in the values array
-    const values = [primaryGenderId, yearOfBirth, postalCodeId, workshopId, newcomerStatusId, newcomerComment, customGender];
+    const values = [primaryGenderId, yearOfBirth, postalCodeId, workshopId, newcomerStatusId, newcomerComment, customGender, languageId];
 
     try {
         const results = await pool.query(query, values);
@@ -189,7 +197,7 @@ const addClientStat = async (request, response) => {
 // Updates an existing clientStat based on its cs_id
 const updateClientStat = async (request, response) => {
     const cs_id = parseInt(request.params.cs_id);
-    const { primaryGenderId, yearOfBirth, postalCodeId, workshopId, userId } = request.body;
+    const { primaryGenderId, yearOfBirth, postalCodeId, workshopId, languageId, userId } = request.body;
 
     // Initialize an array to hold parts of the SQL SET clause
     const updates = [];
@@ -218,6 +226,10 @@ const updateClientStat = async (request, response) => {
     if (userId !== undefined) {
         updates.push(`user_id = $${valuePosition++}`);
         values.push(userId);
+    }
+    if (languageId !== undefined) {
+        updates.push(`language_id = $${valuePosition++}`);
+        values.push(languageId);
     }
 
     // Add the cs_id to the values array for the WHERE clause

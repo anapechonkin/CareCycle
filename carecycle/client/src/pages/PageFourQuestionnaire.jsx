@@ -55,6 +55,7 @@ const PageFourQuestionnaire = () => {
         primaryGenderId: formData.primaryGender.id,
         postalCodeId,
         workshopId,
+        languageId: formData.language.id,
         newcomerStatusId: formData.newcomerStatus.id,
         newcomerComment: formData.newcomerComment,
         userId: null, // Assuming user authentication isn't set up yet, thus 'null'

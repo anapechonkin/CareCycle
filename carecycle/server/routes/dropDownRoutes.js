@@ -55,10 +55,22 @@ const getNewcomerStatus = async (req, res) => {
     }
 };
 
+//Fetch preferred languauge
+const getPreferredLanguage = async (req, res) => {
+    try {
+        const preferredLanguage = await pool.query('SELECT * FROM carecycle.preferredlanguage');
+        res.json(preferredLanguage.rows);
+    } catch (error) {
+        console.error('Error fetching preferred language:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
 module.exports = {
     getPrimaryGenderIdentities,
     getMapRegions,
     getUserTypes,
     getWorkshops,
-    getNewcomerStatus
+    getNewcomerStatus,
+    getPreferredLanguage
 };
