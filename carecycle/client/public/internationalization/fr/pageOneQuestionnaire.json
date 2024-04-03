@@ -1,13 +1,13 @@
 {
     "activeSession": "Session active pour: {{workshopName}}",
     "pageTitle": "Les statistiques aident à obtenir des subventions, merci!",
-    "chooseLanguage": "Veuillez choisir la langue",
+    "chooseLanguage": "Veuillez choisir une langue",
     "consentText": "Je consens à ce que les données obtenues de ce questionnaire soient utilisées pour des demandes de subvention",
     "accept": "J'accepte",
     "decline": "Je refuse",
-    "enterPostalCode": "Veuillez entrer votre code postal",
-    "enterYearOfBirth": "Veuillez entrer votre année de naissance (AAAA)",
-    "preferNotToAnswer": "Je préfère ne pas répondre",
+    "enterPostalCode": "Veuillez indiquer votre code postal",
+    "enterYearOfBirth": "Veuillez indiquer votre année de naissance (AAAA)",
+    "preferNotToAnswer": "Préfère Ne Pas Répondre",
     "nextPage": "PAGE SUIVANTE",
     "modal": {
       "consentRequired": "Veuillez sélectionner une option pour donner votre consentement avant de continuer avec le questionnaire.",

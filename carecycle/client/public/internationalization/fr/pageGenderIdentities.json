@@ -1,0 +1,86 @@
+{
+    "PageTitle": "Toutes Les Identités de Genre Applicables",
+    "SpecifyIdentityLabel": "Si autre, indiquer ici",
+    "CustomGenderPlaceholder": "Identité de genre personnalisée",
+    "Buttons": {
+      "PreviousPage": "PAGE PRÉCÉDENTE",
+      "NextPage": "PAGE SUIVANTE"
+    },
+    "ModalContent": "Veuillez sélectionner au moins une identité de genre, choisir 'Préférer ne pas répondre', ou spécifier une autre identité pour continuer.",
+    "GenderIdentities": {
+      "PreferNotToAnswer": {
+        "Name": "Préfère Ne Pas Répondre",
+        "Description": "Cette option est destinée aux personnes qui préfèrent ne pas préciser leur identité de genre."
+      },
+      "Agender": {
+        "Name": "Agender",
+        "Description": "L'agender est une identité de genre qui peut être comprise comme l'absence de genre ou une identité de genre neutre. Les personnes agender peuvent ne s'identifier à aucun rôle ou concept traditionnel de genre, ressentant soit une absence totale de genre, soit une identité de genre neutre qui n'est ni masculine ni féminine. <a href='https://lgbtqia.fandom.com/wiki/Agender' target='_blank' rel='noopener noreferrer'>Reference: LGBTQIA Wiki - Agender</a>."
+      },
+      "Bigender": {
+        "Name": "Bigender",
+        "Description": "Les personnes bigender ont deux identités de genre, soit simultanément, soit en variant entre les deux. Ces identités peuvent être n'importe quelle combinaison d'hommes, de femmes ou d'identités non binaires. Les personnes bigender peuvent vivre leur double identité de diverses manières et utiliser différentes expressions de genre pour refléter leur identité de genre à différents moments. <a href='https://lgbtqia.fandom.com/wiki/Bigender' target='_blank' rel='noopener noreferrer'>Reference: LGBTQIA Wiki - Bigender</a>."
+      },
+      "Demigender": {
+        "Name": "Demigender",
+        "Description": "Les personnes demigender s'identifient partiellement à un genre, mais pas totalement. Cette identification partielle peut se faire avec n'importe quel genre dans le spectre des genres, ce qui en fait une identité flexible qui permet une connexion personnelle au genre qui n'est pas entièrement englobée par les définitions binaires. <a href='https://lgbtqia.fandom.com/wiki/Demigender' target='_blank' rel='noopener noreferrer'>Reference: LGBTQIA Wiki - Demigender</a>."
+      },
+      "Female": {
+        "Name": "Femme",
+        "Description": "Le terme femme fait traditionnellement référence à une identité de genre alignée sur la féminité. Les personnes qui s'identifient comme femmes peuvent s'aligner sur les rôles ou caractéristiques féminins traditionnels, mais l'expression et l'identification à ces rôles peuvent varier considérablement d'une personne à l'autre."
+      },
+      "GenderFluid": {
+        "Name": "Genre Fluide",
+        "Description": "L'expression genre fluide fait référence à une identité de genre qui varie dans le temps. L'identité et l'expression de genre d'une personne fluide peuvent changer, fluctuant parfois entre une identité plus masculine, plus féminine ou toute autre identité non binaire. <a href='https://lgbtqia.fandom.com/wiki/Genderfluid' target='_blank' rel='noopener noreferrer'>Reference: LGBTQIA Wiki - Gender Fluid</a>."
+      },
+      "GenderNeutral": {
+        "Name": "Genre Neutre",
+        "Description": "Le terme genre neutre est utilisé pour décrire une identité de genre qui ne s'aligne pas sur les catégories binaires traditionnelles d'homme ou de femme. Il peut également faire référence à une approche ou à une politique qui ne fait pas de discrimination fondée sur le genre. <a href='https://lgbtqia.fandom.com/wiki/Genderneutral' target='_blank' rel='noopener noreferrer'>Reference: LGBTQIA Wiki - Gender Neutral</a>."
+      },
+      "GenderNonConforming": {
+        "Name": "Genre Non-Conforme",
+        "Description": "L'expression non conforme au genre désigne les personnes dont l'expression de genre ne correspond pas aux rôles de genre conventionnels. Cette identité met en évidence la diversité des expressions et des expériences de genre au-delà du cadre binaire de l'homme et de la femme. <a href='https://lgbtqia.fandom.com/wiki/Gendernonconforming' target='_blank' rel='noopener noreferrer'>Reference: LGBTQIA Wiki - Gender Non-Conforming</a>."
+      },
+      "Genderqueer": {
+        "Name": "Genderqueer",
+        "Description": "Genderqueer est une identité de genre qui remet en question les conceptions conventionnelles du genre. Elle peut être utilisée par des personnes qui ne souscrivent pas aux distinctions de genre traditionnelles, mais qui peuvent s'identifier à aucun des deux genres, aux deux genres ou à une combinaison de genres masculins et féminins. <a href='https://lgbtqia.fandom.com/wiki/Genderqueer' target='_blank' rel='noopener noreferrer'>Reference: LGBTQIA Wiki - Gender Queer</a>."
+      },
+      "Intersex": {
+        "Name": "Intersexe / Intersexuel",
+        "Description": "Intersexe est un terme utilisé pour décrire une variété de conditions dans lesquelles une personne est née avec une anatomie reproductive ou sexuelle qui ne correspond pas aux définitions typiques de l'homme ou de la femme. Les traits intersexuels peuvent concerner les chromosomes, les organes génitaux ou les caractéristiques sexuelles secondaires. <a href='https://lgbtqia.fandom.com/wiki/Intersex' target='_blank' rel='noopener noreferrer'>Reference: LGBTQIA Wiki - Intersex</a>."
+      },
+      "Male": {
+        "Name": "Homme",
+        "Description": "Le terme homme fait référence à une identité de genre traditionnellement associée au fait d'être un homme ou à la masculinité. Les personnes qui s'identifient comme étant de sexe masculin peuvent exprimer leur genre de diverses manières, sans se limiter aux normes sociétales de la masculinité."
+      },
+      "Neurogender": {
+        "Name": "Neurogenre",
+        "Description": "Le neurogenre est un terme qui englobe les identités de genre influencées par le neurotype d'un individu. Pour les personnes dont l'expérience de leur genre est profondément liée à leur constitution neurologique, en particulier celles qui sont neurodivergentes. <a href='https://lgbtqia.fandom.com/wiki/Neurogender' target='_blank' rel='noopener noreferrer'>Reference: LGBTQIA Wiki - Neurogender</a>."
+      },
+      "NonBinary": {
+        "Name": "Non-Binaire",
+        "Description": "Le terme non binaire décrit une identité de genre qui ne correspond pas strictement aux catégories masculine ou féminine. Les personnes non binaires peuvent s'identifier comme ayant un genre qui mélange des éléments masculins et féminins, qui oscille entre les deux, ou qui ne correspond à aucun genre traditionnel. <a href='https://lgbtqia.fandom.com/wiki/Non-Binary' target='_blank' rel='noopener noreferrer'>Reference: LGBTQIA Wiki - Non-Binary</a>."
+      },
+      "Polygender": {
+        "Name": "Polygenre",
+        "Description": "Les personnes polygenres s'identifient à plusieurs genres simultanément ou varient entre eux au fil du temps. Cette identité reconnaît la complexité et la fluidité du genre, ce qui permet un large éventail d'expériences de genre. <a href='https://lgbtqia.fandom.com/wiki/Polygender' target='_blank' rel='noopener noreferrer'>Reference: LGBTQIA Wiki - Polygender</a>."
+      },
+      "Questioning": {
+        "Name": "Questionnement",
+        "Description": "Le questionnement est un processus par lequel les individus explorent et étudient leur propre identité de genre, leur orientation sexuelle ou les deux. Cette exploration est une partie saine de la compréhension de soi et de sa place dans le spectre du genre et de la sexualité. <a href='https://lgbtqia.fandom.com/wiki/Questioning' target='_blank' rel='noopener noreferrer'>Reference: LGBTQIA Wiki - Questioning</a>."
+      },
+      "Transgender": {
+        "Name": "Transgenre",
+        "Description": "Transgenre est un terme générique désignant les personnes dont l'identité de genre diffère du sexe qui leur a été assigné à la naissance. Les personnes transgenres peuvent s'identifier comme étant de sexe masculin, de sexe féminin ou d'un sexe complètement différent. <a href='https://lgbtqia.fandom.com/wiki/Transgender' target='_blank' rel='noopener noreferrer'>Reference: LGBTQIA Wiki - Transgender</a>."
+      },
+      "TwoSpirit": {
+        "Name": "Bispirituel(le)",
+        "Description": "Le terme bispirituel est utilisé par certaines communautés autochtones d'Amérique du Nord pour décrire une personne qui incarne à la fois l'esprit masculin et l'esprit féminin. Il s'agit d'une identité culturelle qui couvre une variété de genres et d'orientations sexuelles au sein des cultures indigènes. <a href='https://lgbtqia.fandom.com/wiki/Two-Spirit' target='_blank' rel='noopener noreferrer'>Reference: LGBTQIA Wiki - Two-Spirit</a>."
+      },
+      "Xenogender": {
+        "Name": "Xénogender",
+        "Description": "Le xénogender fait référence aux identités de genre non traditionnelles qui ne peuvent pas être entièrement comprises en termes de catégories de genre conventionnelles binaires ou non binaires. Les personnes xénogender peuvent relier leur expérience de genre à des concepts, des choses ou des phénomènes en dehors des normes de genre/sexualité humaines. <a href='https://lgbtqia.fandom.com/wiki/Xenogender' target='_blank' rel='noopener noreferrer'>Reference: LGBTQIA Wiki - Xenogender</a>."
+      }
+    }
+  }
+  
+  

@@ -1,0 +1,15 @@
+{
+      "PageTitle": "Gender",
+      "GenderOptions": {
+        "PreferNotToAnswer": "Prefer Not to Answer",
+        "Male": "Male",
+        "Female": "Female",
+        "ForMoreOptions": "For More Options"
+      },
+      "Buttons": {
+        "PreviousPage": "PREVIOUS PAGE",
+        "NextPage": "NEXT PAGE"
+      },
+      "ModalContent": "Please select a primary gender option to continue."
+}
+  

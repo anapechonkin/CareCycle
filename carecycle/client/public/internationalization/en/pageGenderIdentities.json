@@ -1,0 +1,85 @@
+{
+  "PageTitle": "All Applicable Gender Identities",
+  "SpecifyIdentityLabel": "If you can't find your gender identity in the list, please specify:",
+  "CustomGenderPlaceholder": "Custom Gender Identity",
+  "Buttons": {
+    "PreviousPage": "PREVIOUS PAGE",
+    "NextPage": "NEXT PAGE"
+  },
+  "ModalContent": "Please select at least one gender identity, choose 'Prefer Not To Answer', or specify another identity to continue.",
+  "GenderIdentities": {
+    "PreferNotToAnswer": {
+      "Name": "Prefer Not To Answer",
+      "Description": "This option is for individuals who prefer not to specify their gender identity."
+    },
+    "Agender": {
+      "Name": "Agender",
+      "Description": "Agender is a gender identity that can be understood as the absence of gender or a neutral gender identity. Agender individuals may not identify with any traditional gender roles or concepts, feeling either a lack of gender altogether or a neutral gender identity that is neither male nor female. <a href='https://lgbtqia.fandom.com/wiki/Agender' target='_blank' rel='noopener noreferrer'>Reference: LGBTQIA Wiki - Agender</a>."
+    },
+    "Bigender": {
+      "Name": "Bigender",
+      "Description": "Bigender individuals experience two gender identities, either simultaneously or varying between the two. These identities can be any combination of male, female, or any non-binary identities. Bigender people might experience their dual identities in various ways and may use different gender expressions to reflect their gender identity at different times. <a href='https://lgbtqia.fandom.com/wiki/Bigender' target='_blank' rel='noopener noreferrer'>Reference: LGBTQIA Wiki - Bigender</a>."
+    },
+    "Demigender": {
+      "Name": "Demigender",
+      "Description": "Demigender individuals partially identify with one gender but not wholly. This partial identification can be with any gender within the gender spectrum, making it a flexible identity that allows for a personal connection to gender that isn't fully encompassed by binary definitions. <a href='https://lgbtqia.fandom.com/wiki/Demigender' target='_blank' rel='noopener noreferrer'>Reference: LGBTQIA Wiki - Demigender</a>."
+    },
+    "Female": {
+      "Name": "Female",
+      "Description": "The term Female traditionally refers to a gender identity aligned with womanhood or femininity. Individuals identifying as female might align with traditional feminine roles or characteristics, but the expression and identification with these roles can vary widely among individuals."
+    },
+    "GenderFluid": {
+      "Name": "Gender Fluid",
+      "Description": "Gender Fluid refers to a gender identity that varies over time. A gender fluid person's gender identity and expression can change, sometimes fluctuating between more masculine, more feminine, or any other non-binary identities. <a href='https://lgbtqia.fandom.com/wiki/Genderfluid' target='_blank' rel='noopener noreferrer'>Reference: LGBTQIA Wiki - Gender Fluid</a>."
+    },
+    "GenderNeutral": {
+      "Name": "Gender Neutral",
+      "Description": "Gender Neutral is a term used to describe a gender identity that does not align with traditional binary gender categories of male or female. It can also refer to an approach or policy that does not discriminate based on gender. <a href='https://lgbtqia.fandom.com/wiki/Genderneutral' target='_blank' rel='noopener noreferrer'>Reference: LGBTQIA Wiki - Gender Neutral</a>."
+    },
+    "GenderNonConforming": {
+      "Name": "Gender Non-Conforming",
+      "Description": "Gender Non-Conforming is a term for individuals whose gender expression does not adhere to conventional gender roles. This identity highlights the diversity of gender expressions and experiences beyond the binary framework of male and female. <a href='https://lgbtqia.fandom.com/wiki/Gendernonconforming' target='_blank' rel='noopener noreferrer'>Reference: LGBTQIA Wiki - Gender Non-Conforming</a>."
+    },
+    "Genderqueer": {
+      "Name": "Genderqueer",
+      "Description": "Genderqueer is a gender identity that challenges conventional understandings of gender. It can be used by individuals who do not subscribe to traditional gender distinctions but may identify with neither, both, or a combination of male and female genders. <a href='https://lgbtqia.fandom.com/wiki/Genderqueer' target='_blank' rel='noopener noreferrer'>Reference: LGBTQIA Wiki - Gender Queer</a>."
+    },
+    "Intersex": {
+      "Name": "Intersex",
+      "Description": "Intersex is a term used to describe a variety of conditions where a person is born with reproductive or sexual anatomy that doesn't fit typical definitions of male or female. Intersex traits can involve chromosomes, genitalia, or secondary sex characteristics. <a href='https://lgbtqia.fandom.com/wiki/Intersex' target='_blank' rel='noopener noreferrer'>Reference: LGBTQIA Wiki - Intersex</a>."
+    },
+    "Male": {
+      "Name": "Male",
+      "Description": "Male refers to a gender identity traditionally associated with being a man or masculinity. Individuals identifying as male may express their gender in a variety of ways, not confined to societal norms of masculinity."
+    },
+    "Neurogender": {
+      "Name": "Neurogender",
+      "Description": "Neurogender is a term that encompasses gender identities influenced by an individual's neurotype. For people whose experience of their gender is deeply intertwined with their neurological makeup, particularly those who are neurodivergent. <a href='https://lgbtqia.fandom.com/wiki/Neurogender' target='_blank' rel='noopener noreferrer'>Reference: LGBTQIA Wiki - Neurogender</a>."
+    },
+    "NonBinary": {
+      "Name": "Non-Binary",
+      "Description": "Non-Binary describes a gender identity that does not fit strictly within the male or female categories. Non-binary individuals may identify as having a gender that blends elements of both male and female, fluctuates between them, or may not relate to any traditional gender at all. <a href='https://lgbtqia.fandom.com/wiki/Non-Binary' target='_blank' rel='noopener noreferrer'>Reference: LGBTQIA Wiki - Non-Binary</a>."
+    },
+    "Polygender": {
+      "Name": "Polygender",
+      "Description": "Polygender individuals identify with multiple genders simultaneously or vary between them over time. This identity recognizes the complexity and fluidity of gender, allowing for a broad spectrum of gender experiences. <a href='https://lgbtqia.fandom.com/wiki/Polygender' target='_blank' rel='noopener noreferrer'>Reference: LGBTQIA Wiki - Polygender</a>."
+    },
+    "Questioning": {
+      "Name": "Questioning",
+      "Description": "Questioning is a process where individuals explore and investigate their own gender identity, sexual orientation, or both. This exploration is a healthy part of understanding oneself and one's place in the spectrum of gender and sexuality. <a href='https://lgbtqia.fandom.com/wiki/Questioning' target='_blank' rel='noopener noreferrer'>Reference: LGBTQIA Wiki - Questioning</a>."
+    },
+    "Transgender": {
+      "Name": "Transgender",
+      "Description": "Transgender is an umbrella term for people whose gender identity differs from the sex they were assigned at birth. Transgender people may identify as male, female, or a different gender entirely. <a href='https://lgbtqia.fandom.com/wiki/Transgender' target='_blank' rel='noopener noreferrer'>Reference: LGBTQIA Wiki - Transgender</a>."
+    },
+    "TwoSpirit": {
+      "Name": "Two-Spirit",
+      "Description": "Two-Spirit is a term used by some Indigenous North American communities to describe a person who embodies both masculine and feminine spirits. It's a cultural identity that covers a variety of gender and sexual orientations within Indigenous cultures. <a href='https://lgbtqia.fandom.com/wiki/Two-Spirit' target='_blank' rel='noopener noreferrer'>Reference: LGBTQIA Wiki - Two-Spirit</a>."
+    },
+    "Xenogender": {
+      "Name": "Xenogender",
+      "Description": "Xenogender refers to non-traditional gender identities that cannot be fully understood in terms of conventional binary or non-binary gender categories. Xenogender individuals might relate their gender experience to concepts, things, or phenomena outside human gender/sexuality norms. <a href='https://lgbtqia.fandom.com/wiki/Xenogender' target='_blank' rel='noopener noreferrer'>Reference: LGBTQIA Wiki - Xenogender</a>."
+    }
+  }
+}
+

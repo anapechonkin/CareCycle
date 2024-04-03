@@ -11,6 +11,7 @@ import Checkbox from "../components/Checkbox";
 import { fetchGenderIdentities } from "../api/genderIdentityApi";
 import { useForm } from '../context/FormContext';
 import mockGenderIdentities from "../data/genderIdentities";
+import { useTranslation } from 'react-i18next';
 
 const PageTwoExtraQuestionnaire = () => {
   const navigate = useNavigate();
@@ -21,6 +22,7 @@ const PageTwoExtraQuestionnaire = () => {
   const [preferNotToAnswer, setPreferNotToAnswer] = useState(false);
   const [genderIdentities, setGenderIdentities] = useState([]);
   const [otherGenderIdentity, setOtherGenderIdentity] = useState(formData.custom_gender || '');
+  const { t } = useTranslation('pageGenderIdentities');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -77,7 +79,7 @@ const PageTwoExtraQuestionnaire = () => {
     // Validation logic to ensure either a selection is made or a custom gender is provided
     if (selectedGenderIdentities.length === 0 && !preferNotToAnswer && !otherGenderIdentity.trim()) {
       // No selections made and no custom gender provided, show reminder modal
-      setModalContent("<p>Please select at least one gender identity, choose 'Prefer Not To Answer', or specify another identity to continue.</p>");
+      setModalContent(t("pageGenderIdentities:ModalContent"));
       setShowModal(true);
       return; // Stop execution to prevent navigation
     }
@@ -125,28 +127,42 @@ const PageTwoExtraQuestionnaire = () => {
     setSelectedGenders(prev => ({ ...prev, [gender_identity_id]: !prev[gender_identity_id] }));
   };
 
-  const handleInfoClick = (info) => {
-    setModalContent(info);
+  const handleInfoClick = (genderIdentityType) => {
+    const infoKey = `pageGenderIdentities:GenderIdentities.${genderIdentityType}.Description`;
+
+    let translatedInfo = t(infoKey);
+
+    // Check if the translation was successful or if the key was returned
+    if (translatedInfo.startsWith('GenderIdentities.') && translatedInfo.endsWith('.Description')) {
+        // Attempt to strip the unnecessary parts, though this is not an ideal solution
+        translatedInfo = translatedInfo.replace('GenderIdentities.', '').replace('.Description', '');
+    }
+
+    setModalContent(translatedInfo);
     setShowModal(true);
-  };
+};
 
   // Assuming you have the otherGenderIdentity state setup
-const handleOtherGenderIdentityChange = (e) => {
-  const value = e.target.value;
-  setOtherGenderIdentity(value);
+  const handleOtherGenderIdentityChange = (e) => {
+    const value = e.target.value;
+    setOtherGenderIdentity(value);
 
-  // Update form data immediately
-  updateFormData({
-    ...formData,
-    customGender: value.trim() // Update custom_gender field
-  })
-;};
+    // Update form data immediately
+    updateFormData({
+      ...formData,
+      customGender: value.trim() // Update custom_gender field
+    })
+  ;};
 
 
   const renderGenderIdentities = () => {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 place-items-start ml-12">
-        {genderIdentities.map(({ gender_identity_id, type, info }) => {
+        {genderIdentities.map(({ gender_identity_id, type }) => {
+          // Dynamically construct the keys based on the type
+          const formattedType = type.replace(/-+/g, '').replace(/\s+/g, '');
+          const nameKey = `pageGenderIdentities:GenderIdentities.${formattedType}.Name`;
+          const infoKey = `pageGenderIdentities:GenderIdentities.${formattedType}.Description`;
           const isPreferNotToAnswer = gender_identity_id === 1; // Assuming ID 1 is "Prefer Not To Answer"
           const handleChange = isPreferNotToAnswer
             ? () => handlePreferNotToAnswerChange(!preferNotToAnswer)
@@ -155,13 +171,13 @@ const handleOtherGenderIdentityChange = (e) => {
           return (
             <div key={gender_identity_id} className="flex justify-between items-center w-full px-4">
               <div className="flex items-center space-x-2">
-                <button onClick={() => handleInfoClick(info)} className="flex-shrink-0">
+                <button onClick={() => handleInfoClick(t(infoKey))} className="flex-shrink-0">
                   <FaInfoCircle className="text-xl text-black" />
                 </button>
                 <Checkbox
                   options={[{
                     id: gender_identity_id.toString(),
-                    name: type,
+                    name: t(nameKey),
                     checked: isPreferNotToAnswer ? preferNotToAnswer : !!selectedGenders[gender_identity_id],
                     disabled: !isPreferNotToAnswer && preferNotToAnswer // Disable other checkboxes if 'Prefer Not To Answer' is checked
                   }]}
@@ -182,11 +198,11 @@ const handleOtherGenderIdentityChange = (e) => {
       <Shadow />
       <div className="flex-grow pt-20 pb-20 mt-24 flex flex-col items-center justify-center w-full">
         <div className="max-w-[800px] w-full px-4 lg:px-8 space-y-12">
-          <h1 className="text-5xl font-bold mb-16 text-center text-[#704218]">All Applicable Gender Identities</h1>
+          <h1 className="text-5xl font-bold mb-16 text-center text-[#704218]">{t('pageGenderIdentities:PageTitle')}</h1>
           {renderGenderIdentities()}
           <div className="mt-4">
                   <label htmlFor="customGenderIdentity" className="block text-sm font-medium text-gray-700">
-                    If you can't find your gender identity in the list, please specify:
+                  {t('SpecifyIdentityLabel')}
                   </label>
                   <input
                     type="text"
@@ -195,12 +211,12 @@ const handleOtherGenderIdentityChange = (e) => {
                     value={otherGenderIdentity}
                     onChange={handleOtherGenderIdentityChange}
                     className="mt-1 block w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    placeholder="Custom Gender Identity"
+                    placeholder={t('CustomGenderPlaceholder')}
                   />
                 </div>
           <div className="flex justify-between w-full mt-8">
-            <Button text="PREVIOUS QUESTION" onClick={handlePreviousClick} className="text-lg py-3 px-6" />
-            <Button text="NEXT QUESTION" onClick={handleNextClick} className="text-lg py-3 px-6 mx-4" />
+            <Button text={t('Buttons.PreviousPage')} onClick={handlePreviousClick} className="text-lg py-3 px-6" />
+            <Button text={t('Buttons.NextPage')} onClick={handleNextClick} className="text-lg py-3 px-6 mx-4" />
           </div>
         </div>
       </div>

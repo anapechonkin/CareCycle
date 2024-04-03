@@ -7,9 +7,11 @@ import Button from "../components/Button";
 import Modal from "../components/Modal";
 import { useNavigate } from "react-router-dom";
 import { useForm } from '../context/FormContext'; 
+import { useTranslation } from 'react-i18next';
 
 const PageTwoQuestionnaire = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation('pageTwoQuestionnaire');
   const { formData, updateFormData, workshopId } = useForm();
   const [selectedPrimaryGender, setSelectedPrimaryGender] = useState(formData.primaryGender?.label || '');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -49,10 +51,10 @@ const PageTwoQuestionnaire = () => {
   };
 
   const genderOptions = [
-    { id: 1, label: "Prefer Not to Answer", imgSrc: "/icons/noAnswer.png" },
-    { id: 2, label: "Male", imgSrc: "/icons/male.png" },
-    { id: 3, label: "Female", imgSrc: "/icons/female.png" },
-    { id: 4, label: "For More Options", imgSrc: "/icons/other.png" }
+    { id: 1, label: t('pageTwoQuestionnaire:GenderOptions.PreferNotToAnswer'), imgSrc: "/icons/noAnswer.png" },
+    { id: 2, label: t('pageTwoQuestionnaire:GenderOptions.Male'), imgSrc: "/icons/male.png" },
+    { id: 3, label: t('pageTwoQuestionnaire:GenderOptions.Female'), imgSrc: "/icons/female.png" },
+    { id: 4, label: t('pageTwoQuestionnaire:GenderOptions.ForMoreOptions'), imgSrc: "/icons/other.png" }
   ];
 
   return (
@@ -62,7 +64,7 @@ const PageTwoQuestionnaire = () => {
       <Shadow />
       <div className="flex-grow pt-20 pb-20 mt-24 flex flex-col items-center justify-center w-full">
         <div className="max-w-[800px] w-full px-4 lg:px-8 space-y-12">
-        <h1 className="text-5xl font-bold mb-16 text-center text-[#704218] [text-shadow:0px_4px_4px_#00000040]">Gender</h1>
+        <h1 className="text-5xl font-bold mb-16 text-center text-[#704218] [text-shadow:0px_4px_4px_#00000040]">{t('pageTwoQuestionnaire:PageTitle')}</h1>
           <div className="grid grid-cols-4 gap-8 justify-items-center">
             {genderOptions.map(({ label, imgSrc }) => (
               <label key={label} className="flex flex-col items-center cursor-pointer">
@@ -83,18 +85,18 @@ const PageTwoQuestionnaire = () => {
           <Modal
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
-            htmlContent="<p>Please select a primary gender option to continue.</p>"
+            htmlContent={t('ModalContent')}
             showOkButton={true}
             okButtonText="OK"
           />
           <div className="flex justify-between w-full mt-8">
             <Button 
-              text="PREVIOUS QUESTION"
+              text={t('pageTwoQuestionnaire:Buttons.PreviousPage')}
               onClick={handlePreviousClick}
               className="text-white bg-[#16839B] hover:bg-[#0f6a8b] font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-150 ease-in-out"
             />
             <Button 
-              text="NEXT QUESTION"
+              text={t('pageTwoQuestionnaire:Buttons.NextPage')}
               onClick={handleNextClick}
               className="text-white bg-[#16839B] hover:bg-[#0f6a8b] font-bold py-2 px-4 mx-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-150 ease-in-out"
             />
