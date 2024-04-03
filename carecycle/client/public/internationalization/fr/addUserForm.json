@@ -1,0 +1,88 @@
+{
+    "formTitle": "Ajouter Un Utilisateur",
+    "labels": {
+      "userType": "Type d'utilisateur",
+      "username": "Nom d'utilisateur",
+      "email": "Email",
+      "password": "Mot de passe",
+      "firstName": "Prénom",
+      "lastName": "Nom de famille",
+      "yearOfBirth": "Année de naissance (AAAA)",
+      "primaryGender": "Genre principal",
+      "postalCode": "Code Postal",
+      "vegetable": "Légume préféré",
+      "genderIdentities": "Sélectionnez les identités de genre",
+      "mapAreas": "Sélectionnez les zones cartographiques"
+    },
+    "placeholders": {
+      "selectUserType": "Sélectionnez le type d'utilisateur",
+      "enterUsername": "Entrez le nom d'utilisateur",
+      "enterEmail": "Entrez l'email",
+      "enterPassword": "Entrez le mot de passe",
+      "enterFirstName": "Entrez le prénom",
+      "enterLastName": "Entrez le nom de famille",
+      "enterYearOfBirth": "Entrez l'année de naissance",
+      "selectPrimaryGender": "Sélectionnez le genre principal",
+      "enterPostalCode": "Entrez le code postal",
+      "enterVegetable": "Entrez le légume préféré"
+    },
+    "buttonText": "Ajouter l'utilisateur",
+    "feedbackMessages": {
+      "userAddedSuccess": "Utilisateur ajouté avec succès!",
+      "userAddedError": "Échec de l'ajout de l'utilisateur.",
+      "invalidEmailFormat": "Format d'email invalide."
+    },
+    "userTypes": {
+      "volunteer": "Bénévole",
+      "admin": "Admin",
+      "ca/employee": "CA/Employé"
+    },
+    "primaryGenders": {
+      "prefer not to answer": "Préfère ne pas répondre",
+      "male": "Homme",
+      "female": "Femme",
+      "other": "Autre"
+    },
+    "genderIdentities": {
+      "Prefer Not To Answer": "Préfère ne pas répondre",
+      "Agender": "Agender",
+      "Bigender": "Bigender",
+      "Demigender": "Demigender",
+      "Female": "Femme",
+      "Gender Fluid": "Genre fluide",
+      "Gender Neutral": "Genre neutre",
+      "Gender Non-Conforming": "Non-conformité de genre",
+      "Genderqueer": "Genderqueer",
+      "Intersex": "Intersexe",
+      "Male": "Homme",
+      "Neurogender": "Neurogenre",
+      "Non-Binary": "Non-binaire",
+      "Polygender": "Polygenre",
+      "Questioning": "En questionnement",
+      "Transgender": "Transgenre",
+      "Two-Spirit": "Deux-esprits",
+      "Xenogender": "Xénogenre"
+    },
+    "mapAreas": {
+      "Prefer Not To Answer": "Préfère ne pas répondre",
+      "Middle East": "Moyen-Orient",
+      "Near East": "Proche-Orient",
+      "Southeastern Asia": "Asie du Sud-Est",
+      "South Asia": "Asie du Sud",
+      "Central Asia": "Asie Centrale",
+      "North America": "Amérique du Nord",
+      "Central America": "Amérique Centrale",
+      "South America": "Amérique du Sud",
+      "Caribbean": "Caraïbes",
+      "Northwestern Europe": "Europe du Nord-Ouest",
+      "Eastern Europe": "Europe de l'Est",
+      "Mediterranean Europe": "Europe Méditerranéenne",
+      "South Pacific (including Australia)": "Pacifique Sud (y compris l'Australie)",
+      "Northern Africa": "Afrique du Nord",
+      "Western Africa": "Afrique de l'Ouest",
+      "Central Africa": "Afrique Centrale",
+      "Eastern Africa": "Afrique de l'Est",
+      "Southern Africa": "Afrique du Sud"
+    }
+  }
+  

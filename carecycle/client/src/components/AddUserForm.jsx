@@ -7,8 +7,10 @@ import { fetchPrimaryGenderIdentities, fetchUserTypes } from '../api/dropdownApi
 import { lookupPostalCode, addPostalCode } from '../api/postalCodeApi';
 import { fetchGenderIdentities, addUserGenderIdentities } from '../api/genderIdentityApi';
 import { fetchMapAreas, addUserMapAreas } from '../api/mapAreaApi'; // Importing the necessary API functions
+import { useTranslation } from 'react-i18next';
 
 const AddUserForm = ({ onAddUser }) => {
+  const { t } = useTranslation('addUserForm');
   const initialFormState = {
     userTypeID: '',
     username: '',
@@ -42,7 +44,7 @@ const AddUserForm = ({ onAddUser }) => {
         const checkboxOptions = fetchedGenderIdentities.map(identity => ({
           ...identity,
           id: `gender_${identity.gender_identity_id}`,
-          name: identity.type,
+          name: t(`addUserForm:genderIdentities.${identity.type}`),
           checked: false,
         }));
         setGenderIdentities(checkboxOptions);
@@ -51,7 +53,7 @@ const AddUserForm = ({ onAddUser }) => {
         setMapAreas(fetchedMapAreas.map(area => ({
           ...area,
           id: `map_${area.map_id}`,
-          name: area.map_area_name,
+          name: t(`addUserForm:mapAreas.${area.map_area_name}`),
           checked: false,
         })));
       } catch (error) {
@@ -60,7 +62,7 @@ const AddUserForm = ({ onAddUser }) => {
     };
 
     fetchData();
-  }, []);
+  }, [t]);
 
 const PREFER_NOT_TO_ANSWER_GENDER_ID = 1;
 
@@ -261,32 +263,35 @@ const handleGenderIdentityCheckboxChange = (event, option) => {
 
   return (
     <div className="bg-white shadow-lg rounded-lg p-8 mt-10 mb-10">
-      <h2 className="text-3xl font-semibold text-center text-gray-800 mb-6">Add User</h2>
+      <h2 className="text-3xl font-semibold text-center text-gray-800 mb-6">{t('addUserForm:formTitle')}</h2>
       <form onSubmit={handleSubmit} className="space-y-6">
         <Dropdown
-          options={userTypes.map(({ usertype_id, role }) => ({ label: role, value: usertype_id }))}
-          placeholder="Select User Type"
+          options={userTypes.map(({ usertype_id, role }) => ({
+            label: t(`addUserForm:userTypes.${role.toLowerCase()}`), // Assuming your translation keys match the roles
+            value: usertype_id
+          }))}
+          placeholder={t('addUserForm:placeholders.selectUserType')}
           selectedValue={formData.userTypeID}
           onSelect={(value) => handleDropdownChange('userTypeID', value)}
         />
-        {renderTextInput("username", "Username", formData.username)}
-        {renderTextInput("email", "Email", formData.email)}
-        {renderTextInput("password", "Password", formData.password, true)}
-        {renderTextInput("firstName", "First Name", formData.firstName)}
-        {renderTextInput("lastName", "Last Name", formData.lastName)}
-        {renderTextInput("yearOfBirth", "Year of Birth (YYYY)", formData.yearOfBirth)}
-        {renderTextInput("postalCode", "Postal Code", formData.postalCode)}
-        {renderTextInput("vegetable", "Vegetable", formData.vegetable)}
+        {renderTextInput("username", t('placeholders.enterUsername'), formData.username)}
+        {renderTextInput("email", t('placeholders.enterEmail'), formData.email)}
+        {renderTextInput("password", t('placeholders.enterPassword'), formData.password, true)}
+        {renderTextInput("firstName", t('placeholders.enterFirstName'), formData.firstName)}
+        {renderTextInput("lastName", t('placeholders.enterLastName'), formData.lastName)}
+        {renderTextInput("yearOfBirth", t('placeholders.enterYearOfBirth'), formData.yearOfBirth)}
+        {renderTextInput("postalCode", t('placeholders.enterPostalCode'), formData.postalCode)}
+        {renderTextInput("vegetable", t('placeholders.enterVegetable'), formData.vegetable)}
         <Dropdown
-          options={primaryGenderIdentities.map(({ primary_gender_id, gender_name }) => ({ label: gender_name, value: primary_gender_id }))}
-          placeholder="Select Primary Gender Identity"
+          options={primaryGenderIdentities.map(({ primary_gender_id, gender_name }) => ({ label: t(`addUserForm:primaryGenders.${gender_name.toLowerCase()}`), value: primary_gender_id }))}
+          placeholder={t('addUserForm:placeholders.selectPrimaryGender')}
           selectedValue={formData.primaryGenderId}
           onSelect={(value) => handleDropdownChange('primaryGenderId', value)}
         />
         {
           formData.primaryGenderId === 4 &&
           <Checkbox
-            title="Select Gender Identities"
+            title={t('addUserForm:labels.genderIdentities')}
             options={genderIdentities}
             onChange={(event, option) => handleGenderIdentityCheckboxChange(event, option)}
           />
@@ -295,13 +300,13 @@ const handleGenderIdentityCheckboxChange = (event, option) => {
         {mapAreas.length > 0 && (
           <div>
             <Checkbox
-              title="Select Map Areas"
+              title={t('addUserForm:labels.mapAreas')}
               options={mapAreas}
               onChange={(event, option) => handleMapCheckboxChange(event, option)}
             />
           </div>
         )}
-        <Button type="submit" text="Add User" />
+        <Button type="submit" text={t('addUserForm:buttonText')} />
       </form>
       {feedback.message && <p className={`mt-4 text-${feedback.type === 'success' ? 'green' : 'red'}-500`}>{feedback.message}</p>}
     </div>

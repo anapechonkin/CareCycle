@@ -8,7 +8,7 @@ import { updateUser, getUserById } from "../api/userApi";
 import { fetchGenderIdentities, updateUserGenderIdentities } from "../api/genderIdentityApi";
 import { lookupPostalCode, addPostalCode } from '../api/postalCodeApi';
 import { fetchMapAreas, updateUserMapAreas } from "../api/mapAreaApi";
-
+import { useTranslation } from "react-i18next";
 
 const UpdateUserForm = ({ onAddUser, users }) => {
   const [formData, setFormData] = useState({
@@ -26,6 +26,7 @@ const UpdateUserForm = ({ onAddUser, users }) => {
     postalCodeId: '',
   });
 
+  const { t } = useTranslation('updateUserForm');
   const [filter, setFilter] = useState('all');
   const [userTypes, setUserTypes] = useState([]);
   const [primaryGenderIdentities, setPrimaryGenderIdentities] = useState([]);
@@ -90,7 +91,7 @@ const UpdateUserForm = ({ onAddUser, users }) => {
     const genderOptions = genderIdentities.map(identity => ({
       ...identity,
       id: `gender-${identity.gender_identity_id}`, // Prefixing 'gender-'
-      name: identity.type,
+      name: t(`updateUserForm:genderIdentities.${identity.type}`),
       checked: selectedGenderIdentities.includes(identity.gender_identity_id),
     }));
     setGenderCheckboxOptions(genderOptions);
@@ -98,11 +99,11 @@ const UpdateUserForm = ({ onAddUser, users }) => {
     const mapOptions = mapAreas.map(area => ({
       ...area,
       id: `map-${area.map_id}`, // Prefixing 'map-'
-      name: area.map_area_name,
+      name: t(`updateUserForm:mapAreas.${area.map_area_name}`),
       checked: selectedMapAreas.includes(area.map_id),
     }));
     setMapAreaCheckboxOptions(mapOptions);
-  }, [genderIdentities, selectedGenderIdentities, mapAreas, selectedMapAreas]);
+  }, [t, genderIdentities, selectedGenderIdentities, mapAreas, selectedMapAreas]);
 
   const handleDropdownChange = (name, value) => {
     setFormData(prev => ({
@@ -262,8 +263,7 @@ const UpdateUserForm = ({ onAddUser, users }) => {
       // Validate the email format.
       const formattedEmail = formData.email.trim().toLowerCase();
       if (!isValidEmail(formattedEmail)) {
-        setFeedback({ message: 'Invalid email format.', type: 'error' });
-        return;
+        setFeedback({ message: t('updateUserForm:feedbackMessages.invalidEmailFormat'), type: 'error' });        return;
       }
   
       // Prepare the data for the user update.
@@ -299,8 +299,7 @@ const UpdateUserForm = ({ onAddUser, users }) => {
       console.log('Updated Map Areas:', detailedMapAreas);
   
       // Provide success feedback and potentially update user list or other parent component states
-      setFeedback({ message: 'User updated successfully!', type: 'success' });
-      if (typeof onAddUser === 'function') {
+      setFeedback({ message: t('updateUserForm:feedbackMessages.userUpdatedSuccess'), type: 'success' });      if (typeof onAddUser === 'function') {
         onAddUser();
       }
   
@@ -329,8 +328,7 @@ const UpdateUserForm = ({ onAddUser, users }) => {
       }, 5000);
     } catch (error) {
       console.error("Failed to update user:", error);
-      setFeedback({ message: `Failed to update user: ${error.message}`, type: 'error' });
-      // Consider if you need to reset form state or perform other cleanup here in case of an error
+      setFeedback({ message: `${t('updateUserForm:feedbackMessages.userUpdateError')}: ${error.message}`, type: 'error' });      // Consider if you need to reset form state or perform other cleanup here in case of an error
     }
   };  
   
@@ -363,25 +361,25 @@ const UpdateUserForm = ({ onAddUser, users }) => {
   // Only display the notice if a user is selected and the user is archived
   const archivedNotice = selectedUserId && !formData.isActive ? (
     <div className="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4 mb-4" role="alert">
-      <p>This user is archived and can only be modified if the active status is updated.</p>
+      <p>{t('updateUserForm:archivedNotice')}</p>
     </div>
   ) : null;
 
   return (
     <div className="bg-white shadow rounded-lg p-8">
-      <h2 className="text-3xl font-semibold text-center text-gray-800 mb-6">Update User</h2>
+      <h2 className="text-3xl font-semibold text-center text-gray-800 mb-6">{t('updateUserForm:formTitle')}</h2>
       {/* Notice for Archived Users */}
       {archivedNotice}
       <div className="flex justify-center gap-4 mb-4">
-        {['all', 'active', 'archived'].map(f => (
+        {['all', 'active', 'archived'].map(filterOption => (
           <button
-            key={f}
-            onClick={() => setFilter(f)}
+            key={filterOption}
+            onClick={() => setFilter(filterOption)}
             className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-              filter === f ? 'bg-custom-teal text-white hover:bg-[#0f6a8b]' : 'bg-white text-gray-800 hover:bg-gray-100'
+              filter === filterOption ? 'bg-custom-teal text-white hover:bg-[#0f6a8b]' : 'bg-white text-gray-800 hover:bg-gray-100'
             }`}
           >
-            {f.charAt(0).toUpperCase() + f.slice(1)}
+            {t(`updateUserForm:filters.${filterOption}`)}
           </button>
         ))}
       </div>
@@ -393,16 +391,17 @@ const UpdateUserForm = ({ onAddUser, users }) => {
           user: user,
         }))}
         onChange={(option) => handleSelectChange('username', option)}
-        placeholder="Search by name or username"
+        placeholder={t('updateUserForm:placeholders.searchByNameOrUsername')}
         isClearable
         value={userOptions.find(option => option.value === selectedUserId) || null} // Ensure this line is correct
         className="mb-4"
         styles={customSelectStyles}
+        noOptionsMessage={() => t('updateUserForm:noUsersFound')} 
       />
   
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="username" className="block text-sm font-medium text-gray-700">Username</label>
+          <label htmlFor="username" className="block text-sm font-medium text-gray-700">{t('updateUserForm:labels.username')}</label>
           <input
             id="username"
             type="text"
@@ -415,7 +414,7 @@ const UpdateUserForm = ({ onAddUser, users }) => {
         </div>
   
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email Address</label>
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700">{t('updateUserForm:labels.email')}</label>
           <input
             id="email"
             type="text"
@@ -428,19 +427,22 @@ const UpdateUserForm = ({ onAddUser, users }) => {
         </div>
   
         <div>
-          <label htmlFor="userType" className="block text-sm font-medium text-gray-700">User Type</label>
+          <label htmlFor="userType" className="block text-sm font-medium text-gray-700">{t('updateUserForm:labels.userType')}</label>
           <Dropdown
-            options={userTypes.map(({ usertype_id, role }) => ({ label: role, value: usertype_id }))}
+            options={userTypes.map(({ usertype_id, role }) => ({
+              label: t(`updateUserForm:userTypes.${role}`), // Translate the role
+              value: usertype_id,
+            }))}
             selectedValue={formData.userTypeID}
             onSelect={(value) => handleSelectChange('userTypeID', { value })}
-            placeholder="Select User Type"
+            placeholder={t('updateUserForm:placeholders.selectUserType')}
             disabled={selectedUserId && !formData.isActive}
           />
         </div>
   
         <Checkbox
-          title="Status"
-          options={[{ id: "status", name: "Active", checked: formData.isActive }]}
+          title={t('updateUserForm:labels.status')}
+          options={[{ id: "status", name: t('updateUserForm:filters.active'), checked: formData.isActive }]}
           onChange={(event, option) => {
             handleChange({
               target: {
@@ -453,7 +455,7 @@ const UpdateUserForm = ({ onAddUser, users }) => {
         />
   
         <div>
-          <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">First Name</label>
+          <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">{t('updateUserForm:labels.firstName')}</label>
           <input
             id="firstName"
             type="text"
@@ -466,7 +468,7 @@ const UpdateUserForm = ({ onAddUser, users }) => {
         </div>
   
         <div>
-          <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">Last Name</label>
+          <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">{t('updateUserForm:labels.lastName')}</label>
           <input
             id="lastName"
             type="text"
@@ -479,24 +481,24 @@ const UpdateUserForm = ({ onAddUser, users }) => {
         </div>
   
         <div>
-          <label htmlFor="primaryGenderIdentity" className="block text-sm font-medium text-gray-700">Primary Gender Identity</label>
+          <label htmlFor="primaryGenderIdentity" className="block text-sm font-medium text-gray-700">{t('updateUserForm:labels.primaryGender')}</label>
           <Dropdown
             options={primaryGenderIdentities.map(({ primary_gender_id, gender_name }) => ({
-              label: gender_name,
+              label: t(`updateUserForm:primaryGenders.${gender_name}`),
               value: primary_gender_id,
             }))}
             selectedValue={formData.primaryGenderId}
             onSelect={value => handleDropdownChange('primaryGenderId', value)}
-            placeholder="Select Primary Gender Identity"
+            placeholder={t('updateUserForm:placeholders.selectPrimaryGender')}
             disabled={selectedUserId && !formData.isActive}
           />
         </div>
   
         {/* Checkboxes for gender identities */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">Select Gender Identities</label>
+          <label className="block text-sm font-medium text-gray-700">{t('updateUserForm:placeholders.selectGenderIdentities')}</label>
           <Checkbox
-            title="Gender Identities"
+            title={t('updateUserForm:labels.genderIdentities')}
             options={genderCheckboxOptions}
             onChange={handleGenderIdentityCheckboxChange}
             disabled={selectedUserId && !formData.isActive}
@@ -504,7 +506,7 @@ const UpdateUserForm = ({ onAddUser, users }) => {
         </div>
   
         <div>
-          <label htmlFor="yearOfBirth" className="block text-sm font-medium text-gray-700">Year of Birth</label>
+          <label htmlFor="yearOfBirth" className="block text-sm font-medium text-gray-700">{t('updateUserForm:labels.yearOfBirth')}</label>
           <input
             id="yearOfBirth"
             type="text"
@@ -518,9 +520,9 @@ const UpdateUserForm = ({ onAddUser, users }) => {
   
         {/* Checkboxes for map areas */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">Select Map Areas</label>
+          <label className="block text-sm font-medium text-gray-700">{t('updateUserForm:placeholders.selectMapAreas')}</label>
           <Checkbox
-            title="Map Areas"
+            title={t('updateUserForm:labels.mapAreas')}
             options={mapAreaCheckboxOptions}
             onChange={handleMapAreasCheckboxesChange}
             disabled={selectedUserId && !formData.isActive}
@@ -528,7 +530,7 @@ const UpdateUserForm = ({ onAddUser, users }) => {
         </div>
   
         <div>
-          <label htmlFor="postalCodeId" className="block text-sm font-medium text-gray-700">Postal Code</label>
+          <label htmlFor="postalCodeId" className="block text-sm font-medium text-gray-700">{t('updateUserForm:labels.postalCode')}</label>
           <input
             id="postalCode"
             type="text"
@@ -541,7 +543,7 @@ const UpdateUserForm = ({ onAddUser, users }) => {
         </div>
   
         <div>
-          <label htmlFor="vegetable" className="block text-sm font-medium text-gray-700">Vegetable</label>
+          <label htmlFor="vegetable" className="block text-sm font-medium text-gray-700">{t('updateUserForm:labels.vegetable')}</label>
           <input
             id="vegetable"
             type="text"
@@ -554,7 +556,7 @@ const UpdateUserForm = ({ onAddUser, users }) => {
         </div>
   
         <div className="flex justify-center">
-          <Button type="submit" text="Update User" />
+          <Button type="submit" text={t('updateUserForm:buttonText')}/>
         </div>
             
         {/* Display feedback message */}

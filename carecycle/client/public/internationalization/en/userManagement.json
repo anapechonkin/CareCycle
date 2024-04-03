@@ -1,0 +1,9 @@
+{
+    "pageTitle": "Manage User Account",
+    "tabs": {
+      "add": "ADD",
+      "update": "UPDATE",
+      "archive": "ARCHIVE"
+    }
+  }
+  

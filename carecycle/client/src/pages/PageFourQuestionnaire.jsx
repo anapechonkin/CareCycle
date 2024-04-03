@@ -267,6 +267,7 @@ const PageFourQuestionnaire = () => {
         isOpen={isModalOpen} 
         onClose={() => handleCloseModal('cancel')}
         onConfirm={() => handleCloseModal('confirm')}
+        showOkButton={rulesAccepted !== null}
         showCancelButton = {!rulesAccepted}
       >
         <p>{modalMessage}</p>

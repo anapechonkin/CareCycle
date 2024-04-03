@@ -1,0 +1,89 @@
+{
+    "formTitle": "Mettre à Jour L'utilisateur",
+    "noUsersFound": "Aucun utilisateur trouvé.",
+    "archivedNotice": "Cet utilisateur est archivé et ne peut être modifié que si le statut actif est mis à jour.",    "filters": {
+      "all": "Tous",
+      "active": "Actif",
+      "archived": "Archivé"
+    },
+    "labels": {
+      "userType": "Type d'utilisateur",
+      "username": "Nom d'utilisateur",
+      "email": "E-mail",
+      "firstName": "Prénom",
+      "lastName": "Nom de famille",
+      "yearOfBirth": "Année de naissance (AAAA)",
+      "primaryGender": "Genre primaire",
+      "postalCode": "Code postal",
+      "vegetable": "Légume préféré",
+      "genderIdentities": "Identités de genre",
+      "mapAreas": "Zones Géographiques",
+      "status": "Statut"
+    },
+    "placeholders": {
+      "selectUserType": "Sélectionnez le type d'utilisateur",
+      "searchByNameOrUsername": "Rechercher par nom ou nom d'utilisateur",
+      "selectMapAreas": "Sélectionner les zones géographiques",
+      "selectPrimaryGender": "Sélectionnez le genre primaire",
+      "selectGenderIdentities": "Sélectionner les identités de genre"
+    },
+    "buttonText": "Modifier",
+    "feedbackMessages": {
+      "userUpdatedSuccess": "Utilisateur mis à jour avec succès !",
+      "userUpdateError": "Échec de la mise à jour de l'utilisateur.",
+      "invalidEmailFormat": "Format d'email invalide."
+    },
+    "userTypes": {
+      "Volunteer": "Bénévole",
+      "Admin": "Administrateur",
+      "CA/Employee": "Employé/CA"
+    },
+    "primaryGenders": {
+      "Prefer Not To Answer": "Préfère ne pas répondre",
+      "Male": "Homme",
+      "Female": "Femme",
+      "Other": "Autre"
+    },
+    "genderIdentities": {
+      "Prefer Not To Answer": "Préfère ne pas répondre",
+      "Agender": "Agender",
+      "Bigender": "Bigender",
+      "Demigender": "Demigender",
+      "Female": "Femme",
+      "Gender Fluid": "Genre fluide",
+      "Gender Neutral": "Genre neutre",
+      "Gender Non-Conforming": "Non-conforme au genre",
+      "Genderqueer": "Genderqueer",
+      "Intersex": "Intersexe",
+      "Male": "Homme",
+      "Neurogender": "Neurogenre",
+      "Non-Binary": "Non-binaire",
+      "Polygender": "Polygenre",
+      "Questioning": "En questionnement",
+      "Transgender": "Transgenre",
+      "Two-Spirit": "Bispirituel",
+      "Xenogender": "Xénogenre"
+    },
+    "mapAreas": {
+      "Prefer Not To Answer": "Préfère ne pas répondre",
+      "Middle East": "Moyen-Orient",
+      "Near East": "Proche-Orient",
+      "Southeastern Asia": "Asie du Sud-Est",
+      "South Asia": "Asie du Sud",
+      "Central Asia": "Asie Centrale",
+      "North America": "Amérique du Nord",
+      "Central America": "Amérique Centrale",
+      "South America": "Amérique du Sud",
+      "Caribbean": "Caraïbes",
+      "Northwestern Europe": "Europe du Nord-Ouest",
+      "Eastern Europe": "Europe de l'Est",
+      "Mediterranean Europe": "Europe Méditerranéenne",
+      "South Pacific (including Australia)": "Pacifique Sud (incluant l'Australie)",
+      "Northern Africa": "Afrique du Nord",
+      "Western Africa": "Afrique de l'Ouest",
+      "Central Africa": "Afrique Centrale",
+      "Eastern Africa": "Afrique de l'Est",
+      "Southern Africa": "Afrique du Sud"
+    }
+  }
+  

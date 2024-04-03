@@ -1,0 +1,90 @@
+{
+    "formTitle": "Update User",
+    "archivedNotice": "This user is archived and can only be modified if the active status is updated.",
+    "noUsersFound": "No users found.",
+    "filters": {
+      "all": "All",
+      "active": "Active",
+      "archived": "Archived"
+    },
+    "labels": {
+      "userType": "User Type",
+      "username": "Username",
+      "email": "Email",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "yearOfBirth": "Year of Birth (YYYY)",
+      "primaryGender": "Primary Gender",
+      "postalCode": "Postal Code",
+      "vegetable": "Favorite Vegetable",
+      "genderIdentities": "Gender Identities",
+      "mapAreas": "Map Areas",
+      "status": "Status"
+    },
+    "placeholders": {
+      "selectUserType": "Select User Type",
+      "searchByNameOrUsername": "Search by name or username",
+      "selectPrimaryGender": "Select Primary Gender",
+      "selectGenderIdentities": "Select Gender Identities",
+      "selectMapAreas": "Select Map Areas"
+    },
+    "buttonText": "Update User",
+    "feedbackMessages": {
+      "userUpdatedSuccess": "User updated successfully!",
+      "userUpdateError": "Failed to update user.",
+      "invalidEmailFormat": "Invalid email format."
+    },
+    "userTypes": {
+        "Volunteer": "Volunteer",
+        "Admin": "Admin",
+        "CA/Employee": "CA/Employee"
+      },
+      "primaryGenders": {
+        "Prefer Not To Answer": "Prefer Not To Answer",
+        "Male": "Male",
+        "Female": "Female",
+        "Other": "Other"
+      },
+      "genderIdentities": {
+        "Prefer Not To Answer": "Prefer Not To Answer",
+        "Agender": "Agender",
+        "Bigender": "Bigender",
+        "Demigender": "Demigender",
+        "Female": "Female",
+        "Gender Fluid": "Gender Fluid",
+        "Gender Neutral": "Gender Neutral",
+        "Gender Non-Conforming": "Gender Non-Conforming",
+        "Genderqueer": "Genderqueer",
+        "Intersex": "Intersex",
+        "Male": "Male",
+        "Neurogender": "Neurogender",
+        "Non-Binary": "Non-Binary",
+        "Polygender": "Polygender",
+        "Questioning": "Questioning",
+        "Transgender": "Transgender",
+        "Two-Spirit": "Two-Spirit",
+        "Xenogender": "Xenogender"
+      },
+      "mapAreas": {
+        "Prefer Not To Answer": "Prefer Not To Answer",
+        "Middle East": "Middle East",
+        "Near East": "Near East",
+        "Southeastern Asia": "Southeastern Asia",
+        "South Asia": "South Asia",
+        "Central Asia": "Central Asia",
+        "North America": "North America",
+        "Central America": "Central America",
+        "South America": "South America",
+        "Caribbean": "Caribbean",
+        "Northwestern Europe": "Northwestern Europe",
+        "Eastern Europe": "Eastern Europe",
+        "Mediterranean Europe": "Mediterranean Europe",
+        "South Pacific (including Australia)": "South Pacific (including Australia)",
+        "Northern Africa": "Northern Africa",
+        "Western Africa": "Western Africa",
+        "Central Africa": "Central Africa",
+        "Eastern Africa": "Eastern Africa",
+        "Southern Africa": "Southern Africa"
+      }
+  }
+  

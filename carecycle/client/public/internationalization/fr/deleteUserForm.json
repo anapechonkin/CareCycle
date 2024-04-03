@@ -1,0 +1,17 @@
+{
+    "title": "Supprimer l'utilisateur",
+    "searchPlaceholder": "Recherche par nom d'utilisateur",
+    "deleteButtonText": "SUPPRIMER",
+    "noUsersAvailable": "Aucun utilisateur disponible pour la suppression.",
+    "feedback": {
+      "noUserSelected": "Aucun utilisateur sélectionné.",
+      "userArchivedSuccess": "Utilisateur archivé avec succès.",
+      "userArchiveError": "Échec de l'archivage de l'utilisateur."
+    },
+    "userInfo": {
+      "firstName": "Prénom :",
+      "lastName": "Nom de famille :",
+      "username": "Nom d'utilisateur :"
+    }
+  }
+  

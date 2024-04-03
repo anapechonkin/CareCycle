@@ -1,0 +1,17 @@
+{
+    "title": "Delete User",
+    "searchPlaceholder": "Search by username",
+    "deleteButtonText": "DELETE",
+    "noUsersAvailable": "No users available for deletion.",
+    "feedback": {
+      "noUserSelected": "No user selected.",
+      "userArchivedSuccess": "User successfully archived.",
+      "userArchiveError": "Failed to archive user."
+    },
+    "userInfo": {
+      "firstName": "First Name:",
+      "lastName": "Last Name:",
+      "username": "Username:"
+    }
+  }
+  
