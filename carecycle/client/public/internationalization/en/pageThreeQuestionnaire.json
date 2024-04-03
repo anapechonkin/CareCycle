@@ -1,0 +1,63 @@
+{
+      "title": "Place of Origin",
+      "newcomerQuestion": "Do you consider yourself to be a newcomer?",
+      "commentPlaceholder": "Leave a comment (optional)",
+      "selfIdentificationSection": "Do you consider yourself to be a:",
+      "originSection": "Where do you consider your origins to be?",
+      "buttons": {
+        "previous": "PREVIOUS PAGE",
+        "next": "NEXT PAGE"
+      },
+      "modalMessages": {
+        "pleaseSelect": "Please select ",
+        "continue": " to continue.",
+        "selectAnewcomerStatus": "a newcomer status",
+        "selectAtLeastOneSelfIdentificationOption": "at least one self-identification option",
+        "selectAtLeastOneMapArea": "at least one map area"
+      },
+      "continents": {
+        "preferNotToAnswer": "Prefer Not To Answer",
+        "americas": "Americas",
+        "europe": "Europe",
+        "asia": "Asia",
+        "africa": "Africa",
+        "oceania": "Oceania"
+      },
+      "mapAreas": {
+        "Prefer_Not_To_Answer": "Prefer Not To Answer",
+        "Middle_East": "Middle East",
+        "Near_East": "Near East",
+        "Southeastern_Asia": "Southeastern Asia",
+        "South_Asia": "South Asia",
+        "Central_Asia": "Central Asia",
+        "North_America": "North America",
+        "Central_America": "Central America",
+        "South_America": "South America",
+        "Caribbean": "Caribbean",
+        "Northwestern_Europe": "Northwestern Europe",
+        "Eastern_Europe": "Eastern Europe",
+        "Mediterranean_Europe": "Mediterranean Europe",
+        "South_Pacific_including_Australia": "South Pacific (including Australia)",
+        "Northern_Africa": "Northern Africa",
+        "Western_Africa": "Western Africa",
+        "Central_Africa": "Central Africa",
+        "Eastern_Africa": "Eastern Africa",
+        "Southern_Africa": "Southern Africa"
+      },
+      "newcomerStatusOptions": {
+        "Prefer_Not_To_Answer": "Prefer Not To Answer",
+        "No": "No",
+        "Yes_in_Montreal": "Yes in Montreal",
+        "Yes_in_Quebec": "Yes in Quebec",
+        "Yes_in_Canada": "Yes in Canada"
+      },
+      "selfIdentificationOptions": {
+        "preferNotToAnswer": "Prefer Not To Answer",
+        "visibleMinorityRacializedPerson": "Visible minority (racialized person)",
+        "ethnicalMinority": "Ethnical minority",
+        "memberOfAFirstNationOrInuit": "Member of a first nation or Inuit",
+        "bodyDiversity": "Body Diversity",
+        "white": "White"
+      }      
+}
+  

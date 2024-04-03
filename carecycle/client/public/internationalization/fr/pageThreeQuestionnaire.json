@@ -1,0 +1,63 @@
+{
+      "title": "Lieu d'origine",
+      "newcomerQuestion": "Vous considérez-vous comme un nouvel arrivant?",
+      "commentPlaceholder": "Laissez un commentaire (facultatif)",
+      "selfIdentificationSection": "Vous considérez-vous comme étant :",
+      "originSection": "Quelles sont vos origines ?",
+      "buttons": {
+        "previous": "PAGE PRÉCÉDENTE",
+        "next": "PAGE SUIVANTE"
+      },
+      "modalMessages": {
+        "pleaseSelect": "Veuillez sélectionner ",
+        "continue": "pour continuer",
+        "selectAnewcomerStatus": "un statut de nouvel arrivant",
+        "selectAtLeastOneSelfIdentificationOption": "au moins une option d'auto-identification",
+        "selectAtLeastOneMapArea": "au moins une zone géographique"
+      },
+      "continents": {
+        "preferNotToAnswer": "Préfère Ne Pas Répondre",
+        "americas": "Amériques",
+        "europe": "Europe",
+        "asia": "Asie",
+        "africa": "Afrique",
+        "oceania": "Océanie"
+      },
+      "mapAreas": {
+        "Prefer_Not_To_Answer": "Préfère Ne Pas Répondre",
+        "Middle_East": "Moyen-Orient",
+        "Near_East": "Proche-Orient",
+        "Southeastern_Asia": "Asie du Sud-Est",
+        "South_Asia": "Asie du Sud",
+        "Central_Asia": "Asie Centrale",
+        "North_America": "Amérique du Nord",
+        "Central_America": "Amérique Centrale",
+        "South_America": "Amérique du Sud",
+        "Caribbean": "Caraïbes",
+        "Northwestern_Europe": "Europe du Nord-Ouest",
+        "Eastern_Europe": "Europe de l'Est",
+        "Mediterranean_Europe": "Europe Méditerranéenne",
+        "South_Pacific_including_Australia": "Pacifique Sud (y compris l'Australie)",
+        "Northern_Africa": "Afrique du Nord",
+        "Western_Africa": "Afrique de l'Ouest",
+        "Central_Africa": "Afrique Centrale",
+        "Eastern_Africa": "Afrique de l'Est",
+        "Southern_Africa": "Afrique du Sud"
+      },
+      "newcomerStatusOptions": {
+        "Prefer_Not_To_Answer": "Préfère Ne Pas Répondre",
+        "No": "Non",
+        "Yes_in_Montreal": "Oui, à Montréal",
+        "Yes_in_Quebec": "Oui, au Québec",
+        "Yes_in_Canada": "Oui, au Canada"
+      },
+      "selfIdentificationOptions": {
+        "preferNotToAnswer": "Préfère Ne Pas Répondre",
+        "visibleMinorityRacializedPerson": "Minorité visible (personne racialisée)",
+        "ethnicalMinority": "Minorité ethnique",
+        "memberOfAFirstNationOrInuit": "Membre d'une première nation ou Inuit",
+        "bodyDiversity": "Diversité corporelle",
+        "white": "Blanc"
+      }      
+}
+  

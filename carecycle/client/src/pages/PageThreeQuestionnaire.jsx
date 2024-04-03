@@ -12,6 +12,7 @@ import { fetchMapAreas } from "../api/mapAreaApi";
 import { fetchSelfIdentificationOptions } from "../api/selfIdApi";
 import { fetchNewcomerStatus } from "../api/dropdownApi"; // Ensure this function is correctly implemented to fetch options
 import { useForm } from '../context/FormContext';
+import { useTranslation } from 'react-i18next';
 
 const continentMapping = {
   "Prefer Not To Answer": [1], // Special case, might not be associated with a specific continent
@@ -24,6 +25,7 @@ const continentMapping = {
 
 const PageThreeQuestionnaire = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation('pageThreeQuestionnaire');
   // Accesses form context for global form state management.
   const { formData, updateFormData, workshopId, markQuestionnaireCompleted } = useForm();
   // State management for dynamic form elements and modal.
@@ -37,83 +39,112 @@ const PageThreeQuestionnaire = () => {
   const [groupedMapAreas, setGroupedMapAreas] = useState({});
   const [isFormValid, setIsFormValid] = useState(false); 
 
+  // Example of transforming a string into camelCase
+  const toCamelCase = (str) => {
+    return str
+      .toLowerCase()
+      .replace(/[^a-zA-Z0-9]+(.)/g, (m, chr) => chr.toUpperCase());
+  }
+
   // Effect hook for loading self-identification options on component mount.
   useEffect(() => {
     const loadSelfIdOptions = async () => {
       try {
         const data = await fetchSelfIdentificationOptions();
-        setSelfIdOptions(data.map(option => ({
-          ...option,
-          id: option.self_identification_id,
-          name: option.option,
-          checked: formData.selfIdentificationOptions?.some(selection => selection.id === option.self_identification_id) || false,
-        })));
+        setSelfIdOptions(data.map(option => {
+          // Assuming option.option is the name of the option that needs translation
+          // and it matches a key in your translation JSON files
+          // Convert the option name to camelCase or another consistent format
+          const optionKey = toCamelCase(option.option);
+          return {
+            ...option,
+            id: option.self_identification_id,
+            // Use the converted key to fetch the translation
+            name: t(`pageThreeQuestionnaire:selfIdentificationOptions.${optionKey}`),
+            checked: formData.selfIdentificationOptions?.some(selection => selection.id === option.self_identification_id) || false,
+          };
+        }));
       } catch (error) {
         console.error("Failed to fetch self-identification options:", error);
       }
     };
-    
+  
     loadSelfIdOptions();
-  }, [formData.selfIdentificationOptions]);
+  }, [t, formData.selfIdentificationOptions]);
 
   // Effect hook for loading map area data on component mount or form data changes.
   useEffect(() => {
     const loadMapAreas = async () => {
       try {
         const areas = await fetchMapAreas(); 
-        setMapAreas(areas.map(area => ({
-          ...area,
-          id: area.map_id,
-          name: area.map_area_name,
-          checked: formData.mapSelections?.some(selection => selection.mapID === area.map_id) || false,
-        })));
+        setMapAreas(areas.map(area => {
+          // Standardize the map area name to closely match translation keys
+          // This should reflect the exact structure of keys in your translation files
+          const standardizedKey = area.map_area_name.replace(/\s+/g, '_').replace(/\(/g, '').replace(/\)/g, '').replace(/__+/g, '_');
+          return {
+            ...area,
+            id: area.map_id,
+            // Ensure the key transformation here matches exactly with your translation key structure
+            name: t(`pageThreeQuestionnaire:mapAreas.${standardizedKey}`),
+            checked: formData.mapSelections?.some(selection => selection.mapID === area.map_id) || false,
+          };
+        }));
       } catch (error) {
         console.error("Failed to fetch map areas:", error);
       }
     };
     loadMapAreas();
-  }, [formData.mapSelections]);
-
+  }, [t, formData.mapSelections]);
+    
   // Loads newcomer status options from an API on component mount and sets the initial value.
-useEffect(() => {
-  const loadNewcomerStatusOptions = async () => {
-    try {
-      const statuses = await fetchNewcomerStatus();
-      const mappedStatuses = statuses.map(status => ({
-        value: status.newcomer_status_id,
-        label: status.status,
-      }));
-      setNewcomerStatusOptions(mappedStatuses);
-
-      // If formData already has a newcomerStatus, set it as the initial value for the dropdown
-      if (formData.newcomerStatus) {
-        const existingStatus = mappedStatuses.find(status => status.value === formData.newcomerStatus.id);
-        if (existingStatus) {
-          setNewcomerStatus(formData.newcomerStatus.id); // Ensure this matches how you're storing the selected value
+  useEffect(() => {
+    const loadNewcomerStatusOptions = async () => {
+      try {
+        const statuses = await fetchNewcomerStatus();
+        const mappedStatuses = statuses.map(status => ({
+          value: status.newcomer_status_id,
+          // Use a function to transform `status.status` into a key, or directly use `status.status`
+          // as keys if they're already standardized in your translation files.
+          label: t(`pageThreeQuestionnaire:newcomerStatusOptions.${status.status.replace(/\s+/g, '_').replace(/[\(\)]/g, '')}`),
+        }));
+        setNewcomerStatusOptions(mappedStatuses);
+  
+        // Set the initial value for the dropdown if formData already has a newcomerStatus
+        if (formData.newcomerStatus) {
+          const existingStatus = mappedStatuses.find(status => status.value === formData.newcomerStatus.id);
+          if (existingStatus) {
+            setNewcomerStatus(formData.newcomerStatus.id);
+          }
         }
+      } catch (error) {
+        console.error("Failed to fetch newcomer statuses:", error);
       }
-    } catch (error) {
-      console.error("Failed to fetch newcomer statuses:", error);
-    }
-  };
-  loadNewcomerStatusOptions();
-}, [formData.newcomerStatus]); // Depend on formData.newcomerStatus to reset if it changes
+    };
+    loadNewcomerStatusOptions();
+  }, [t, formData.newcomerStatus]); // Add 't' to the dependency array to ensure the effect reruns if the language changes
 
 useEffect(() => {
   // Initialize newcomerComment state based on form data
   setNewcomerComment(formData.newcomerComment || ''); // Set to newcomerComment if available, otherwise set to an empty string
 }, [formData.newcomerComment]); // Depend on formData.newcomerComment to reset if it changes
 
-  useEffect(() => {
-    const grouped = Object.keys(continentMapping).reduce((acc, continent) => {
-      // Filter mapAreas by checking if the area's ID is included in the continentMapping for the current continent
-      acc[continent] = mapAreas.filter(area => continentMapping[continent].includes(area.id));
-      return acc;
-    }, {});
-  
-    setGroupedMapAreas(grouped);
-  }, [mapAreas]);
-  
+useEffect(() => {
+  const grouped = Object.keys(continentMapping).reduce((acc, continent) => {
+    // Ensure the key matches the format in your JSON files. This example assumes camelCase.
+    let formattedContinentKey = continent.charAt(0).toLowerCase() + continent.slice(1).replace(/ /g, '');
+    let continentTranslationKey = `pageThreeQuestionnaire:continents.${formattedContinentKey}`;
+    let continentName = t(continentTranslationKey);
+    
+    console.log(`Key: ${continentTranslationKey}, Translated: ${continentName}`); // Debug log for translation check
+    
+    // Keep the original logic for filtering map areas
+    acc[continentName] = mapAreas.filter(area => continentMapping[continent].includes(area.id));
+    return acc;
+  }, {});
+
+  setGroupedMapAreas(grouped);
+}, [mapAreas, t]); // Added 't' to dependencies to ensure re-calculation when translations load
+
   // Effect hook for validating the form on every change to the form data.
   useEffect(() => {
     // Perform validation checks
@@ -158,34 +189,30 @@ useEffect(() => {
 
   // Handles navigation to the next page, ensuring at least one map area is selected.
   const handleNextClick = () => {
-    let missingSections = [];
+    let missingSectionsKeys = [];
   
     // Check if newcomer status is selected
     if (!formData.newcomerStatus) {
-      missingSections.push("a newcomer status");
+      missingSectionsKeys.push("selectAnewcomerStatus");
     }
   
     // Check if at least one self-identification option is selected
     if (!(formData.selfIdentificationOptions && formData.selfIdentificationOptions.length > 0)) {
-      missingSections.push("at least one self-identification option");
+      missingSectionsKeys.push("selectAtLeastOneSelfIdentificationOption");
     }
   
     // Check if at least one map area is selected
     if (!(formData.mapSelections && formData.mapSelections.length > 0)) {
-      missingSections.push("at least one map area");
+      missingSectionsKeys.push("selectAtLeastOneMapArea");
     }
   
     // If any sections are missing, show a modal with a combined message and prevent navigation
-    if (missingSections.length > 0) {
-      let message = "Please select ";
-      if (missingSections.length === 1) {
-        message += missingSections[0];
-      } else {
-        // Combine all but the last missing section with commas, and add "and" before the last missing section
-        message += missingSections.slice(0, -1).join(", ") + ", and " + missingSections.slice(-1);
-      }
-      message += " to continue.";
-  
+    if (missingSectionsKeys.length > 0) {
+      let messageParts = missingSectionsKeys.map(key => t(`pageThreeQuestionnaire:modalMessages.${key}`));
+      let message = t('pageThreeQuestionnaire:modalMessages.pleaseSelect') +
+                    messageParts.join(", ") + 
+                    t('pageThreeQuestionnaire:modalMessages.continue');
+      
       setModalContent(message);
       setShowModal(true);
       return;
@@ -280,9 +307,9 @@ useEffect(() => {
       <Shadow />
       <div className="flex-grow pt-20 pb-20 mt-24 flex flex-col items-center justify-center w-full">
         <div className="max-w-[800px] w-full px-4 lg:px-8 space-y-12">
-          <h1 className="text-5xl font-bold mb-16 text-center text-[#704218]">Place of Origin</h1>
+          <h1 className="text-5xl font-bold mb-16 text-center text-[#704218]">{t('pageThreeQuestionnaire:title')}</h1>
           <Dropdown
-            placeholder="Do you consider yourself to be a newcomer?"
+            placeholder={t('pageThreeQuestionnaire:newcomerQuestion')}
             options={newcomerStatusOptions}
             onSelect={handleSelect}
             selectedValue={newcomerStatus}
@@ -290,7 +317,7 @@ useEffect(() => {
           <div className="flex flex-col items-center justify-center">
             <textarea
               className="w-full p-2 border rounded"
-              placeholder="Leave a comment (optional)"
+              placeholder={t('pageThreeQuestionnaire:commentPlaceholder')}
               maxLength="255"
               value={newcomerComment}
               onChange={handleNewcomerCommentChange}
@@ -303,7 +330,7 @@ useEffect(() => {
           {/* Self-Identification Section */}
           <div className="w-full">
             <div className="mb-4">
-              <h2 className="text-xl font-semibold">Do you consider yourself to be a:</h2>
+              <h2 className="text-xl font-semibold">{t('pageThreeQuestionnaire:selfIdentificationSection')}</h2>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               {selfIdOptions.map((option) => (
@@ -321,7 +348,7 @@ useEffect(() => {
             </div>
           </div>
           <div className="w-full">
-            <h2 className="text-xl font-semibold mb-4">Where do you consider your origins to be?</h2>
+            <h2 className="text-xl font-semibold mb-4">{t('pageThreeQuestionnaire:originSection')}</h2>
             {Object.entries(groupedMapAreas).map(([continent, areas]) => (
               <div key={continent}>
                 <h3 className="text-lg font-semibold">{continent}</h3>
@@ -350,8 +377,8 @@ useEffect(() => {
             {modalContent}
           </Modal>
           <div className="flex justify-between w-full mt-8">
-            <Button text="PREVIOUS QUESTION" onClick={handlePreviousClick} style={{ marginRight: '15px' }} />
-            <Button text="NEXT QUESTION" onClick={handleNextClick} disabled={!isFormValid}/>
+            <Button text={t('pageThreeQuestionnaire:buttons.previous')}  onClick={handlePreviousClick} style={{ marginRight: '15px' }} />
+            <Button text={t('pageThreeQuestionnaire:buttons.next')} onClick={handleNextClick} disabled={!isFormValid}/>
           </div>
         </div>
       </div>
