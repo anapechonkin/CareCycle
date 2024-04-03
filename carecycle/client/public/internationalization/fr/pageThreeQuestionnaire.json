@@ -10,7 +10,7 @@
       },
       "modalMessages": {
         "pleaseSelect": "Veuillez sélectionner ",
-        "continue": "pour continuer",
+        "continue": " pour continuer",
         "selectAnewcomerStatus": "un statut de nouvel arrivant",
         "selectAtLeastOneSelfIdentificationOption": "au moins une option d'auto-identification",
         "selectAtLeastOneMapArea": "au moins une zone géographique"

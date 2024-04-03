@@ -12,9 +12,11 @@ import { lookupPostalCode, addPostalCode } from '../api/postalCodeApi';
 import { addClientStatGenderIdentities } from '../api/genderIdentityApi'; 
 import { addClientStatsMapAreas } from "../api/mapAreaApi";
 import { addClientStatSelfIdentification } from "../api/selfIdApi";
+import { useTranslation } from 'react-i18next'; 
 
 const PageFourQuestionnaire = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation('pageFourQuestionnaire'); 
   const { formData, 
           updateFormData, 
           workshopId, 
@@ -86,11 +88,11 @@ const PageFourQuestionnaire = () => {
       // Decide which modal message to show based on rulesAccepted
       if (rulesAccepted === false) {
         // If the user declined, set up the first modal to inform and prompt to give back the device
-        setModalMessage('You have successfully submitted the questionnaire. Please give the device back to the volunteer or employee, thank you for your time.');
+        setModalMessage(t('pageFourQuestionnaire:modal.declineMessage'));
         setIsModalOpen(true);
       } else {
         // If the user accepted or in any other case, just show the success message
-        setModalMessage('You have successfully submitted the questionnaire. Please give the device back to the volunteer or employee, thank you for your time.');
+        setModalMessage(t('pageFourQuestionnaire:modal.acceptMessage'));
         setIsModalOpen(true);
       }
   
@@ -114,30 +116,36 @@ const PageFourQuestionnaire = () => {
   
     } catch (error) {
       console.error('Submission error:', error);
-      setModalMessage('Failed to submit the questionnaire. Please try again.');
+      setModalMessage(t('pageFourQuestionnaire:submissionFailureMessage'));
       setIsModalOpen(true);
       return false;
     }
   }; 
-  
+
   const handleAcceptOrDeclineRules = async () => {
+    // Check if the user has not made a choice yet
+    if (rulesAccepted === null) {
+        // Set modal message instructing the user to accept or decline the rules
+        setModalMessage(t('pageFourQuestionnaire:modal.pleaseChooseMessage'));
+        setIsModalOpen(true);
+        return; // Prevent further execution
+    }
+
     let submissionSuccess = false;
   
     if (questionnaireCompleted) {
-      submissionSuccess = await handleSubmitQuestionnaire();
-      setSubmissionStatus(submissionSuccess ? 'success' : 'failure');
+        submissionSuccess = await handleSubmitQuestionnaire();
+        setSubmissionStatus(submissionSuccess ? 'success' : 'failure');
     }
   
     if (rulesAccepted) {
-      setModalMessage("Thank you for your participation and for accepting our rules. Please return the device to the volunteer or employee.");
-      setIsModalOpen(true);
+        setModalMessage(t('pageFourQuestionnaire:modal.acceptMessage'));
     } else {
-      setModalMessage("You are about to decline the rules and values, which may limit your access. If you wish to continue, please click OK and return the device to the volunteer or employee. Click 'Cancel' if you wish to change your decision.");
-      setIsModalOpen(true);
+        setModalMessage(t('pageFourQuestionnaire:modal.declineMessage'));
     }
-  };
-  
 
+    setIsModalOpen(true);
+};
 
   // Adjust handleCloseModal to handle different scenarios more explicitly
   const handleCloseModal = (action) => {
@@ -152,7 +160,7 @@ const PageFourQuestionnaire = () => {
       setTimeout(() => {
         // Hide the overlay right before showing the second modal
         setShowOverlay(false);
-        setModalMessage("The client has declined the rules and values. Please decide what to do next.");
+        setModalMessage(t('pageFourQuestionnaire:modal.finalMessage'));
         setIsSecondModalOpen(true);
       }, 5000); // Delay the second modal by 5 seconds (5000 milliseconds)
       } else if (action === 'cancel') {
@@ -190,10 +198,11 @@ const PageFourQuestionnaire = () => {
       <Shadow />
       <div className="flex-grow pt-20 pb-20 mt-24 flex flex-col items-center justify-center w-full">
         <div className="max-w-[900px] w-full px-4 lg:px-8 space-y-12">
-          <h1 className="text-6xl font-bold mb-16 text-center text-[#704218] [text-shadow:0px_4px_4px_#00000040]">Rules and Values</h1>
+          <h1 className="text-6xl font-bold mb-16 text-center text-[#704218] [text-shadow:0px_4px_4px_#00000040]"> {t('pageFourQuestionnaire:rulesAndValuesTitle')}</h1>
           <div className="overflow-auto h-80 border-2 border-black rounded-lg shadow-lg p-6 mb-6 bg-white text-xl">
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p><br></br>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+            {t('pageFourQuestionnaire:rulesAndValuesContent', { returnObjects: true }).map((rule, index) => (
+              <p key={index}>{rule}</p>
+            ))}
           </div>
           <div className="flex justify-center mt-6 text-2xl">
             <label className="flex items-center cursor-pointer">
@@ -204,7 +213,7 @@ const PageFourQuestionnaire = () => {
                 checked={rulesAccepted === true}
                 onChange={() => setRulesAccepted(true)}
               />
-              <span className="ml-2">Accept</span>
+              <span className="ml-2"> {t('pageFourQuestionnaire:accept')}</span>
             </label>
             <label className="flex items-center mx-8 cursor-pointer">
               <input
@@ -214,7 +223,7 @@ const PageFourQuestionnaire = () => {
                 checked={rulesAccepted === false}
                 onChange={() => setRulesAccepted(false)}
               />
-              <span className="ml-2">Decline</span>
+              <span className="ml-2">{t('pageFourQuestionnaire:decline')}</span>
             </label>
           </div>
           <div className="flex items-center justify-between w-full mt-4">
@@ -225,19 +234,19 @@ const PageFourQuestionnaire = () => {
                 }}
               >
                 {submissionStatus === 'success'
-                  ? 'Questionnaire submitted successfully.'
-                  : 'Failed to submit the questionnaire.'}
+                  ? t('submissionSuccessMessage')
+                  : t('submissionFailureMessage')}
               </div>
             )}
           </div>
           <div className="flex items-center w-full mt-8">
             <Button
-              text="PREVIOUS QUESTION"
+              text={t('previous')}
               onClick={handlePreviousClick}
               className="text-white bg-[#16839B] hover:bg-[#0f6a8b] font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-150 ease-in-out"
             />
             <Button
-              text="SUBMIT QUESTIONNAIRE"
+              text={t('submitQuestionnaireButtonText')}
               onClick={handleAcceptOrDeclineRules}
               className="text-white bg-[#16839B] hover:bg-[#0f6a8b] font-bold py-2 px-4 mx-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-150 ease-in-out"
               disabled={rulesAccepted === null}
@@ -287,7 +296,7 @@ const PageFourQuestionnaire = () => {
           color: 'white',
           fontSize: '24px',
       }}>
-          Processing...
+         {t('pageFourQuestionnaire:overlayMessage')}
       </div>
     )}
     </div>

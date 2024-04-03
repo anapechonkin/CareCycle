@@ -1,0 +1,23 @@
+{
+    "rulesAndValuesTitle": "Règles et Valeurs",
+    "rulesAndValuesContent": [
+      "Respect de tous les participants, quel que soit leur parcours.",
+      "Engagement envers une interaction constructive et positive.",
+      "Tolérance zéro pour le harcèlement ou la discrimination.",
+      "Confidentialité des histoires personnelles ou informations partagées."
+    ],
+    "accept": "Accepter",
+    "decline": "Refuser",
+    "previous": "PAGE PRÉCÉDENTE",
+    "submitQuestionnaireButtonText": "SOUMETTRE LE QUESTIONNAIRE",
+    "submissionSuccessMessage": "Questionnaire soumis avec succès.",
+    "submissionFailureMessage": "Échec de la soumission du questionnaire.",
+    "modal": {
+      "pleaseChooseMessage": "Veuillez accepter ou refuser les règles pour terminer la soumission du questionnaire.",
+      "declineMessage": "Vous êtes sur le point de refuser les règles et les valeurs, ce qui peut limiter votre accès. Si vous souhaitez continuer, veuillez cliquer sur OK et retourner l'appareil au bénévole ou à l'employé. Cliquez sur 'Annuler' si vous souhaitez changer votre décision.",
+      "acceptMessage": "Merci pour votre participation et pour avoir accepté nos règles. Veuillez retourner l'appareil au bénévole ou à l'employé.",
+      "finalMessage": "Le client a refusé les règles et les valeurs. Veuillez décider de la suite."
+    },
+    "overlayMessage": "Traitement..."
+  }
+  

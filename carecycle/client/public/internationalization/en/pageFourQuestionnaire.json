@@ -1,0 +1,23 @@
+{
+    "rulesAndValuesTitle": "Rules and Values",
+    "rulesAndValuesContent": [
+      "Respect for all participants regardless of their background.",
+      "Commitment to constructive and positive engagement.",
+      "No tolerance for harassment or discrimination.",
+      "Confidentiality of shared personal stories or information."
+    ],
+    "accept": "Accept",
+    "decline": "Decline",
+    "previous": "PREVIOUS PAGE",
+    "submitQuestionnaireButtonText": "SUBMIT QUESTIONNAIRE",
+    "submissionSuccessMessage": "You have successfully submitted the questionnaire.",
+    "submissionFailureMessage": "Failed to submit the questionnaire.",
+    "modal": {
+      "pleaseChooseMessage": "Please accept or decline the rules to finish submitting the questionnaire.",
+      "declineMessage": "You are about to decline the rules and values, which may limit your access. If you wish to continue, please click OK and return the device to the volunteer or employee. Click 'Cancel' if you wish to change your decision.",
+      "acceptMessage": "Thank you for your participation and for accepting our rules. Please return the device to the volunteer or employee.",
+      "finalMessage": "The client has declined the rules and values. Please decide what to do next."
+    },
+    "overlayMessage": "Processing..."
+  }
+  
