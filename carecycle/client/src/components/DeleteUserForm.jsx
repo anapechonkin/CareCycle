@@ -16,13 +16,14 @@ const DeleteUserForm = ({ onUsersChanged }) => {
     const fetchUsers = async () => {
       try {
         const fetchedUsers = await getUsers();
-        setUsers(fetchedUsers.length ? fetchedUsers : []);
+        const activeUsers = fetchedUsers.filter(user => user.is_active); // Ensure is_active is correctly used
+        setUsers(activeUsers.length ? activeUsers : []);
       } catch (error) {
         console.error('Error fetching users:', error);
         setFeedbackMessage("Failed to fetch users.");
         setFeedbackType("error");
       }
-    };
+    };    
     fetchUsers();
   }, [onUsersChanged]);
 
@@ -55,7 +56,8 @@ const DeleteUserForm = ({ onUsersChanged }) => {
     try {
       await softDeleteUser(selectedUser.value);
       console.log("User successfully archived:", selectedUser);
-      handleFeedback(t('deleteUserForm:feedback.userArchivedSuccess'), "success");      setClearSelect(true); // Clear the select input after successful deletion
+      handleFeedback(t('deleteUserForm:feedback.userArchivedSuccess'), "success");    
+      setClearSelect(true); // Clear the select input after successful deletion
       if (typeof onUsersChanged === "function") {
         onUsersChanged(); // Propagate change upwards to trigger a re-fetch or other actions
       }

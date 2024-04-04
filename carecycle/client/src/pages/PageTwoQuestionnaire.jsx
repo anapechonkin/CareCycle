@@ -18,20 +18,25 @@ const PageTwoQuestionnaire = () => {
   
   // Function to navigate based on gender selection
   const handleNextClick = () => {
-    if (!selectedPrimaryGender) { // Check if no gender is selected
-      setIsModalOpen(true); // Show modal if no gender is selected
+    if (!selectedPrimaryGender) {
+      setIsModalOpen(true);
     } else {
       console.log("Current workshop ID:", workshopId);
       console.log('FormData after page two for this client:', formData);
-      if (selectedPrimaryGender === 'For More Options') {
+      
+      // Assuming the id for "For More Options" is 4, adjust as necessary
+      const forMoreOptionsId = 4;
+      const selectedOption = genderOptions.find(option => option.label === selectedPrimaryGender);
+      
+      if (selectedOption && selectedOption.id === forMoreOptionsId) {
         console.log('Answer saved, navigating to the next page.');
-        navigate('/pageTwoExtraQuestionnaire'); // Navigate to extra questions for "Other" selection
+        navigate('/pageTwoExtraQuestionnaire');
       } else {
-        navigate('/pageThreeQuestionnaire'); // Navigate to the next page for all other selections
+        navigate('/pageThreeQuestionnaire');
       }
     }
   };
-    
+      
   //Function to navigate to previous page
   const handlePreviousClick = () => navigate('/pageOneQuestionnaire');
 

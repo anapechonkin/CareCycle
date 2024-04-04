@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, startTransition } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from '../context/UserContext';
 import NavBar from "../components/NavBar";
@@ -17,6 +17,7 @@ const toTranslationKey = (name) => {
 const Dashboard = () => {
   const { userType, setUserType } = useUser(); // Combine these into a single call
   const { t } = useTranslation('dashboard');
+  const navigate = useNavigate();
   // Debugging: Log current userType to verify it's being set correctly
   console.log("Current userType in Dashboard Component:", userType);
 
@@ -33,7 +34,12 @@ const Dashboard = () => {
   // Debugging: Log the containers to verify they are being set correctly
   console.log("Containers to render:", containers);
   
-  const navigate = useNavigate();
+  // Use this function for navigating to different pages
+  const handleNavigate = (route) => {
+    startTransition(() => {
+      navigate(route);
+    });
+  };
 
   return (
     <div className="relative min-h-screen flex flex-col">
@@ -52,7 +58,7 @@ const Dashboard = () => {
                         key={name}
                         name={t(toTranslationKey(name))} 
                         icon={icon}
-                        onClick={() => navigate(route)}
+                        onClick={() => handleNavigate(route)}
                     />
                 ))}
             </div>

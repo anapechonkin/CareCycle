@@ -152,7 +152,7 @@ const handleGenderIdentityCheckboxChange = (event, option) => {
   
       const formattedEmail = formData.email.trim().toLowerCase();
       if (!isValidEmail(formattedEmail)) {
-        setFeedback({ message: 'Invalid email format.', type: 'error' });
+        setFeedback({ message: t('addUserForm:feedbackMessages.invalidEmailFormat'), type: 'error' });
         return;
       }
   
@@ -194,7 +194,7 @@ const handleGenderIdentityCheckboxChange = (event, option) => {
       setGenderIdentities(resetGenderIdentities);
       
       await onAddUser();
-      setFeedback({ message: 'User added successfully!', type: 'success' });
+      setFeedback({ message: t('addUserForm:feedbackMessages.userAddedSuccess'), type: 'success' });
       setTimeout(() => {
         setFeedback({ message: '', type: '' });
       }, 5000);
@@ -202,8 +202,10 @@ const handleGenderIdentityCheckboxChange = (event, option) => {
       setFormData(initialFormState);
     } catch (error) {
       console.error('Failed to add user:', error);
-      setFeedback({ message: `Failed to add user: ${error.message}`, type: 'error' });
-  
+      setFeedback({ 
+        message: `${t('addUserForm:feedbackMessages.userAddedError')} ${error.message}`, 
+        type: 'error' 
+    });      
       setTimeout(() => {
         setFeedback({ message: '', type: '' });
       }, 5000);
