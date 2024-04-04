@@ -1,0 +1,16 @@
+{
+    "headers": {
+        "Newcomer Status": "Statut Nouvel Arrivant",
+        "Newcomer Comment": "Commentaire Nouvel Arrivant",
+        "Self-Identification": "Identification",
+        "Primary Gender": "Genre Principal",
+        "Gender Identity": "Identité de Genre",
+        "Custom Gender": "Genre Personnalisé",
+        "Area": "Secteur",
+        "Map Region": "Région Carte",
+        "Workshop": "Atelier",
+        "Year of Birth": "Année de Naissance",
+        "Preferred Language": "Langue Préférée"
+    }
+}
+  

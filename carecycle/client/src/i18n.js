@@ -24,6 +24,9 @@ i18n
       'userManagement',
       'addUserForm',
       'deleteUserForm',
+      'reportPage',
+      'clientStatsReportForm',
+      'reportTable',
     ], // Namespace used, you can add more namespaces here
     defaultNS: 'navbar',
     backend: {

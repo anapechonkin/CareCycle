@@ -1,7 +1,16 @@
 import React from 'react';
 
-const Checkbox = ({ title, options, onChange, onSelectAll, onUnselectAll, disabled }) => {
-  // Adjusted handler to pass both event and option
+// Add selectAllText and unselectAllText to the component's props
+const Checkbox = ({
+  title, 
+  options, 
+  onChange, 
+  onSelectAll, 
+  onUnselectAll, 
+  disabled,
+  selectAllText, // Added prop for Select All text
+  unselectAllText // Added prop for Unselect All text
+}) => {
   const handleChange = (event, option) => {
     if (!disabled) {
       onChange(event, option);
@@ -17,26 +26,24 @@ const Checkbox = ({ title, options, onChange, onSelectAll, onUnselectAll, disabl
             <button
               type="button"
               onClick={() => onSelectAll()}
-              // Adjusted color to match primary color scheme
               className="px-4 py-2 text-sm text-white bg-[#16839B] rounded hover:bg-[#0f6a8b] mr-2 transition-colors duration-150 ease-in-out"
             >
-              Select All
+              {selectAllText} {/* Use the prop here */}
             </button>
           )}
           {onUnselectAll && (
             <button
               type="button"
               onClick={() => onUnselectAll()}
-              // Adjusted color for contrast while staying in the color palette
               className="px-4 py-2 text-sm text-white bg-[#D78030] rounded hover:bg-[#bf6f29] transition-colors duration-150 ease-in-out"
             >
-              Unselect All
+              {unselectAllText} {/* Use the prop here */}
             </button>
           )}
         </div>
       </div>
       <div className="flex flex-wrap gap-2 justify-start items-center">
-      {options.map((option) => (
+        {options.map((option) => (
           <label key={option.id} className={`flex items-center cursor-pointer mr-2 mb-2 flex-nowrap ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`} style={{ minWidth: '0', maxWidth: '100%' }}>
             <input
               type="checkbox"

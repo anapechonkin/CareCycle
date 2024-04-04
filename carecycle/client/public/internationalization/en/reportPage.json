@@ -1,0 +1,21 @@
+{
+    "pageTitle": "Statistics",
+    "pageSubtitle": "Please Choose From Filters to Generate Report",
+    "tabs": {
+      "clientStatsReport": {
+        "name": "Client Stats",
+        "headerTitle": "Client reports focus on individual engagement metrics."
+      },
+      "volunteerStatsReport": {
+        "name": "Volunteer Stats",
+        "headerTitle": "Coming soon...",
+        "placeholder": "Coming soon. Stay tuned for volunteer/user report!"
+      },
+      "volunteerAttendance": {
+        "name": "Volunteer Attendance",
+        "headerTitle": "Coming soon...",
+        "placeholder": "Coming soon. Stay tuned for volunteer attendance tracking!"
+      }
+    }
+  }
+  

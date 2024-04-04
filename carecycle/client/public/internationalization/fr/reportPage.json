@@ -1,0 +1,21 @@
+{
+    "pageTitle": "Statistiques",
+    "pageSubtitle": "Veuillez choisir parmi les filtres pour générer le rapport",
+    "tabs": {
+      "clientStatsReport": {
+        "name": "Statistiques des Clients",
+        "headerTitle": "Les rapports des clients se concentrent sur les métriques d'engagement individuel."
+      },
+      "volunteerStatsReport": {
+        "name": "Statistiques des Bénévoles",
+        "headerTitle": "Bientôt disponible...",
+        "placeholder": "Bientôt disponible. Restez à l'écoute pour le rapport des bénévoles/utilisateurs !"
+      },
+      "volunteerAttendance": {
+        "name": "Présence des Bénévoles",
+        "headerTitle": "Bientôt disponible...",
+        "placeholder": "Bientôt disponible. Restez à l'écoute pour le suivi de la présence des bénévoles !"
+      }
+    }
+  }
+  

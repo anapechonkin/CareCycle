@@ -1,0 +1,121 @@
+{
+    "form": {
+      "selectDates": "Sélectionnez les Dates :",
+      "selectDatesTip": "Astuce : Sélectionnez la même date de début et de fin pour un seul jour ou choisissez une plage de dates.",
+      "allYears": "Toutes les années",
+      "seasonLabel": "Saison",
+      "seasonOptions": {
+        "bikeSeason": "Saison Vélo",
+        "offSeason": "Hors Saison",
+        "wholeYear": "Toute l'Année"
+      },
+      "selectYearOfBirth": "Sélectionnez l'Année de Naissance",
+      "buttons": {
+        "reset": "Réinitialiser",
+        "viewReport": "Voir le Rapport",
+        "exportToExcel": "Exporter vers Excel"
+      },
+      "selectAll": "Tout Sélectionner",
+      "unselectAll": "Tout Désélectionner"
+    },
+    "newcomerStatus": {
+      "title": "Statut de Nouvel Arrivant",
+      "options": {
+        "Prefer Not To Answer": "Préfère ne pas répondre",
+        "No": "Non",
+        "Yes in Montreal": "Oui à Montréal",
+        "Yes in Quebec": "Oui au Québec",
+        "Yes in Canada": "Oui au Canada"
+      }
+    },  
+    "selfIdentification": {
+        "title": "Identification Personnelle",
+        "options": {
+          "Prefer Not To Answer": "Préfère ne pas répondre",
+          "Visible Minority Racialized Person": "Personne de minorité visible racialisée",
+          "Ethnical Minority": "Minorité ethnique",
+          "Member of a First Nation or Inuit": "Membre d'une Première Nation ou Inuit",
+          "Body Diversity": "Diversité corporelle",
+          "White": "Blanc"
+        }
+      },
+      "primaryGenders": {
+        "title": "Genres Primaires",
+        "options": {
+          "Prefer Not To Answer": "Préfère ne pas répondre",
+          "Male": "Homme",
+          "Female": "Femme",
+          "Other": "Autre"
+        }
+      },
+      "genderIdentities": {
+        "title": "Identités de Genre",
+        "options": {
+          "Prefer Not To Answer": "Préfère ne pas répondre",
+          "Agender": "Agender",
+          "Bigender": "Bigender",
+          "Demigender": "Demigender",
+          "Female": "Femme",
+          "Gender Fluid": "Genre Fluide",
+          "Gender Neutral": "Genre Neutre",
+          "Gender Non-Conforming": "Non-conforme au genre",
+          "Genderqueer": "Genderqueer",
+          "Intersex": "Intersexe",
+          "Male": "Homme",
+          "Neurogender": "Neurogenre",
+          "Non-Binary": "Non-binaire",
+          "Polygender": "Polygenre",
+          "Questioning": "En questionnement",
+          "Transgender": "Transgenre",
+          "Two-Spirit": "Deux-Esprit",
+          "Xenogender": "Xénogenre"
+        }
+      },
+      "postalCodeAreas": {
+        "title": "Zones de Code Postal",
+        "options": {
+          "Prefer Not To Answer": "Préfère ne pas répondre",
+          "Parc-X": "Parc-X",
+          "Villeray": "Villeray",
+          "Rest of Montreal": "Reste de Montréal",
+          "Outside Montreal": "Extérieur de Montréal",
+          "Undefined": "Indéfini"
+        }
+      },
+      "placeOfOrigin": {
+        "title": "Lieu d'Origine",
+        "options": {
+          "Prefer Not To Answer": "Préfère ne pas répondre",
+          "Middle East": "Moyen-Orient",
+          "Near East": "Proche-Orient",
+          "Southeastern Asia": "Asie du Sud-Est",
+          "South Asia": "Asie du Sud",
+          "Central Asia": "Asie Centrale",
+          "North America": "Amérique du Nord",
+          "Central America": "Amérique Centrale",
+          "South America": "Amérique du Sud",
+          "Caribbean": "Caraïbes",
+          "Northwestern Europe": "Europe du Nord-Ouest",
+          "Eastern Europe": "Europe de l'Est",
+          "Mediterranean Europe": "Europe Méditerranéenne",
+          "South Pacific (including Australia)": "Pacifique Sud (y compris l'Australie)",
+          "Northern Africa": "Afrique du Nord",
+          "Western Africa": "Afrique de l'Ouest",
+          "Central Africa": "Afrique Centrale",
+          "Eastern Africa": "Afrique de l'Est",
+          "Southern Africa": "Afrique du Sud"
+        }
+      },
+      "workshopActivityTypes": {
+        "title": "Types d'Activités de l'Atelier",
+        "options": {
+          "Wednesday DIY": "DIY Mercredi",
+          "Regular DIY": "DIY Régulier",
+          "Moonday": "Lundi Lune",
+          "Special Event": "Événement Spécial",
+          "Other": "Autre"
+        }
+      }
+    }
+    
+  

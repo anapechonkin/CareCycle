@@ -12,9 +12,11 @@ import { fetchSelfIdentificationOptions } from '../api/selfIdApi';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import * as XLSX from 'xlsx';
+import { useTranslation } from 'react-i18next';
 
 const StatsReportForm = ({ headerTitle }) => {
-  
+  const { t } = useTranslation('clientStatsReportForm');
+
   const [selectedOptions, setSelectedOptions] = useState({
     primaryGenders: [],
     genderIdentities: [],
@@ -199,7 +201,7 @@ const StatsReportForm = ({ headerTitle }) => {
 
   const currentYear = new Date().getFullYear();
   const yearOptions = [
-    { value: 'ALL', label: 'All Years' },
+    { value: 'ALL', label: t('clientStatsReportForm:form.allYears')},
     ...Array.from({ length: currentYear - 1919 }, (_, i) => {
       const year = (currentYear - i).toString();
       return { value: year, label: year };
@@ -406,8 +408,8 @@ const handleSubmit = async (event) => {
       {/* Form Section */}
       <form onSubmit={handleSubmit} className="p-5 bg-white space-y-8">
       <div className="mb-4">
-          <div className="font-semibold text-lg mb-2">Select Dates:</div>
-          <div className="text-sm mb-2">Tip: Select the same start and end date for a single day or choose date range.</div>
+          <div className="font-semibold text-lg mb-2">{t('clientStatsReportForm:form.selectDates')}</div>
+          <div className="text-sm mb-2">{t('clientStatsReportForm:form.selectDatesTip')}</div>
           <DatePicker
             selectsRange={true}
             startDate={startDate}
@@ -419,118 +421,132 @@ const handleSubmit = async (event) => {
         </div>
       {/* Season selection radio buttons */}
         <div className="flex flex-col space-y-2">
-          <h3 className="font-semibold text-lg">Season</h3>
+          <h3 className="font-semibold text-lg">{t('clientStatsReportForm:form.seasonLabel')}</h3>
           <div className="flex items-center space-x-4">
-            {["Bike Season", "Off Season", "Whole Year"].map(season => (
-              <label key={season} className="flex items-center space-x-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="season"
-                  value={season}
-                  checked={selectedSeason === season}
-                  onChange={handleSeasonChange}
-                  disabled={dateRangeSelected} // Disable radio buttons when date range is selected
-                  className="radio radio-primary"
-                />
-                <span>{season}</span>
-              </label>
-            ))}
+          {Object.keys(t('clientStatsReportForm:form.seasonOptions', { returnObjects: true })).map(seasonKey => (
+            <label key={seasonKey} className="flex items-center space-x-2 cursor-pointer">
+              <input
+                type="radio"
+                name="season"
+                value={t(`clientStatsReportForm:form.seasonOptions.${seasonKey}`)}
+                checked={selectedSeason === t(`clientStatsReportForm:form.seasonOptions.${seasonKey}`)}
+                onChange={handleSeasonChange}
+                disabled={dateRangeSelected}
+                className="radio radio-primary"
+              />
+              <span>{t(`clientStatsReportForm:form.seasonOptions.${seasonKey}`)}</span>
+            </label>
+          ))}
           </div>
         </div>
         <DropDown
           options={yearOptions}
-          placeholder="Select Year of Birth"
+          placeholder={t('clientStatsReportForm:form.selectYearOfBirth')}
           onSelect={handleDropdownSelection}
           selectedValue={selectedOptions.yearOfBirth}
         />
         <Checkbox
-          title="Newcomer Status"
+          title={t('clientStatsReportForm:newcomerStatus.title')}
           options={newcomerStatus.map(status => ({
             id: status.newcomer_status_id,
-            name: status.status, // Adjust according to your data structure
+            name: t(`clientStatsReportForm:newcomerStatus.options.${status.status}`), 
             checked: selectedOptions.newcomerStatus.includes(status.id),
           }))}
           onChange={(e, option) => handleCheckboxChange(e, option.id, 'newcomerStatus')}
           onSelectAll={() => handleSelectAll('newcomerStatus')}
           onUnselectAll={() => handleUnselectAll('newcomerStatus')}
+          selectAllText={t('clientStatsReportForm:form.selectAll')} 
+          unselectAllText={t('clientStatsReportForm:form.unselectAll')}
         />
         <Checkbox
-          title="Self-Identification"
+          title={t('clientStatsReportForm:selfIdentification.title')}
           options={selfIdentification.map(option => ({
             id: option.self_identification_id,
-            name: option.option, // Adjust based on your actual data structure
+            name: t(`clientStatsReportForm:selfIdentification.options.${option.option}`), 
             checked: selectedOptions.selfIdentification.includes(option.id),
           }))}
           onChange={(e, option) => handleCheckboxChange(e, option.id, 'selfIdentification')}
           onSelectAll={() => handleSelectAll('selfIdentification')}
           onUnselectAll={() => handleUnselectAll('selfIdentification')}
+          selectAllText={t('clientStatsReportForm:form.selectAll')} 
+          unselectAllText={t('clientStatsReportForm:form.unselectAll')}
         />
          <Checkbox
-          title="Primary Genders"
+          title={t('clientStatsReportForm:primaryGenders.title')}
           options={primaryGenders.map(gender => ({
             id: gender.primary_gender_id,
-            name: gender.gender_name, // Adjust according to your data structure
+            name: t(`clientStatsReportForm:primaryGenders.options.${gender.gender_name}`), 
             checked: selectedOptions.primaryGenders.includes(gender.id),
           }))}
           onChange={(e, option) => handleCheckboxChange(e, option.id, 'primaryGenders')}
           onSelectAll={() => handleSelectAll('primaryGenders')}
           onUnselectAll={() => handleUnselectAll('primaryGenders')}
+          selectAllText={t('clientStatsReportForm:form.selectAll')} 
+          unselectAllText={t('clientStatsReportForm:form.unselectAll')}
         />
         <Checkbox
-          title="Gender Identities"
+          title={t('clientStatsReportForm:genderIdentities.title')}
           options={genderIdentities.map(identity => ({
             id: identity.gender_identity_id,
-            name: identity.type, 
+            name: t(`clientStatsReportForm:genderIdentities.options.${identity.type}`), 
             checked: selectedOptions.genderIdentities.includes(identity.id)
           }))}
           onChange={(e, option) => handleCheckboxChange(e, option.id, 'genderIdentities')}
           onSelectAll={() => handleSelectAll('genderIdentities')}
           onUnselectAll={() => handleUnselectAll('genderIdentities')}
+          selectAllText={t('clientStatsReportForm:form.selectAll')} 
+          unselectAllText={t('clientStatsReportForm:form.unselectAll')}
         />
         <Checkbox
-            title="Postal Code Areas"
+            title={t('clientStatsReportForm:postalCodeAreas.title')}
             options={areas.map(area => ({
                 id: area.area_id,
-                name: area.area_name,
+                name: t(`clientStatsReportForm:postalCodeAreas.options.${area.area_name}`), 
                 checked: selectedOptions.areas.includes(area.id), 
             }))}
             onChange={(e, option) => handleCheckboxChange(e, option.id, 'areas')}
             onSelectAll={() => handleSelectAll('areas')}
             onUnselectAll={() => handleUnselectAll('areas')}
-        />
+            selectAllText={t('clientStatsReportForm:form.selectAll')} 
+            unselectAllText={t('clientStatsReportForm:form.unselectAll')}
+           />
         <Checkbox
-            title="Place of Origin"
+            title={t('clientStatsReportForm:placeOfOrigin.title')}
             options={mapRegions.map(region => ({
               id: region.map_id,
-              name: region.map_area_name,
+              name: t(`clientStatsReportForm:placeOfOrigin.options.${region.map_area_name}`), 
               checked: selectedOptions.mapRegions.includes(region.id),
             }))}
             onChange={(e, option) => handleCheckboxChange(e, option.id, 'mapRegions')}
             onSelectAll={() => handleSelectAll('mapRegions')}
             onUnselectAll={() => handleUnselectAll('mapRegions')}
+            selectAllText={t('clientStatsReportForm:form.selectAll')} 
+            unselectAllText={t('clientStatsReportForm:form.unselectAll')}
           />
           <Checkbox
-            title="Workshop Activity Types"
+            title={t('clientStatsReportForm:workshopActivityTypes.title')}
             options={workshopTypes.map(activityType => ({
               ...activityType,
               id: activityType.workshop_id,
-              name: activityType.name,
+              name: t(`clientStatsReportForm:workshopActivityTypes.options.${activityType.name}`), 
               checked: selectedOptions.workshopTypes.includes(activityType.id),
             }))}
             onChange={(e, option) => handleCheckboxChange(e, option.id, 'workshopTypes')} 
             onSelectAll={() => handleSelectAll('workshopTypes')} 
             onUnselectAll={() => handleUnselectAll('workshopTypes')} 
-        />
+            selectAllText={t('clientStatsReportForm:form.selectAll')} 
+            unselectAllText={t('clientStatsReportForm:form.unselectAll')}
+          />
         <div className="flex justify-end space-x-4 mt-5">
   <Button
     type="button"
-    text="Reset"
+    text={t('clientStatsReportForm:form.buttons.reset')}
     onClick={resetForm}
     className="bg-gray-300 text-black" // Example of making the reset button visually distinct
   />
   <Button
     type="submit"
-    text="View Report"
+    text={t('clientStatsReportForm:form.buttons.viewReport')}
     className="bg-[#0f6a8b] text-white"
   />
 </div>
@@ -541,7 +557,7 @@ const handleSubmit = async (event) => {
           <ReportTable data={reportData} />
           <div className="mt-6 flex justify-center">
             <Button
-              text="Export to Excel"
+              text={t('clientStatsReportForm:form.buttons.exportToExcel')}
               onClick={handleExport}
               className="bg-[#0f6a8b] text-white font-bold py-2 px-4 rounded hover:bg-[#0d5a7a] transition ease-in duration-200"
             />

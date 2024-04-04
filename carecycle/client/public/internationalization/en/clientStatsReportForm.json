@@ -1,0 +1,120 @@
+{
+    "form": {
+      "selectDates": "Select Dates:",
+      "selectDatesTip": "Tip: Select the same start and end date for a single day or choose date range.",
+      "allYears": "All Years",
+      "seasonLabel": "Season",
+      "seasonOptions": {
+        "bikeSeason": "Bike Season",
+        "offSeason": "Off Season",
+        "wholeYear": "Whole Year"
+      },
+      "selectYearOfBirth": "Select Year of Birth",
+      "buttons": {
+        "reset": "Reset",
+        "viewReport": "View Report",
+        "exportToExcel": "Export to Excel"
+      },
+      "selectAll": "Select All",
+      "unselectAll": "Unselect All"
+    },
+    "newcomerStatus": {
+      "title": "Newcomer Status",
+      "options": {
+        "Prefer Not To Answer": "Prefer Not To Answer",
+        "No": "No",
+        "Yes in Montreal": "Yes in Montreal",
+        "Yes in Quebec": "Yes in Quebec",
+        "Yes in Canada": "Yes in Canada"
+      }
+    },
+    "selfIdentification": {
+        "title": "Self-Identification",
+        "options": {
+          "Prefer Not To Answer": "Prefer Not To Answer",
+          "Visible Minority Racialized Person": "Visible Minority Racialized Person",
+          "Ethnical Minority": "Ethnical Minority",
+          "Member of a First Nation or Inuit": "Member of a First Nation or Inuit",
+          "Body Diversity": "Body Diversity",
+          "White": "White"
+        }
+      },
+      "primaryGenders": {
+        "title": "Primary Genders",
+        "options": {
+          "Prefer Not To Answer": "Prefer Not To Answer",
+          "Male": "Male",
+          "Female": "Female",
+          "Other": "Other"
+        }
+      },
+      "genderIdentities": {
+        "title": "Gender Identities",
+        "options": {
+          "Prefer Not To Answer": "Prefer Not To Answer",
+          "Agender": "Agender",
+          "Bigender": "Bigender",
+          "Demigender": "Demigender",
+          "Female": "Female",
+          "Gender Fluid": "Gender Fluid",
+          "Gender Neutral": "Gender Neutral",
+          "Gender Non-Conforming": "Gender Non-Conforming",
+          "Genderqueer": "Genderqueer",
+          "Intersex": "Intersex",
+          "Male": "Male",
+          "Neurogender": "Neurogender",
+          "Non-Binary": "Non-Binary",
+          "Polygender": "Polygender",
+          "Questioning": "Questioning",
+          "Transgender": "Transgender",
+          "Two-Spirit": "Two-Spirit",
+          "Xenogender": "Xenogender"
+        }
+      },
+      "postalCodeAreas": {
+        "title": "Postal Code Areas",
+        "options": {
+          "Prefer Not To Answer": "Prefer Not To Answer",
+          "Parc-X": "Parc-X",
+          "Villeray": "Villeray",
+          "Rest of Montreal": "Rest of Montreal",
+          "Outside Montreal": "Outside Montreal",
+          "Undefined": "Undefined"
+        }
+      },
+      "placeOfOrigin": {
+        "title": "Place of Origin",
+        "options": {
+          "Prefer Not To Answer": "Prefer Not To Answer",
+          "Middle East": "Middle East",
+          "Near East": "Near East",
+          "Southeastern Asia": "Southeastern Asia",
+          "South Asia": "South Asia",
+          "Central Asia": "Central Asia",
+          "North America": "North America",
+          "Central America": "Central America",
+          "South America": "South America",
+          "Caribbean": "Caribbean",
+          "Northwestern Europe": "Northwestern Europe",
+          "Eastern Europe": "Eastern Europe",
+          "Mediterranean Europe": "Mediterranean Europe",
+          "South Pacific (including Australia)": "South Pacific (including Australia)",
+          "Northern Africa": "Northern Africa",
+          "Western Africa": "Western Africa",
+          "Central Africa": "Central Africa",
+          "Eastern Africa": "Eastern Africa",
+          "Southern Africa": "Southern Africa"
+        }
+      },
+      "workshopActivityTypes": {
+        "title": "Workshop Activity Types",
+        "options": {
+          "Wednesday DIY": "Wednesday DIY",
+          "Regular DIY": "Regular DIY",
+          "Moonday": "Moonday",
+          "Special Event": "Special Event",
+          "Other": "Other"
+        }
+      }
+    }
+    
