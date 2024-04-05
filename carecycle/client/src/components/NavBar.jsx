@@ -14,14 +14,16 @@ const Navbar = () => {
   const location = useLocation(); 
   const { clearWorkshopId, clearFormData } = useForm();
   const { t, i18n } = useTranslation('navbar');
-  const { userType } = useUser();
+  const { userType, isAuthenticated, setIsAuthenticated } = useUser();
+  const roleName = localStorage.getItem('roleName');
+  
   console.log("Current userType in Navbar:", userType); 
-
+ 
   // Define user roles based on userType
   const userRoleMapping = {
-    admin: t('userRoleAdmin'),
-    volunteer: t('userRoleVolunteer'),
-    'ca/employee': t('userRoleCAEmployee'),
+    Admin: t('userRoleAdmin'),
+    Volunteer: t('userRoleVolunteer'),
+    'CA/Employee': t('userRoleCAEmployee'),
   };
   
   const userRole = userRoleMapping[userType] || t('defaultRole');
@@ -41,6 +43,9 @@ const Navbar = () => {
     console.log(`Logout confirmed with reason: ${reason}`);
     setIsLogoutModalOpen(false); // Close the modal
     setLogoutConfirmed(true); // Indicate that logout has been confirmed
+    setIsAuthenticated(false);
+    localStorage.removeItem('token');
+    localStorage.removeItem('roleName'); 
     // Reset language to English
     i18n.changeLanguage('en');
   };
